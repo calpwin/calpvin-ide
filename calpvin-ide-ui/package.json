@@ -24,7 +24,7 @@
     "rxjs": "~6.4.0",
     "tslib": "^1.10.0",
     "zone.js": "~0.9.1",
-	"calpvin-ide-shared": "1.0.0"
+	"calpvin-ide-shared": "link:lib/calpvin-ide-shared"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.803.23",
