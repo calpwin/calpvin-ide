@@ -9,6 +9,6 @@
     "lerna": "2.4.0"
   },
   "workspaces": [
-    "calpvin-theia-custom-extension", "browser-app"
+    "custom-extension", "browser-app"
   ]
 }

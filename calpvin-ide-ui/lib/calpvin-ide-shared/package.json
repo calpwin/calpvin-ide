@@ -1,6 +1,6 @@
 {
   "name": "calpvin-ide-shared",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "IdeCommand.js",
   "license": "MIT"
 }

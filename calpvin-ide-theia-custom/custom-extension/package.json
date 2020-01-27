@@ -1,5 +1,5 @@
 {
-  "name": "calpvin-theia-custom-extension",
+  "name": "custom-extension",
   "keywords": [
     "theia-extension"
   ],
@@ -10,7 +10,8 @@
   ],
   "dependencies": {
     "@theia/core": "latest",
-    "@theia/filesystem": "latest"
+    "@theia/filesystem": "latest",
+    "calpvin-ide-shared": "link:../../calpvin-ide-ui/lib/calpvin-ide-shared"
   },
   "devDependencies": {
     "rimraf": "latest",

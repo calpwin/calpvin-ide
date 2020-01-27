@@ -17,7 +17,7 @@
     "@theia/textmate-grammars": "latest",
     "@theia/typescript": "latest",
     "@theia/messages": "latest",
-    "calpvin-theia-custom-extension": "0.0.0"
+    "custom-extension": "0.0.0"
   },
   "devDependencies": {
     "@theia/cli": "latest"

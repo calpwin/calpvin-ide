@@ -2,7 +2,7 @@ import { injectable, inject } from "inversify";
 import { CommandContribution, CommandRegistry, MenuContribution, MenuModelRegistry, MessageService } from "@theia/core/lib/common";
 import { CommonMenus, FrontendApplicationContribution, FrontendApplication } from "@theia/core/lib/browser";
 import { FileSystem } from '@theia/filesystem/lib/common/filesystem';
-import { } from '@theia/navigator/lib/browser';
+import  {Hello} from "calpvin-ide-shared";
 
 // import { FileNavigatorCommands } from '@theia/navigator/lib/browser/navigator-contribution';
 
@@ -27,7 +27,7 @@ export class CalpvinTheiaCustomCommandContribution implements CommandContributio
     registerCommands(registry: CommandRegistry): void {
         registry.registerCommand(CalpvinTheiaCustomCommand, {
             execute: async () => {
-                this.messageService.info('Hello, Andrey 22!');
+                this.messageService.info(new Hello().say());
 
 
             }
