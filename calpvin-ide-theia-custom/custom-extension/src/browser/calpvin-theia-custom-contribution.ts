@@ -58,16 +58,16 @@ export class CalpvinTheiaFrontendApplicationContribution implements FrontendAppl
                 return;
             }
 
-            console.log('Iframe receive message', e);
+            e.datd
         });
 
         //const fileContent = await this.fileSystem.resolveContent( 'lerna.json');
 
-        const path = await this.fileSystem.getFsPath('file:///home/project/lerna.json');
+        const path = await this.fileSystem.getFsPath('file:///home/project/calpvin-ide-ui/src/app/app.component.html');
         const content = await this.fileSystem.resolveContent(path!);
 
         console.log('Content: ', content.content);
 
-        // parent.postMessage({ fileContent: fileContent.content}, '*');
+        parent.postMessage({ fileContent: fileContent.content}, '*');
     }
 }
