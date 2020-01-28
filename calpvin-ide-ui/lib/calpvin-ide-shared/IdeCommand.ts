@@ -45,7 +45,7 @@ export class EventManager {
       this.receiveEventListener(e);
     }
 
-    const waiter = this.messageEventWaiters.find(x => x?.command?.uniqueIdentifier === data.uniqueIdentifier);
+    const waiter = this.messageEventWaiters.find(x => x.command.uniqueIdentifier === data.uniqueIdentifier);
 
     if (!waiter) { return; }
 
