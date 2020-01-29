@@ -1,7 +1,8 @@
 import { Guid } from 'guid-typescript';
 
 export enum CommandType {
-  ReadFile
+  ReadFile,
+  WriteFile
 }
 
 export interface IdeCommand {
