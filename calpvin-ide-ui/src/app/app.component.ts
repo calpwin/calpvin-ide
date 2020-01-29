@@ -29,33 +29,23 @@ export class AppComponent implements OnInit {
       //   });
 
       const res = {
-        data: `<div class="cide-component-container" cdkDropList>
-      <div class="cide-component"></div>
-    </div>
+        data: `
+        <div class="cide-component-container" cdkDropList>
+          <div class="cide-component cide-component-1" (click)="onCideComponentClick($event)"></div>
+          <div class="cide-component cide-component-2" (click)="onCideComponentClick($event)"></div>
+        </div>
 
-    <cide-wysiwyg-ui-editor></cide-wysiwyg-ui-editor>
+        <cide-wysiwyg-ui-editor></cide-wysiwyg-ui-editor>
 
-    <iframe #ide class="ide-wrapper" src="http://localhost:3000"></iframe>
+        <cide-code-editor></cide-code-editor>
     `};
 
       this._componentFileStructure.htmlTemplate.content = res.data;
-
-      // this.parseHtml(res.data);
     }, 1000);
   }
 
   private messageEventListener(e: MessageEvent) {
     console.log('Main: ', e);
-  }
-
-  private parseHtml(html: string) {
-
-    const parser = new HtmlParser();
-    const parsedTreeResult = parser.parse(html, 'fake_url');
-
-    const findNode = findElement(parsedTreeResult.rootNodes.map(x => x as Element), 'cide-component');
-
-    console.log(findNode);
   }
 
   async onCideComponentClick(event: MouseEvent) {
@@ -65,7 +55,7 @@ export class AppComponent implements OnInit {
 
       let className: string = null;
       (event.target as HTMLElement).classList.forEach(element => {
-        if (element.startsWith('cide-component')) { className = element; }
+        if (element.startsWith('cide-component-')) { className = element; }
       });
 
       const findNode = findElement(parsedTreeResult.rootNodes.map(x => x as Element), className);

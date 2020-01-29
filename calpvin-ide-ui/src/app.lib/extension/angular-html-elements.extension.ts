@@ -6,7 +6,7 @@ export function findElement(els: Element[], byClass: string): Element {
   const _getFunc = (_findClass: string, nodes: Element[]): Element | undefined => {
     if (nodes.length === 0) { return; }
 
-    node = nodes.find(n => n.attrs && n.attrs.find(atr => atr.name === 'class' && atr.value === _findClass));
+    node = nodes.find(n => n.attrs && n.attrs.find(atr => atr.name === 'class' && atr.value.includes(_findClass)));
 
     if (node) { return node; }
 
