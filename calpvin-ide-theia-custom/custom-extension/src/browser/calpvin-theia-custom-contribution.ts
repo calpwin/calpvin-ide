@@ -2,7 +2,7 @@ import { injectable, inject } from "inversify";
 import { CommandContribution, CommandRegistry, MenuContribution, MenuModelRegistry, MessageService } from "@theia/core/lib/common";
 import { CommonMenus, FrontendApplicationContribution, FrontendApplication } from "@theia/core/lib/browser";
 import { FileSystem } from '@theia/filesystem/lib/common/filesystem';
-import { EventManager, CommandType, IdeCommand } from "calpvin-ide-shared";
+import { EventManager, EventType, IdeEvent, VirtualFile } from "calpvin-ide-shared";
 
 // import { FileNavigatorCommands } from '@theia/navigator/lib/browser/navigator-contribution';
 
@@ -27,7 +27,7 @@ export class CalpvinTheiaCustomCommandContribution implements CommandContributio
     registerCommands(registry: CommandRegistry): void {
         registry.registerCommand(CalpvinTheiaCustomCommand, {
             execute: async () => {
-                this.messageService.info('Norm');
+                this.messageService.info('Norm ok!');
 
 
             }
@@ -57,32 +57,35 @@ export class CalpvinTheiaFrontendApplicationContribution implements FrontendAppl
     async onStart?(app: FrontendApplication): Promise<void> {
         this.eventManager = new EventManager(window, parent, (e: MessageEvent) => { this.receiveEventListener(e); });
 
-        // this.eventManager.sendEvent({
-        //     commandType: CommandType.ReadFile,
-        //     uniqueIdentifier: EventManager.generateUniqueIdentifire(),
-        //     data: 'dsabnbsksBBBBBBBBBBBBBBBBBBB!!'
-        // }, false);
+        this.eventManager.sendEvent({
+            eventType: EventType.IdeStartEvent,
+            uniqueIdentifier: EventManager.generateUniqueIdentifire(),
+            data: 'Ide Start!'
+        }, false);
     }
 
     private async receiveEventListener(e: MessageEvent) {
         console.log('Ide: ', e);
 
-        const command = e.data as IdeCommand;
+        const command = e.data as IdeEvent<VirtualFile>;
 
-        if (command.commandType === CommandType.ReadFile) {
-            const path = await this.fileSystem.getFsPath('file:///home/project/calpvin-ide-ui/src/app/app.component.html');
+        if (command.eventType === EventType.ReadComponentFile) {
+            const componentName = (command.data as VirtualFile).componentName;
+            const path = await this.fileSystem.getFsPath(`file:///home/project/calpvin-ide-ui/src/app/${componentName}/${componentName}.component.html`);
             const fileContent = await this.fileSystem.resolveContent(path!);
 
+            (command.data as VirtualFile).content = fileContent.content;
+
             this.eventManager.sendEvent({
-                commandType: CommandType.ReadFile,
+                eventType: EventType.ReadComponentFile,
                 uniqueIdentifier: e.data.uniqueIdentifier,
-                data: fileContent.content
+                data: command.data
             }, false);
         }
-        else if (command.commandType === CommandType.WriteFile) {
-            const fileStat = await this.fileSystem.getFileStat('file:///home/project/calpvin-ide-ui/src/app/app.component.html');
-            await this.fileSystem.setContent(fileStat!, e.data.data);
-        }
-
+        else if (command.eventType === EventType.WriteComponentFile) {
+            const componentName = (command.data as VirtualFile).componentName;
+            const fileStat = await this.fileSystem.getFileStat(`file:///home/project/calpvin-ide-ui/src/app/${componentName}/${componentName}.component.html`);
+            await this.fileSystem.setContent(fileStat!, (command.data as VirtualFile).content!);
+        }        
     }
 }

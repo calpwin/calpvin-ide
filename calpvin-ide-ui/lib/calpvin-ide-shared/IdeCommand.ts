@@ -1,13 +1,37 @@
 import { Guid } from 'guid-typescript';
 
-export enum CommandType {
-  ReadFile,
-  WriteFile
+// #region Commands
+export enum EventType {
+  ReadComponentFile,
+  WriteComponentFile,
+  IdeStartEvent
 }
 
-export interface IdeCommand {
-  commandType: CommandType;
-  data: string;
+export enum VirtualFileType {
+  ComponentHtml = 0,
+  ComponentScss = 1
+}
+
+export class VirtualFile {
+  constructor(
+    public fileType: VirtualFileType,
+    public componentName: string,
+    public content?: string) {
+
+  }
+}
+
+export class ComponentFileCommand implements IdeEvent<VirtualFile> {
+  eventType: EventType;
+  data: VirtualFile;
+  uniqueIdentifier: string;
+}
+
+// #endregion
+
+export interface IdeEvent<T extends any = string> {
+  eventType: EventType;
+  data: T;
   uniqueIdentifier: string;
 }
 
@@ -34,11 +58,7 @@ export class EventManager {
   }
 
   private receiveEvent(e: MessageEvent) {
-    // if (e.origin === 'http://localhost:3000') {
-    //   return;
-    // }
-
-    const data = e.data as IdeCommand;
+    const data = e.data as IdeEvent;
 
     if (!data || !data.uniqueIdentifier) { return; }
 
@@ -55,9 +75,9 @@ export class EventManager {
     this.messageEventWaiters = this.messageEventWaiters.filter(x => x.command.uniqueIdentifier !== data.uniqueIdentifier);
   }
 
-  sendEvent(command: IdeCommand, isWaiting = true): Promise<IdeCommand> | undefined {
+  sendEvent<T = any>(command: IdeEvent<T>, isWaiting = true): Promise<IdeEvent<T>> | undefined {
     const promise = isWaiting
-      ? new Promise<IdeCommand>((resolve, rejected) => {
+      ? new Promise<IdeEvent<T>>((resolve, rejected) => {
         this.messageEventWaiters.push({ command, resolve, rejected });
       })
       : undefined;
@@ -68,9 +88,9 @@ export class EventManager {
   }
 }
 
-interface MessageEventWaiter {
-  command: IdeCommand;
-  resolve: (value?: IdeCommand | PromiseLike<IdeCommand>) => void;
+interface MessageEventWaiter<T = any> {
+  command: IdeEvent<T>;
+  resolve: (value?: IdeEvent<T> | PromiseLike<IdeEvent<T>>) => void;
   rejected: (reason?: any) => void;
 }
 

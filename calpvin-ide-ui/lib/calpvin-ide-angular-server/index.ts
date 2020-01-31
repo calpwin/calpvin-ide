@@ -1,4 +1,4 @@
-import http from 'http';
+import * as http from 'http';
 
 const hostname = '127.0.0.1';
 const port = 4300;
