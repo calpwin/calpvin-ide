@@ -55,6 +55,16 @@ export class CalpvinTheiaFrontendApplicationContribution implements FrontendAppl
     private eventManager: EventManager;
 
     async onStart?(app: FrontendApplication): Promise<void> {
+        document.addEventListener('keydown', (e: KeyboardEvent) => {
+            if (e.ctrlKey && e.key === 'q') {
+                this.eventManager.sendEvent({
+                    eventType: EventType.AppHideIde,
+                    uniqueIdentifier: EventManager.generateUniqueIdentifire(),
+                    data: 'Command: Hide Ide'
+                }, false);
+            }
+        });
+
         this.eventManager = new EventManager(window, parent, (e: MessageEvent) => { this.receiveEventListener(e); });
 
         this.eventManager.sendEvent({

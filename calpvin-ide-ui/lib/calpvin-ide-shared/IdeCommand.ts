@@ -4,7 +4,8 @@ import { Guid } from 'guid-typescript';
 export enum EventType {
   ReadComponentFile,
   WriteComponentFile,
-  IdeStartEvent
+  IdeStartEvent,
+  AppHideIde
 }
 
 export enum VirtualFileType {

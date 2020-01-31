@@ -9,7 +9,7 @@ import { VirtualFileTree } from 'src/app.lib/virtual-tree/virtual-tree';
 })
 export class AppComponent implements OnInit {
 
-  constructor(private virtualFileTree: VirtualFileTree) {
+  constructor(private virtualFileTree: VirtualFileTree, private _el: ElementRef<HTMLElement>) {
 
   }
 
@@ -19,7 +19,7 @@ export class AppComponent implements OnInit {
   @ViewChild('ide', { read: ElementRef, static: true }) _ide: ElementRef<HTMLElement>;
 
   async ngOnInit() {
-    AppComponent.EventManager = new EventManager(window, this._ide.nativeElement.contentWindow, this.messageEventListener);
+    AppComponent.EventManager = new EventManager(window, (this._ide.nativeElement as any).contentWindow, this.messageEventListener);
   }
 
   private messageEventListener = async (e: MessageEvent) => {
@@ -35,16 +35,29 @@ export class AppComponent implements OnInit {
 
       const file = this.virtualFileTree.addFile(res.data);
     }
+
+    if ((e.data as IdeEvent).eventType === EventType.AppHideIde) {
+      this.hideIde();
+    }
   }
 
   async onCideComponentClick(event: MouseEvent) {
 
   }
 
+  private hideIde() {
+    this._ide.nativeElement.style.display = 'none';
+    window.focus();
+  }
+
+  private showIde() {
+    this._ide.nativeElement.style.display = 'block';
+  }
+
   @HostListener('document:keydown', ['$event'])
   onKeydownHandler(event: KeyboardEvent) {
-    if (event.ctrlKey &&  event.key === 'a') {
-      this._ide.nativeElement.style.display = this._ide.nativeElement.style.display === 'block' ? 'none' : 'block';
+    if (event.ctrlKey && event.key === 'q') {
+      this._ide.nativeElement.style.display === 'block' ? this.hideIde() : this.showIde();
     }
   }
 }
