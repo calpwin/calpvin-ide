@@ -1,4 +1,4 @@
-import { Component, ViewChild, OnInit, ElementRef } from '@angular/core';
+import { Component, ViewChild, OnInit, ElementRef, HostListener } from '@angular/core';
 import { EventManager, EventType, VirtualFileType, VirtualFile, IdeEvent } from 'calpvin-ide-shared/IdeCommand';
 import { VirtualFileTree } from 'src/app.lib/virtual-tree/virtual-tree';
 
@@ -16,28 +16,10 @@ export class AppComponent implements OnInit {
   public static EventManager: EventManager;
   title = 'calpvin-ide';
 
-  @ViewChild('ide', { read: ElementRef, static: true }) _ide: ElementRef;
+  @ViewChild('ide', { read: ElementRef, static: true }) _ide: ElementRef<HTMLElement>;
 
   async ngOnInit() {
     AppComponent.EventManager = new EventManager(window, this._ide.nativeElement.contentWindow, this.messageEventListener);
-
-    console.log(AppComponent.EventManager);
-
-    // setTimeout(async () => {
-    //   console.log('Send to IDE');
-
-
-    //   const res = await this._eventManager.sendEvent(
-    //     {
-    //       eventType: EventType.ReadComponentFile,
-    //       uniqueIdentifier: EventManager.generateUniqueIdentifire(),
-    //       data: 'Yooolo'
-    //     });
-
-    //   const file = this.virtualFileTree.addFile(new VirtualFile(res.data, VirtualFileType.ComponentHtml, 'test-component'));
-
-    //   console.log('Add file: ', file);
-    // }, 9000);
   }
 
   private messageEventListener = async (e: MessageEvent) => {
@@ -57,5 +39,12 @@ export class AppComponent implements OnInit {
 
   async onCideComponentClick(event: MouseEvent) {
 
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  onKeydownHandler(event: KeyboardEvent) {
+    if (event.ctrlKey &&  event.key === 'a') {
+      this._ide.nativeElement.style.display = this._ide.nativeElement.style.display === 'block' ? 'none' : 'block';
+    }
   }
 }

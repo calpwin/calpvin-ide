@@ -7,13 +7,15 @@ import { WysiwygUiEditorComponent } from './wysiwyg-ui-editor/wysiwyg-ui-editor.
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { TestComponentComponent } from './test-component/test-component.component';
 import { CideComponentDirective } from './directive/cide-component.directive';
+import { IdeComponent } from './ide/ide.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     WysiwygUiEditorComponent,
     TestComponentComponent,
-    CideComponentDirective
+    CideComponentDirective,
+    IdeComponent
   ],
   imports: [
     BrowserModule,
