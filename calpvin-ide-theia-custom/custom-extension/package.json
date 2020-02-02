@@ -11,6 +11,10 @@
   "dependencies": {
     "@theia/core": "latest",
     "@theia/filesystem": "latest",
+    "@theia/plugin": "latest",
+    "@theia/plugin-ext": "latest",
+    "@theia/plugin-ext-vscode": "latest",
+    "@theia/workspace": "latest",
     "calpvin-ide-shared": "file:../../calpvin-ide-ui/lib/calpvin-ide-shared"
   },
   "devDependencies": {

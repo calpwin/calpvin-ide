@@ -1,8 +1,11 @@
 import { injectable, inject } from "inversify";
-import { CommandContribution, CommandRegistry, MenuContribution, MenuModelRegistry, MessageService } from "@theia/core/lib/common";
-import { CommonMenus, FrontendApplicationContribution, FrontendApplication } from "@theia/core/lib/browser";
+import { CommandContribution, CommandService, MenuContribution, MenuModelRegistry, MessageService, CommandRegistry } from "@theia/core/lib/common";
+import { CommonMenus, FrontendApplicationContribution, FrontendApplication} from "@theia/core/lib/browser";
 import { FileSystem } from '@theia/filesystem/lib/common/filesystem';
 import { EventManager, EventType, IdeEvent, VirtualFile } from "calpvin-ide-shared";
+// import {WorkspaceCommands} from '@theia/workspace/lib/browser/workspace-commands';
+import {WorkspaceService} from '@theia/workspace/lib/browser/workspace-service';
+import URI from '@theia/core/lib/common/uri';
 
 // import { FileNavigatorCommands } from '@theia/navigator/lib/browser/navigator-contribution';
 
@@ -15,7 +18,7 @@ export const CalpvinTheiaCustomCommand = {
 export class CalpvinTheiaCustomCommandContribution implements CommandContribution {
 
     @inject(FileSystem)
-    protected readonly fileSystem: FileSystem;
+    protected readonly fileSystem: FileSystem;    
 
     // @inject(SourceTreeWidget)
     // protected readonly sourceTreeWidget: SourceTreeWidget;
@@ -27,7 +30,7 @@ export class CalpvinTheiaCustomCommandContribution implements CommandContributio
     registerCommands(registry: CommandRegistry): void {
         registry.registerCommand(CalpvinTheiaCustomCommand, {
             execute: async () => {
-                this.messageService.info('Norm ok!');
+                this.messageService.info('Norm ok 22!');
 
 
             }
@@ -52,9 +55,24 @@ export class CalpvinTheiaFrontendApplicationContribution implements FrontendAppl
     @inject(FileSystem)
     protected readonly fileSystem: FileSystem;
 
+    @inject(CommandService)
+    protected readonly commandService: CommandService;
+
+    @inject(WorkspaceService)
+    protected readonly workspaceService: WorkspaceService;
+
     private eventManager: EventManager;
 
     async onStart?(app: FrontendApplication): Promise<void> {
+
+        console.log('OK!!');
+        await this.workspaceService.addRoot(new URI('/home/project/calpvin-ide-ui'));
+        
+        setTimeout(async () => {
+            await this.workspaceService.removeRoots([new URI('/home/project/calpvin-ide-ui')]);
+            await this.workspaceService.addRoot(new URI('/home/project/calpvin-ide-ui/src'));
+        }, 7000);
+
         document.addEventListener('keydown', (e: KeyboardEvent) => {
             if (e.ctrlKey && e.key === 'q') {
                 this.eventManager.sendEvent({
