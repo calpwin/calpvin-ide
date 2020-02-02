@@ -3656,9 +3656,10 @@ caller-id@^0.1.0:
   dependencies:
     stack-trace "~0.0.7"
 
-"calpvin-ide-shared@link:../calpvin-ide-ui/lib/calpvin-ide-shared":
-  version "0.0.0"
-  uid ""
+"calpvin-ide-shared@file:../calpvin-ide-ui/lib/calpvin-ide-shared":
+  version "1.0.0"
+  dependencies:
+    guid-typescript "^1.0.9"
 
 camelcase-keys@^2.0.0:
   version "2.1.0"

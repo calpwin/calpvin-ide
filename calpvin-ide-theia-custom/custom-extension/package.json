@@ -11,7 +11,7 @@
   "dependencies": {
     "@theia/core": "latest",
     "@theia/filesystem": "latest",
-    "calpvin-ide-shared": "link:../../calpvin-ide-ui/lib/calpvin-ide-shared"
+    "calpvin-ide-shared": "file:../../calpvin-ide-ui/lib/calpvin-ide-shared"
   },
   "devDependencies": {
     "rimraf": "latest",
