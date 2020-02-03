@@ -1,10 +1,10 @@
 import { injectable, inject } from "inversify";
 import { CommandContribution, CommandService, MenuContribution, MenuModelRegistry, MessageService, CommandRegistry } from "@theia/core/lib/common";
-import { CommonMenus, FrontendApplicationContribution, FrontendApplication} from "@theia/core/lib/browser";
+import { CommonMenus, FrontendApplicationContribution, FrontendApplication } from "@theia/core/lib/browser";
 import { FileSystem } from '@theia/filesystem/lib/common/filesystem';
 import { EventManager, EventType, IdeEvent, VirtualFile } from "calpvin-ide-shared";
 // import {WorkspaceCommands} from '@theia/workspace/lib/browser/workspace-commands';
-import {WorkspaceService} from '@theia/workspace/lib/browser/workspace-service';
+import { WorkspaceService } from '@theia/workspace/lib/browser/workspace-service';
 import URI from '@theia/core/lib/common/uri';
 
 // import { FileNavigatorCommands } from '@theia/navigator/lib/browser/navigator-contribution';
@@ -18,7 +18,7 @@ export const CalpvinTheiaCustomCommand = {
 export class CalpvinTheiaCustomCommandContribution implements CommandContribution {
 
     @inject(FileSystem)
-    protected readonly fileSystem: FileSystem;    
+    protected readonly fileSystem: FileSystem;
 
     // @inject(SourceTreeWidget)
     // protected readonly sourceTreeWidget: SourceTreeWidget;
@@ -65,13 +65,10 @@ export class CalpvinTheiaFrontendApplicationContribution implements FrontendAppl
 
     async onStart?(app: FrontendApplication): Promise<void> {
 
-        console.log('OK!!');
-        await this.workspaceService.addRoot(new URI('/home/project/calpvin-ide-ui'));
-        
-        setTimeout(async () => {
-            await this.workspaceService.removeRoots([new URI('/home/project/calpvin-ide-ui')]);
-            await this.workspaceService.addRoot(new URI('/home/project/calpvin-ide-ui/src'));
-        }, 7000);
+        this.workspaceService.open(new URI('/home/project'));
+        const allRoots = this.workspaceService.tryGetRoots().map(x => new URI(x.uri));
+        await this.workspaceService.removeRoots(allRoots);
+        await this.workspaceService.addRoot(new URI('/home/project/calpvin-ide-ui/src/app/test-component'));
 
         document.addEventListener('keydown', (e: KeyboardEvent) => {
             if (e.ctrlKey && e.key === 'q') {
@@ -114,6 +111,6 @@ export class CalpvinTheiaFrontendApplicationContribution implements FrontendAppl
             const componentName = (command.data as VirtualFile).componentName;
             const fileStat = await this.fileSystem.getFileStat(`file:///home/project/calpvin-ide-ui/src/app/${componentName}/${componentName}.component.html`);
             await this.fileSystem.setContent(fileStat!, (command.data as VirtualFile).content!);
-        }        
+        }
     }
 }
