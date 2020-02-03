@@ -124,7 +124,7 @@ export class CalpvinTheiaFrontendApplicationContribution implements FrontendAppl
             const allRoots = this.workspaceService.tryGetRoots().map(x => new URI(x.uri));
             // await this.workspaceService.addRoot(new URI(commandData.rootUris[0]));
                         
-            await this.workspaceService.removeRoots([new URI('calpvin-ide-ui')]);
+            await this.workspaceService.removeRoots([new URI('/home/project/calpvin-ide-ui')]);
             // console.log(allRoots);
 
             // commandData.rootUris.forEach(uri => this.workspaceService.addRoot(new URI(uri)));
