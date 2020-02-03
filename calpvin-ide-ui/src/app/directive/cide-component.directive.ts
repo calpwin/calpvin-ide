@@ -36,7 +36,7 @@ export class CideComponentDirective implements OnInit {
       const parser = new HtmlParser();
 
       const componentName = VirtualFileTree.getComponentName(this.baseComponentTagName);
-      const file = this.virtualTree.getFile(componentName, VirtualFileType.ComponentHtml);
+      const file = this.virtualTree.getFile(componentName, `${componentName}.component.html`);
 
       const parsedTreeResult = parser.parse(file.content, 'fake_url');
 

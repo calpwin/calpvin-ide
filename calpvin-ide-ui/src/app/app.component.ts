@@ -1,6 +1,7 @@
 import { Component, ViewChild, OnInit, ElementRef, HostListener } from '@angular/core';
-import { EventManager, EventType, VirtualFileType, VirtualFile, IdeEvent } from 'calpvin-ide-shared/IdeCommand';
+import { EventManager, EventType, VirtualFileType, VirtualFile, IdeEvent, SetWorkspaceCommandData } from 'calpvin-ide-shared/IdeCommand';
 import { VirtualFileTree } from 'src/app.lib/virtual-tree/virtual-tree';
+import * as csstree from 'css-tree';
 
 @Component({
   selector: 'cide-root',
@@ -26,17 +27,20 @@ export class AppComponent implements OnInit {
     console.log('Main: ', e);
 
     if ((e.data as IdeEvent).eventType === EventType.IdeStartEvent) {
-      const res = await AppComponent.EventManager.sendEvent<VirtualFile>(
-        {
-          eventType: EventType.ReadComponentFile,
-          uniqueIdentifier: EventManager.generateUniqueIdentifire(),
-          data: new VirtualFile(VirtualFileType.ComponentHtml, 'test-component')
-        });
+      await this.virtualFileTree.addComponentFiles('test-component');
 
-      const file = this.virtualFileTree.addFile(res.data);
-    }
+      const cssFile = this.virtualFileTree.getFile('test-component', 'test-component.component.scss');
+      const cssAst = csstree.parse(cssFile.content, {
+        positions: true
+      });
 
-    if ((e.data as IdeEvent).eventType === EventType.AppHideIde) {
+      csstree.walk(cssAst, (node) => {
+        if (node.type === 'ClassSelector') {
+          console.log('NOde: ', node);
+        }
+      });
+
+    } else if ((e.data as IdeEvent).eventType === EventType.AppHideIde) {
       this.hideIde();
     }
   }
@@ -50,7 +54,14 @@ export class AppComponent implements OnInit {
     window.focus();
   }
 
-  private showIde() {
+  private async showIde() {
+    await AppComponent.EventManager.sendEvent<SetWorkspaceCommandData>(
+      {
+        eventType: EventType.IdeSetWorkspace,
+        uniqueIdentifier: EventManager.generateUniqueIdentifire(),
+        data: new SetWorkspaceCommandData(['/home/project/calpvin-ide-ui/src/app'])
+      }, false);
+
     this._ide.nativeElement.style.display = 'block';
   }
 

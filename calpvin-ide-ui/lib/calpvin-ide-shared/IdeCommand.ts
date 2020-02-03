@@ -5,18 +5,20 @@ export enum EventType {
   ReadComponentFile,
   WriteComponentFile,
   IdeStartEvent,
-  AppHideIde
+  AppHideIde,
+  IdeSetWorkspace
 }
 
 export enum VirtualFileType {
   ComponentHtml = 0,
-  ComponentScss = 1
+  ComponentCss = 1
 }
 
 export class VirtualFile {
   constructor(
     public fileType: VirtualFileType,
     public componentName: string,
+    public fileName: string,
     public content?: string) {
 
   }
@@ -28,9 +30,16 @@ export class ComponentFileCommand implements IdeEvent<VirtualFile> {
   uniqueIdentifier: string;
 }
 
+export class SetWorkspaceCommandData {
+  constructor(public rootUris: string[]) {
+
+  }
+}
+
+
 // #endregion
 
-export interface IdeEvent<T extends any = string> {
+export class IdeEvent<T extends any = string> {
   eventType: EventType;
   data: T;
   uniqueIdentifier: string;
