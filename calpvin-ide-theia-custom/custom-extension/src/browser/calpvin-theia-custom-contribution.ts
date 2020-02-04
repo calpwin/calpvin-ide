@@ -1,14 +1,13 @@
 import { injectable, inject } from "inversify";
 import { CommandContribution, CommandService, MenuContribution, MenuModelRegistry, MessageService, CommandRegistry } from "@theia/core/lib/common";
-import { CommonMenus, FrontendApplicationContribution, FrontendApplication, PreferenceServiceImpl, PreferenceScope } from "@theia/core/lib/browser";
+import { CommonMenus, FrontendApplicationContribution, FrontendApplication, PreferenceServiceImpl } from "@theia/core/lib/browser";
 import { FileSystem } from '@theia/filesystem/lib/common/filesystem';
-import { EventManager, EventType, IdeEvent, VirtualFile, SetWorkspaceCommandData } from "calpvin-ide-shared";
-// import {WorkspaceCommands} from '@theia/workspace/lib/browser/workspace-commands';
-import { WorkspaceService } from '@theia/workspace/lib/browser/workspace-service';
-import URI from '@theia/core/lib/common/uri';
-import { WorkspaceServer } from "@theia/workspace/lib/common";
-
-// import { FileNavigatorCommands } from '@theia/navigator/lib/browser/navigator-contribution';
+import { EventManager, EventType, IdeEvent, VirtualFile } from "calpvin-ide-shared";
+import { WorkspaceService, WorkspaceData } from '@theia/workspace/lib/browser/workspace-service';
+import { WorkspaceServer, THEIA_EXT } from "@theia/workspace/lib/common";
+import URI from "@theia/core/lib/common/uri";
+import { WorkspacePreferences } from "@theia/workspace/lib/browser/workspace-preferences";
+import * as jsoncparser from 'jsonc-parser';
 
 export const CalpvinTheiaCustomCommand = {
     id: 'CalpvinTheiaCustom.command',
@@ -68,7 +67,11 @@ export class CalpvinTheiaFrontendApplicationContribution implements FrontendAppl
     @inject(PreferenceServiceImpl)
     protected readonly preferenceServiceImpl: PreferenceServiceImpl;
 
-    private eventManager: EventManager;
+    @inject(WorkspacePreferences)
+    protected workspacePreferences: WorkspacePreferences;
+
+    private eventManager: EventManager;    
+    _workspaceFileUri: URI;
 
     async onStart?(app: FrontendApplication): Promise<void> {
 
@@ -89,6 +92,12 @@ export class CalpvinTheiaFrontendApplicationContribution implements FrontendAppl
             uniqueIdentifier: EventManager.generateUniqueIdentifire(),
             data: 'Ide Start!'
         }, false);
+
+        const userHome = await this.fileSystem.getCurrentUserHome();
+        const homeDirPath = await this.fileSystem.getFsPath(userHome!.uri);    
+        this._workspaceFileUri = new URI(homeDirPath).resolve('.theia').resolve(`developer.${THEIA_EXT}`).withScheme('file');
+
+        await this.workspaceService.save(this._workspaceFileUri);
     }
 
     private async receiveEventListener(e: MessageEvent) {
@@ -117,14 +126,47 @@ export class CalpvinTheiaFrontendApplicationContribution implements FrontendAppl
             await this.fileSystem.setContent(fileStat!, (command.data as VirtualFile).content!);
         }
         else if (command.eventType === EventType.IdeSetWorkspace) {
-            const commandData = command.data as SetWorkspaceCommandData;
+            // const commandData = command.data as SetWorkspaceCommandData;
 
             // await this.preferenceServiceImpl.set('folders', '[]', PreferenceScope.Workspace);
+
+
+            // const stat = await this.fileSystem.setContent(this.workspaceService.workspace!, result);
+
+            const { content } = await this.fileSystem.resolveContent(this._workspaceFileUri.toString());
+
+            const workspaceJson = jsoncparser.parse(content);
+
+            (workspaceJson as WorkspaceData).folders = [{path: 'file:///home/project/calpvin-ide-ui/src/app'}];
+
+            const worspaceContentEdited = JSON.stringify(workspaceJson);
+
+            const fileStat = await this.fileSystem.getFileStat(this._workspaceFileUri.toString());
+            await this.fileSystem.setContent(fileStat!, worspaceContentEdited);
+
+            // const allRoots = this.workspaceService.tryGetRoots().map(x => new URI(x.uri));            
+
+            // const userHome = await this.fileSystem.getCurrentUserHome();
+            // const homeDirPath = await this.fileSystem.getFsPath(userHome!.uri);
+            // const untitledWorkspace = getTemporaryWorkspaceFileUri(new URI(homeDirPath));
+
+            // await this.workspaceService.spliceRoots(0, allRoots.length);            
+            // await this.workspaceService.spliceRoots(0, 0, new URI('/home/project/calpvin-ide-ui/src/app'));
+            // await this.workspaceService.save(new URI('/home/project/hosts.theia-workspace'));
             
-            const allRoots = this.workspaceService.tryGetRoots().map(x => new URI(x.uri));
+
+
+            
+
+
+            // console.log(homeDirPath);
+            // console.log(untitledWorkspace);
+            // console.log(commandData);
+
+
             // await this.workspaceService.addRoot(new URI(commandData.rootUris[0]));
-                        
-            await this.workspaceService.removeRoots([new URI('/home/project/calpvin-ide-ui')]);
+
+            // await this.workspaceService.removeRoots([new URI('/home/project/calpvin-ide-ui')]);
             // console.log(allRoots);
 
             // commandData.rootUris.forEach(uri => this.workspaceService.addRoot(new URI(uri)));
