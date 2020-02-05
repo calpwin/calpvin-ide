@@ -1,12 +1,15 @@
 import { Injectable } from '@angular/core';
 import { VirtualFileType, VirtualFile, EventType, EventManager } from 'calpvin-ide-shared/IdeCommand';
 import { AppComponent } from 'src/app/app.component';
+import { HtmlParser } from '@angular/compiler';
+import * as csstree from 'css-tree';
 
 @Injectable({
   providedIn: 'root',
 })
 export class VirtualFileTree {
   private readonly _virtualFiles: VirtualFile[] = [];
+  private readonly _htmlParser: HtmlParser = new HtmlParser();
 
   static getComponentName(byTagName: string) {
     return byTagName.replace('cide-', '');
@@ -15,7 +18,29 @@ export class VirtualFileTree {
   addFile(file: VirtualFile): VirtualFile {
     this._virtualFiles.push(file);
 
+    this.trySetFileAst(file);
+
     return file;
+  }
+
+  private trySetFileAst(file: VirtualFile) {
+    if (file.astTree) {
+      return true;
+    }
+
+    if (file.fileType === VirtualFileType.ComponentHtml) {
+      file.astTree = this._htmlParser.parse(file.content, file.fileName);
+
+      return true;
+    }
+
+    if (file.fileType === VirtualFileType.ComponentCss) {
+      file.astTree = csstree.parse(file.content, { positions: true });
+
+      return true;
+    }
+
+    return false;
   }
 
   getFile(componentName: string, fileName: string): VirtualFile {

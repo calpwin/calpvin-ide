@@ -14,7 +14,7 @@ export enum VirtualFileType {
   ComponentCss = 1
 }
 
-export class VirtualFile {
+export class VirtualFile<TAst = any> {
   constructor(
     public fileType: VirtualFileType,
     public componentName: string,
@@ -22,6 +22,8 @@ export class VirtualFile {
     public content?: string) {
 
   }
+
+  public astTree: TAst;
 }
 
 export class ComponentFileCommand implements IdeEvent<VirtualFile> {

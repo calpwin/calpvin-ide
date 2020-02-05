@@ -34,12 +34,6 @@ export class AppComponent implements OnInit {
         positions: true
       });
 
-      csstree.walk(cssAst, (node) => {
-        if (node.type === 'ClassSelector') {
-          console.log('NOde: ', node);
-        }
-      });
-
     } else if ((e.data as IdeEvent).eventType === EventType.AppHideIde) {
       this.hideIde();
     }

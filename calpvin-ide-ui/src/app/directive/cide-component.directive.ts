@@ -1,6 +1,5 @@
 import { Directive, Renderer2, ElementRef, Input, OnInit } from '@angular/core';
-import { Guid } from 'guid-typescript';
-import { HtmlParser, Element } from '@angular/compiler';
+import {  Element, ParseTreeResult } from '@angular/compiler';
 import { VirtualFileTree } from 'src/app.lib/virtual-tree/virtual-tree';
 import { findElement } from 'src/app.lib/extension/angular-html-elements.extension';
 import { VirtualFileType, EventManager, EventType, VirtualFile } from 'calpvin-ide-shared/IdeCommand';
@@ -27,18 +26,16 @@ export class CideComponentDirective implements OnInit {
 
   ngOnInit(): void {
     if (!this.baseComponentTagName) {
-      console.log('Base Component name not set!!');
+      console.log('Base Component name not set!');
     }
   }
 
   private onClick = async (event: MouseEvent) => {
     if (event.ctrlKey) {
-      const parser = new HtmlParser();
-
       const componentName = VirtualFileTree.getComponentName(this.baseComponentTagName);
       const file = this.virtualTree.getFile(componentName, `${componentName}.component.html`);
 
-      const parsedTreeResult = parser.parse(file.content, 'fake_url');
+      const parsedTreeResult = file.astTree as ParseTreeResult;
 
       let uniqueClassName: string = null;
       (event.target as HTMLElement).classList.forEach(element => {
