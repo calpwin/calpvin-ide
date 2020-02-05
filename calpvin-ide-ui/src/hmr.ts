@@ -7,18 +7,26 @@ export const hmrBootstrap = async (module: any, bootstrap: () => Promise<NgModul
 
   let devModule: NgModuleRef<any> = null;
 
+  const newAppModule = require('./app/test-module/test-module.module').TestModuleModule;
+  const newNode = document.createElement('cide-test-component');
+
   if (!(window as any).NgModule) {
     bootstrap().then(async mod => {
       (window as any).NgModule = mod;
+
+      document.getElementsByTagName('cide-wysiwyg-ui-editor')[0].insertAdjacentElement('beforeend', newNode);
+
+      devModule = await platformBrowserDynamic().bootstrapModule(newAppModule);
     });
   }
 
-  const newNode = document.createElement('cide-del-component');
-  document.getElementsByTagName('cide-root')[0].insertAdjacentElement('beforeend', newNode);
+  const el = document.getElementsByTagName('cide-wysiwyg-ui-editor')[0];
 
-  const newAppModule = require('./app/test-module/test-module.module').TestModuleModule;
-  devModule = await platformBrowserDynamic().bootstrapModule(newAppModule);
+  if (el) {
+    el.insertAdjacentElement('beforeend', newNode);
 
+    devModule = await platformBrowserDynamic().bootstrapModule(newAppModule);
+  }
 
   module.hot.dispose(() => {
     devModule.destroy();

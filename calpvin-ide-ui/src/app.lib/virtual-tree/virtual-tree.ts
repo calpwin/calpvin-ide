@@ -59,7 +59,7 @@ export class VirtualFileTree {
       {
         eventType: EventType.ReadComponentFile,
         uniqueIdentifier: EventManager.generateUniqueIdentifire(),
-        data: new VirtualFile(VirtualFileType.ComponentHtml, componentName, `${componentName}.component.scss`)
+        data: new VirtualFile(VirtualFileType.ComponentCss, componentName, `${componentName}.component.scss`)
       });
 
     this.addFile(htmlFileRes.data);

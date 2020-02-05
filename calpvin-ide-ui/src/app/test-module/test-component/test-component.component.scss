@@ -4,18 +4,19 @@
   width: 100%;
   position: relative;
 }
-
 .cide-component-container {
+  position: relative;
   height: 100%;
   width: 100%;
 }
-
-.cide-component {
+.cide-unique-1 {
   width: 200px;
   height: 50px;
   background-color: red;
+  left: 165px;
+  top: 102px;
+  position: absolute;
 }
-
 .ide-wrapper {
   position: absolute;
   top: calc(50% - 45vh);

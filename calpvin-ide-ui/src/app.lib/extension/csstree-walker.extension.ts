@@ -1,5 +1,5 @@
 import * as csstree from 'css-tree';
-import { CssNode, Rule } from 'css-tree';
+import { CssNode, Rule, List } from 'css-tree';
 
 export function tryGetNode(cssNode: CssNode, byClassSelector: string): CssNode | undefined {
   let findNode;
@@ -17,15 +17,23 @@ export function tryGetNode(cssNode: CssNode, byClassSelector: string): CssNode |
   return findNode;
 }
 
-export function trySetCssValue(node: Rule, declaration: string, value: string): boolean {
+export function setCssValue(node: Rule, property: string, value: string) {
   let result = false;
 
   csstree.walk(node, (_blockNode) => {
-    if (_blockNode.type === 'Declaration' && _blockNode.property === 'height') {
+    if (_blockNode.type === 'Declaration' && _blockNode.property === property) {
       _blockNode.value = { type: 'Raw', value };
       result = true;
     }
   });
 
-  return result;
+  if (!result) {
+    node.block.children.appendData({
+      type: 'Declaration',
+      property,
+      value: { type: 'Raw', value },
+      important: false,
+      loc: null
+    } as csstree.Declaration);
+  }
 }

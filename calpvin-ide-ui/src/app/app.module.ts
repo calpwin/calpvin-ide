@@ -5,7 +5,6 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { WysiwygUiEditorComponent } from './wysiwyg-ui-editor/wysiwyg-ui-editor.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
-import { TestComponentComponent } from './test-component/test-component.component';
 import { CideComponentDirective } from './directive/cide-component.directive';
 import { IdeComponent } from './ide/ide.component';
 
@@ -13,7 +12,6 @@ import { IdeComponent } from './ide/ide.component';
   declarations: [
     AppComponent,
     WysiwygUiEditorComponent,
-    TestComponentComponent,
     CideComponentDirective,
     IdeComponent
   ],

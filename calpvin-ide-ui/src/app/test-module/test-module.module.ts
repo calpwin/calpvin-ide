@@ -1,17 +1,20 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DelComponentComponent } from './del-component/del-component.component';
+import { TestComponentComponent } from './test-component/test-component.component';
 import { BrowserModule } from '@angular/platform-browser';
+import { AppModule } from '../app.module';
 
 @NgModule({
-  declarations: [DelComponentComponent],
+  declarations: [
+    TestComponentComponent],
   imports: [
     BrowserModule,
-    CommonModule
+    CommonModule,
+    AppModule
   ],
   exports: [
-    DelComponentComponent
+    TestComponentComponent
   ],
-  bootstrap: [DelComponentComponent]
+  bootstrap: [TestComponentComponent]
 })
 export class TestModuleModule { }

@@ -108,7 +108,7 @@ export class CalpvinTheiaFrontendApplicationContribution implements FrontendAppl
         if (command.eventType === EventType.ReadComponentFile) {
             const componentName = (command.data as VirtualFile).componentName;
             const fileName = (command.data as VirtualFile).fileName;
-            const path = await this.fileSystem.getFsPath(`file:///home/project/calpvin-ide-ui/src/app/${componentName}/${fileName}`);
+            const path = await this.fileSystem.getFsPath(`file:///home/project/calpvin-ide-ui/src/app/test-module/${componentName}/${fileName}`);
             const fileContent = await this.fileSystem.resolveContent(path!);
 
             (command.data as VirtualFile).content = fileContent.content;
@@ -122,7 +122,7 @@ export class CalpvinTheiaFrontendApplicationContribution implements FrontendAppl
         else if (command.eventType === EventType.WriteComponentFile) {
             const componentName = (command.data as VirtualFile).componentName;
             const fileName = (command.data as VirtualFile).fileName;
-            const fileStat = await this.fileSystem.getFileStat(`file:///home/project/calpvin-ide-ui/src/app/${componentName}/${fileName}`);
+            const fileStat = await this.fileSystem.getFileStat(`file:///home/project/calpvin-ide-ui/src/app/test-module/${componentName}/${fileName}`);
             await this.fileSystem.setContent(fileStat!, (command.data as VirtualFile).content!);
         }
         else if (command.eventType === EventType.IdeSetWorkspace) {
