@@ -4,7 +4,9 @@ import { HtmlParser } from '@angular/compiler';
 import * as csstree from 'css-tree';
 import { EventManagerService } from './event-manager.service';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class VirtualFileTreeService {
   private readonly _virtualFiles: VirtualFile[] = [];
   private readonly _htmlParser: HtmlParser = new HtmlParser();
@@ -14,22 +16,23 @@ export class VirtualFileTreeService {
   }
 
   constructor(private readonly eventManagerService: EventManagerService) {
-      console.log('!!!!!!!!!!!!!!!!!!!!!!!! Create Ioc!!!');
   }
 
   addFile(file: VirtualFile): VirtualFile {
-    this._virtualFiles.push(file);
+    const findFile = this.getFile(file.componentName, file.fileName, file.fileType);
 
-    this.trySetFileAst(file);
+    if (!findFile) {
+      this._virtualFiles.push(file);
+      this.tryUpdateFileAst(file);
+    } else {
+      findFile.content = file.content;
+      this.tryUpdateFileAst(findFile);
+    }
 
     return file;
   }
 
-  private trySetFileAst(file: VirtualFile) {
-    if (file.astTree) {
-      return true;
-    }
-
+  private tryUpdateFileAst(file: VirtualFile): boolean {
     if (file.fileType === VirtualFileType.ComponentHtml) {
       file.astTree = this._htmlParser.parse(file.content, file.fileName);
 
@@ -45,8 +48,10 @@ export class VirtualFileTreeService {
     return false;
   }
 
-  getFile(componentName: string, fileName: string): VirtualFile {
-    return this._virtualFiles.find(x => x.componentName === componentName && x.fileName === fileName);
+  getFile(componentName: string, fileName: string, fileType?: VirtualFileType): VirtualFile {
+    const file = this._virtualFiles.find(x => x.componentName === componentName && x.fileName === fileName);
+
+    return file && fileType ? (file.fileType === fileType ? file : undefined) : file;
   }
 
   async addComponentFiles(componentName: string): Promise<VirtualFile[]> {
@@ -56,6 +61,7 @@ export class VirtualFileTreeService {
         uniqueIdentifier: EventManager.generateUniqueIdentifire(),
         data: new VirtualFile(VirtualFileType.ComponentHtml, componentName, `${componentName}.component.html`)
       });
+
 
     const cssFileRes = await this.eventManagerService.EventManager.sendEvent<VirtualFile>(
       {

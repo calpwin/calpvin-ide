@@ -83,7 +83,7 @@ export class CideComponentDirective implements OnInit {
         {
           eventType: EventType.WriteComponentFile,
           uniqueIdentifier: EventManager.generateUniqueIdentifire(),
-          data: new VirtualFile(VirtualFileType.ComponentHtml, componentName, file.content)
+          data: file
         }, false);
     }
   }

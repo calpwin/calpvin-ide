@@ -23,7 +23,7 @@ export const hmrBootstrap = async (module: any, bootstrap: () => Promise<NgModul
       devModuleRef = await platformBrowserDynamic().bootstrapModule(devModule);
 
       const devModuleManagerService = mainModule.injector.get(DevModuleManagerService);
-      devModuleManagerService.onModuleBoostraped(devModuleRef);
+      devModuleManagerService.applyCideComponentDirective();
     });
   }
 
@@ -35,7 +35,8 @@ export const hmrBootstrap = async (module: any, bootstrap: () => Promise<NgModul
     devModuleRef = await platformBrowserDynamic().bootstrapModule(devModule);
 
     const devModuleManagerService = mainModule.injector.get(DevModuleManagerService);
-    devModuleManagerService.onModuleBoostraped(devModuleRef);
+    await devModuleManagerService.updateVirtualTreeAsync();
+    devModuleManagerService.applyCideComponentDirective();
   }
 
   module.hot.dispose(() => {

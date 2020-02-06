@@ -17,11 +17,13 @@ export class DevModuleManagerService {
 
   }
 
-  onModuleBoostraped(moduleRef: NgModuleRef<any>) {
-    // const appRef: ApplicationRef = module.injector.get(ApplicationRef);
-    // const elements = appRef.components[0].location. .map(c => c.location);
+  async updateVirtualTreeAsync() {
+    await this.virtualTree.addComponentFiles('test-component');
+  }
 
+   applyCideComponentDirective() {
     const componentEls = document.getElementsByClassName('cide-component');
+
 
     for (let index = 0; index < componentEls.length; index++) {
       const compEl = componentEls[index];
