@@ -17,7 +17,15 @@
     "lib": [
       "es2018",
       "dom"
-    ]
+    ],
+    "paths": {
+      "ide-ui-lib": [
+        "dist/ide-ui-lib"
+      ],
+      "ide-ui-lib/*": [
+        "dist/ide-ui-lib/*"
+      ]
+    }
   },
   "angularCompilerOptions": {
     "fullTemplateTypeCheck": true,

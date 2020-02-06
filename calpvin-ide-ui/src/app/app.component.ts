@@ -1,7 +1,7 @@
 import { Component, ViewChild, OnInit, ElementRef, HostListener } from '@angular/core';
-import { EventManager, EventType, VirtualFileType, VirtualFile, IdeEvent, SetWorkspaceCommandData } from 'calpvin-ide-shared/IdeCommand';
-import { VirtualFileTree } from 'src/app.lib/virtual-tree/virtual-tree';
-import * as csstree from 'css-tree';
+import { EventManager, EventType, IdeEvent, SetWorkspaceCommandData } from 'calpvin-ide-shared/IdeCommand';
+import { EventManagerService } from 'projects/ide-ui-lib/src/lib/services/event-manager.service';
+import { VirtualFileTreeService } from 'projects/ide-ui-lib/src/lib/services/virtual-tree';
 
 @Component({
   selector: 'cide-root',
@@ -10,17 +10,19 @@ import * as csstree from 'css-tree';
 })
 export class AppComponent implements OnInit {
 
-  constructor(private virtualFileTree: VirtualFileTree, private _el: ElementRef<HTMLElement>) {
+  constructor(
+    private virtualFileTree: VirtualFileTreeService,
+    private _el: ElementRef<HTMLElement>,
+    private _eventManagerService: EventManagerService) {
 
   }
 
-  public static EventManager: EventManager;
   title = 'calpvin-ide';
 
   @ViewChild('ide', { read: ElementRef, static: true }) _ide: ElementRef<HTMLElement>;
 
   async ngOnInit() {
-    AppComponent.EventManager = new EventManager(window, (this._ide.nativeElement as any).contentWindow, this.messageEventListener);
+    this._eventManagerService.init(window, (this._ide.nativeElement as any).contentWindow, this.messageEventListener);
   }
 
   private messageEventListener = async (e: MessageEvent) => {
@@ -28,12 +30,6 @@ export class AppComponent implements OnInit {
 
     if ((e.data as IdeEvent).eventType === EventType.IdeStartEvent) {
       await this.virtualFileTree.addComponentFiles('test-component');
-
-      const cssFile = this.virtualFileTree.getFile('test-component', 'test-component.component.scss');
-      const cssAst = csstree.parse(cssFile.content, {
-        positions: true
-      });
-
     } else if ((e.data as IdeEvent).eventType === EventType.AppHideIde) {
       this.hideIde();
     }
@@ -49,7 +45,7 @@ export class AppComponent implements OnInit {
   }
 
   private async showIde() {
-    await AppComponent.EventManager.sendEvent<SetWorkspaceCommandData>(
+    await this._eventManagerService.EventManager.sendEvent<SetWorkspaceCommandData>(
       {
         eventType: EventType.IdeSetWorkspace,
         uniqueIdentifier: EventManager.generateUniqueIdentifire(),

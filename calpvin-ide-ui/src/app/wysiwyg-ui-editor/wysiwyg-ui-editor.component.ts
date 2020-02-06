@@ -1,6 +1,4 @@
-import { Component, OnInit, Inject } from '@angular/core';
-import { DragDrop } from '@angular/cdk/drag-drop';
-import { DOCUMENT } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
 
 
 @Component({
@@ -10,14 +8,9 @@ import { DOCUMENT } from '@angular/common';
 })
 export class WysiwygUiEditorComponent implements OnInit {
 
-  constructor(
-    @Inject(DragDrop) private dragDrop: DragDrop,
-    @Inject(DOCUMENT) private document: Document) { }
+  constructor() { }
 
   ngOnInit() {
-    const els = this.document.getElementsByClassName('cide-component');
-
-    this.dragDrop.createDrag(els[0] as HTMLElement);
   }
 
 }

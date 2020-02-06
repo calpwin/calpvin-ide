@@ -1,14 +1,14 @@
 import { Directive, Renderer2, ElementRef, Input, OnInit, Inject } from '@angular/core';
 import { Element, ParseTreeResult } from '@angular/compiler';
-import { VirtualFileTree } from 'src/app.lib/virtual-tree/virtual-tree';
-import { findElement } from 'src/app.lib/extension/angular-html-elements.extension';
+import { findElement } from '../extension/angular-html-elements.extension';
 import { VirtualFileType, EventManager, EventType, VirtualFile } from 'calpvin-ide-shared/IdeCommand';
-import { AppComponent } from '../app.component';
 import { DragDrop, DragRef } from '@angular/cdk/drag-drop';
-import { CssNode, Rule } from 'css-tree';
-import { tryGetNode, setCssValue } from 'src/app.lib/extension/csstree-walker.extension';
+import { tryGetNode, setCssValue } from '../extension/csstree-walker.extension';
 import { Point } from '@angular/cdk/drag-drop/typings/drag-ref';
 import * as csstree from 'css-tree';
+import { CssNode, Rule } from 'css-tree';
+import { VirtualFileTreeService } from '../services/virtual-tree';
+import { EventManagerService } from '../services/event-manager.service';
 
 @Directive({
   selector: '[cideComponent]'
@@ -24,7 +24,8 @@ export class CideComponentDirective implements OnInit {
     @Inject(DragDrop) private dragDrop: DragDrop,
     private renderer: Renderer2,
     private hostElement: ElementRef<HTMLElement>,
-    private virtualTree: VirtualFileTree) {
+    private virtualTree: VirtualFileTreeService,
+    private readonly eventManagerService: EventManagerService) {
 
     renderer.addClass(hostElement.nativeElement, CideComponentDirective.ComponentCssClass);
 
@@ -46,17 +47,19 @@ export class CideComponentDirective implements OnInit {
   }
 
   private onMoveEnded = async (event: { source: DragRef<any>, distance: Point }) => {
-    const componentName = VirtualFileTree.getComponentName(this.baseComponentTagName);
+    const componentName = VirtualFileTreeService.getComponentName(this.baseComponentTagName);
     const file = this.virtualTree.getFile(componentName, `${componentName}.component.scss`);
+
+    const elStyle = getComputedStyle(this.hostElement.nativeElement);
 
     const node = tryGetNode(file.astTree as CssNode, this._uniqueClassName);
     setCssValue(node as Rule, 'position', 'absolute');
-    setCssValue(node as Rule, 'left', event.distance.x.toString() + 'px');
-    setCssValue(node as Rule, 'top', event.distance.y.toString() + 'px');
+    setCssValue(node as Rule, 'left', Number.parseInt(elStyle.left, 0) + event.distance.x + 'px');
+    setCssValue(node as Rule, 'top', Number.parseInt(elStyle.top, 0) + event.distance.y + 'px');
 
     file.content = csstree.generate(file.astTree);
 
-    const res = await AppComponent.EventManager.sendEvent<VirtualFile>(
+    const res = await this.eventManagerService.EventManager.sendEvent<VirtualFile>(
       {
         eventType: EventType.WriteComponentFile,
         uniqueIdentifier: EventManager.generateUniqueIdentifire(),
@@ -66,7 +69,7 @@ export class CideComponentDirective implements OnInit {
 
   private onClick = async (event: MouseEvent) => {
     if (event.ctrlKey) {
-      const componentName = VirtualFileTree.getComponentName(this.baseComponentTagName);
+      const componentName = VirtualFileTreeService.getComponentName(this.baseComponentTagName);
       const file = this.virtualTree.getFile(componentName, `${componentName}.component.html`);
 
       const parsedTreeResult = file.astTree as ParseTreeResult;
@@ -76,7 +79,7 @@ export class CideComponentDirective implements OnInit {
       file.content = file.content.substr(0, findNode.startSourceSpan.start.offset)
         + file.content.substr(findNode.endSourceSpan.end.offset, file.content.length);
 
-      const res = await AppComponent.EventManager.sendEvent<VirtualFile>(
+      const res = await this.eventManagerService.EventManager.sendEvent<VirtualFile>(
         {
           eventType: EventType.WriteComponentFile,
           uniqueIdentifier: EventManager.generateUniqueIdentifire(),

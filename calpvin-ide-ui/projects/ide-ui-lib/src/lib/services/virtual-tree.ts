@@ -1,18 +1,20 @@
 import { Injectable } from '@angular/core';
 import { VirtualFileType, VirtualFile, EventType, EventManager } from 'calpvin-ide-shared/IdeCommand';
-import { AppComponent } from 'src/app/app.component';
 import { HtmlParser } from '@angular/compiler';
 import * as csstree from 'css-tree';
+import { EventManagerService } from './event-manager.service';
 
-@Injectable({
-  providedIn: 'root',
-})
-export class VirtualFileTree {
+@Injectable()
+export class VirtualFileTreeService {
   private readonly _virtualFiles: VirtualFile[] = [];
   private readonly _htmlParser: HtmlParser = new HtmlParser();
 
   static getComponentName(byTagName: string) {
     return byTagName.replace('cide-', '');
+  }
+
+  constructor(private readonly eventManagerService: EventManagerService) {
+      console.log('!!!!!!!!!!!!!!!!!!!!!!!! Create Ioc!!!');
   }
 
   addFile(file: VirtualFile): VirtualFile {
@@ -48,14 +50,14 @@ export class VirtualFileTree {
   }
 
   async addComponentFiles(componentName: string): Promise<VirtualFile[]> {
-    const htmlFileRes = await AppComponent.EventManager.sendEvent<VirtualFile>(
+    const htmlFileRes = await this.eventManagerService.EventManager.sendEvent<VirtualFile>(
       {
         eventType: EventType.ReadComponentFile,
         uniqueIdentifier: EventManager.generateUniqueIdentifire(),
         data: new VirtualFile(VirtualFileType.ComponentHtml, componentName, `${componentName}.component.html`)
       });
 
-    const cssFileRes = await AppComponent.EventManager.sendEvent<VirtualFile>(
+    const cssFileRes = await this.eventManagerService.EventManager.sendEvent<VirtualFile>(
       {
         eventType: EventType.ReadComponentFile,
         uniqueIdentifier: EventManager.generateUniqueIdentifire(),
