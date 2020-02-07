@@ -1,4 +1,5 @@
 import { Guid } from 'guid-typescript';
+export { Workspace as Workspace } from './workplace';
 
 // #region Commands
 export enum EventType {
@@ -6,7 +7,8 @@ export enum EventType {
   WriteComponentFile,
   IdeStartEvent,
   AppHideIde,
-  IdeSetWorkspace
+  SetWorkspace,
+  GetWorkspace
 }
 
 export enum VirtualFileType {
@@ -30,12 +32,6 @@ export class ComponentFileCommand implements IdeEvent<VirtualFile> {
   eventType: EventType;
   data: VirtualFile;
   uniqueIdentifier: string;
-}
-
-export class SetWorkspaceCommandData {
-  constructor(public rootUris: string[]) {
-
-  }
 }
 
 

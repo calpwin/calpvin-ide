@@ -7,7 +7,7 @@ import { tryGetNode, setCssValue } from '../extension/csstree-walker.extension';
 import { Point } from '@angular/cdk/drag-drop/typings/drag-ref';
 import * as csstree from 'css-tree';
 import { CssNode, Rule } from 'css-tree';
-import { VirtualFileTreeService } from '../services/virtual-tree';
+import { VirtualFileTreeService } from '../services/virtual-tree.service';
 import { EventManagerService } from '../services/event-manager.service';
 
 @Directive({

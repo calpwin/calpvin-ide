@@ -1,7 +1,8 @@
 import { Component, ViewChild, OnInit, ElementRef, HostListener } from '@angular/core';
-import { EventManager, EventType, IdeEvent, SetWorkspaceCommandData } from 'calpvin-ide-shared/IdeCommand';
+import { EventType, IdeEvent, Workspace } from 'calpvin-ide-shared/IdeCommand';
 import { EventManagerService } from 'projects/ide-ui-lib/src/lib/services/event-manager.service';
-import { VirtualFileTreeService } from 'projects/ide-ui-lib/src/lib/services/virtual-tree';
+import { VirtualFileTreeService } from 'projects/ide-ui-lib/src/lib/services/virtual-tree.service';
+import { WorkspaceService } from 'projects/ide-ui-lib/src/lib/services/workspace.service';
 
 @Component({
   selector: 'cide-root',
@@ -12,6 +13,7 @@ export class AppComponent implements OnInit {
 
   constructor(
     private virtualFileTree: VirtualFileTreeService,
+    private _workspaceService: WorkspaceService,
     private _el: ElementRef<HTMLElement>,
     private _eventManagerService: EventManagerService) {
 
@@ -28,10 +30,18 @@ export class AppComponent implements OnInit {
   private messageEventListener = async (e: MessageEvent) => {
     console.log('Main: ', e);
 
-    if ((e.data as IdeEvent).eventType === EventType.IdeStartEvent) {
+    const command = (e.data as IdeEvent<any>);
+
+    if (command.eventType === EventType.IdeStartEvent) {
       await this.virtualFileTree.addComponentFiles('test-component');
-    } else if ((e.data as IdeEvent).eventType === EventType.AppHideIde) {
+
+      setInterval(() => {
+        // this._workspaceService.activeComponent = '';
+      }, 3000);
+    } else if (command.eventType === EventType.AppHideIde) {
       this.hideIde();
+    } else if (command.eventType === EventType.SetWorkspace) {
+      this._workspaceService.activeWorkspace = command.data as Workspace;
     }
   }
 
@@ -45,19 +55,12 @@ export class AppComponent implements OnInit {
   }
 
   private async showIde() {
-    await this._eventManagerService.EventManager.sendEvent<SetWorkspaceCommandData>(
-      {
-        eventType: EventType.IdeSetWorkspace,
-        uniqueIdentifier: EventManager.generateUniqueIdentifire(),
-        data: new SetWorkspaceCommandData(['/home/project/calpvin-ide-ui/src/app'])
-      }, false);
-
     this._ide.nativeElement.style.display = 'block';
   }
 
   @HostListener('document:keydown', ['$event'])
   onKeydownHandler(event: KeyboardEvent) {
-    if (event.ctrlKey && event.key === 'q') {
+    if (event.altKey && event.key === 'q') {
       this._ide.nativeElement.style.display === 'block' ? this.hideIde() : this.showIde();
     }
   }
