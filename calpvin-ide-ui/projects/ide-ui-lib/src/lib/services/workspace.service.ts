@@ -1,11 +1,11 @@
-import { Injectable } from '@angular/core';
 import { Workspace, EventManager, EventType } from 'calpvin-ide-shared/IdeCommand';
 import { EventManagerService } from './event-manager.service';
+import { Injectable } from '@angular/core';
 
 
-Injectable({
-  providedIn: 'platform'
-});
+@Injectable({
+  providedIn: 'root'
+})
 export class WorkspaceService {
 
   constructor(private readonly _eventManagerService: EventManagerService) {

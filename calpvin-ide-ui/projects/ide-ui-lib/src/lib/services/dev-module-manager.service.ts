@@ -5,7 +5,7 @@ import { VirtualFileTreeService } from './virtual-tree.service';
 import { EventManagerService } from './event-manager.service';
 
 @Injectable({
-  providedIn: 'platform'
+  providedIn: 'root'
 })
 export class DevModuleManagerService {
 

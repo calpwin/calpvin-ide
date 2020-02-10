@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { EventManager } from 'calpvin-ide-shared/IdeCommand';
 
 @Injectable({
-  providedIn: 'platform'
+  providedIn: 'root'
 })
 export class EventManagerService {
   public EventManager: EventManager;

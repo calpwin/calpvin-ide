@@ -5,7 +5,7 @@ import * as csstree from 'css-tree';
 import { EventManagerService } from './event-manager.service';
 
 @Injectable({
-  providedIn: 'platform'
+  providedIn: 'root'
 })
 export class VirtualFileTreeService {
   private readonly _virtualFiles: VirtualFile[] = [];
