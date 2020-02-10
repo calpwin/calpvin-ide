@@ -21,7 +21,7 @@
     "@angular/platform-browser": "~8.2.14",
     "@angular/platform-browser-dynamic": "~8.2.14",
     "@angular/router": "~8.2.14",
-    "calpvin-ide-shared": "link:lib/calpvin-ide-shared",
+
     "css-tree": "^1.0.0-alpha.39",
     "guid-typescript": "^1.0.9",
     "reset-css": "^5.0.1",

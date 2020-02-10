@@ -14,7 +14,7 @@ import { CideCPropertyEditorComponent } from './components/cide-c-property-edito
     CideCPropertyEditorComponent],
   imports: [
   ],
-  exports: [CideComponentDirective]
+  exports: [CideComponentDirective, CideCPropertyEditorComponent]
 })
 export class IdeUiLibModule {
   static forRoot(): ModuleWithProviders {
