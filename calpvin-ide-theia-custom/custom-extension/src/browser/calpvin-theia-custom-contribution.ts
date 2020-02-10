@@ -145,8 +145,6 @@ export class CalpvinTheiaFrontendApplicationContribution implements FrontendAppl
             await editor.commandService.executeCommand('editor.action.formatDocument');  
             await editor.document.save();
             console.log(editor.document.getText());
-            
-            // await this.fileSystem.setContent(fileStat!, (command.data as VirtualFile).content!);
         }
         else if (command.eventType == EventType.SetWorkspace) {
             this._activeWorkspace = command.data as Workspace;
@@ -161,62 +159,7 @@ export class CalpvinTheiaFrontendApplicationContribution implements FrontendAppl
             }, false);
         }
         else if (command.eventType === EventType.IdeFormatDocument) {
-            // const uri = (command.data as IdeFormatDocumentCommandData).uri;
-
-            // const fileUri = new URI(`/home/project/calpvin-ide-ui/src/app/${this._activeWorkspace.activeModule}/${this._activeWorkspace.activeComponent}/${uri}`);
-
-            // const editor = await this.monacoEditorProvider.get(fileUri);
-            // editor.focus();
-            // await editor.commandService.executeCommand('editor.action.formatDocument');  
-            // await editor.document.save();
-            // const documentContent = await editor.document.getText();
-            // const fileStat = await this.fileSystem.getFileStat(fileUri.toString());
-
-            // await this.fileSystem.setContent(fileStat!, documentContent);
-                   
-        }
-        // else if (command.eventType === EventType.IdeSetWorkspace) {
-        //     // const commandData = command.data as SetWorkspaceCommandData;
-
-        //     // await this.preferenceServiceImpl.set('folders', '[]', PreferenceScope.Workspace);
-
-
-        //     // const stat = await this.fileSystem.setContent(this.workspaceService.workspace!, result);
-
-        //     const { content } = await this.fileSystem.resolveContent(this._workspaceFileUri.toString());
-
-        //     const workspaceJson = jsoncparser.parse(content);
-
-        //     (workspaceJson as WorkspaceData).folders = [{ path: 'file:///home/project/calpvin-ide-ui/src/app' }];
-
-        //     const worspaceContentEdited = JSON.stringify(workspaceJson);
-
-        //     const fileStat = await this.fileSystem.getFileStat(this._workspaceFileUri.toString());
-        //     await this.fileSystem.setContent(fileStat!, worspaceContentEdited);
-
-        //     // const allRoots = this.workspaceService.tryGetRoots().map(x => new URI(x.uri));            
-
-        //     // const userHome = await this.fileSystem.getCurrentUserHome();
-        //     // const homeDirPath = await this.fileSystem.getFsPath(userHome!.uri);
-        //     // const untitledWorkspace = getTemporaryWorkspaceFileUri(new URI(homeDirPath));
-
-        //     // await this.workspaceService.spliceRoots(0, allRoots.length);            
-        //     // await this.workspaceService.spliceRoots(0, 0, new URI('/home/project/calpvin-ide-ui/src/app'));
-        //     // await this.workspaceService.save(new URI('/home/project/hosts.theia-workspace'));
-
-
-        //     // console.log(homeDirPath);
-        //     // console.log(untitledWorkspace);
-        //     // console.log(commandData);
-
-
-        //     // await this.workspaceService.addRoot(new URI(commandData.rootUris[0]));
-
-        //     // await this.workspaceService.removeRoots([new URI('/home/project/calpvin-ide-ui')]);
-        //     // console.log(allRoots);
-
-        //     // commandData.rootUris.forEach(uri => this.workspaceService.addRoot(new URI(uri)));
-        // }
+        }        
     }
 
     private async setActiveWorkplace() {
