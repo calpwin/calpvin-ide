@@ -8,7 +8,8 @@ export enum EventType {
   IdeStartEvent,
   AppHideIde,
   SetWorkspace,
-  GetWorkspace
+  GetWorkspace,
+  IdeFormatDocument
 }
 
 export enum VirtualFileType {
@@ -32,6 +33,10 @@ export class ComponentFileCommand implements IdeEvent<VirtualFile> {
   eventType: EventType;
   data: VirtualFile;
   uniqueIdentifier: string;
+}
+
+export class IdeFormatDocumentCommandData {
+  uri: string;
 }
 
 

@@ -8,6 +8,8 @@ import { WorkspaceServer, THEIA_EXT } from "@theia/workspace/lib/common";
 import URI from "@theia/core/lib/common/uri";
 import { WorkspacePreferences } from "@theia/workspace/lib/browser/workspace-preferences";
 import * as jsoncparser from 'jsonc-parser';
+import { MonacoEditorProvider } from '@theia/monaco/lib/browser/monaco-editor-provider';
+
 
 export const CalpvinTheiaCustomCommand = {
     id: 'CalpvinTheiaCustom.command',
@@ -70,6 +72,9 @@ export class CalpvinTheiaFrontendApplicationContribution implements FrontendAppl
     @inject(WorkspacePreferences)
     protected workspacePreferences: WorkspacePreferences;
 
+    @inject(MonacoEditorProvider)
+    protected monacoEditorProvider: MonacoEditorProvider;
+
     private eventManager: EventManager;
     _workspaceFileUri: URI;
     private _activeWorkspace = new Workspace();
@@ -79,7 +84,7 @@ export class CalpvinTheiaFrontendApplicationContribution implements FrontendAppl
         const userHome = await this.fileSystem.getCurrentUserHome();
         const homeDirPath = await this.fileSystem.getFsPath(userHome!.uri);
         this._workspaceFileUri = new URI(homeDirPath).resolve('.theia').resolve(`developer.${THEIA_EXT}`).withScheme('file');
-        await this.workspaceService.save(this._workspaceFileUri);
+        // await this.workspaceService.save(this._workspaceFileUri);
 
         this._activeWorkspace.activeComponent = 'test-component';
         this._activeWorkspace.activeModule = 'test-module';
@@ -133,19 +138,42 @@ export class CalpvinTheiaFrontendApplicationContribution implements FrontendAppl
             const componentName = (command.data as VirtualFile).componentName;
             const fileName = (command.data as VirtualFile).fileName;
             const fileStat = await this.fileSystem.getFileStat(`file:///home/project/calpvin-ide-ui/src/app/test-module/${componentName}/${fileName}`);
-            await this.fileSystem.setContent(fileStat!, (command.data as VirtualFile).content!);
+            const fileUri = new URI(fileStat?.uri);
+            const editor = await this.monacoEditorProvider.get(fileUri);            
+            editor.focus();
+            editor.document.textEditorModel.setValue((command.data as VirtualFile).content!);
+            await editor.commandService.executeCommand('editor.action.formatDocument');  
+            await editor.document.save();
+            console.log(editor.document.getText());
+            
+            // await this.fileSystem.setContent(fileStat!, (command.data as VirtualFile).content!);
         }
         else if (command.eventType == EventType.SetWorkspace) {
             this._activeWorkspace = command.data as Workspace;
 
             this.setActiveWorkplace();
         }
-        else if (command.eventType == EventType.GetWorkspace) {
+        else if (command.eventType === EventType.GetWorkspace) {
             this.eventManager.sendEvent({
                 eventType: EventType.SetWorkspace,
                 uniqueIdentifier: e.data.uniqueIdentifier,
                 data: this._activeWorkspace
             }, false);
+        }
+        else if (command.eventType === EventType.IdeFormatDocument) {
+            // const uri = (command.data as IdeFormatDocumentCommandData).uri;
+
+            // const fileUri = new URI(`/home/project/calpvin-ide-ui/src/app/${this._activeWorkspace.activeModule}/${this._activeWorkspace.activeComponent}/${uri}`);
+
+            // const editor = await this.monacoEditorProvider.get(fileUri);
+            // editor.focus();
+            // await editor.commandService.executeCommand('editor.action.formatDocument');  
+            // await editor.document.save();
+            // const documentContent = await editor.document.getText();
+            // const fileStat = await this.fileSystem.getFileStat(fileUri.toString());
+
+            // await this.fileSystem.setContent(fileStat!, documentContent);
+                   
         }
         // else if (command.eventType === EventType.IdeSetWorkspace) {
         //     // const commandData = command.data as SetWorkspaceCommandData;

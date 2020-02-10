@@ -35,9 +35,9 @@ export class AppComponent implements OnInit {
     if (command.eventType === EventType.IdeStartEvent) {
       await this.virtualFileTree.addComponentFiles('test-component');
 
-      setInterval(() => {
-        // this._workspaceService.activeComponent = '';
-      }, 3000);
+      // setTimeout(() => {
+      //   this._workspaceService.activeComponent = 'test-component';
+      // }, 6000);
     } else if (command.eventType === EventType.AppHideIde) {
       this.hideIde();
     } else if (command.eventType === EventType.SetWorkspace) {

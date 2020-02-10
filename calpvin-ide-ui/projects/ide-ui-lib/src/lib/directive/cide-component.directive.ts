@@ -1,7 +1,7 @@
 import { Directive, Renderer2, ElementRef, Input, OnInit, Inject } from '@angular/core';
 import { Element, ParseTreeResult } from '@angular/compiler';
 import { findElement } from '../extension/angular-html-elements.extension';
-import { VirtualFileType, EventManager, EventType, VirtualFile } from 'calpvin-ide-shared/IdeCommand';
+import { EventManager, EventType, VirtualFile, IdeFormatDocumentCommandData } from 'calpvin-ide-shared/IdeCommand';
 import { DragDrop, DragRef } from '@angular/cdk/drag-drop';
 import { tryGetNode, setCssValue } from '../extension/csstree-walker.extension';
 import { Point } from '@angular/cdk/drag-drop/typings/drag-ref';
@@ -59,11 +59,18 @@ export class CideComponentDirective implements OnInit {
 
     file.content = csstree.generate(file.astTree);
 
-    const res = await this.eventManagerService.EventManager.sendEvent<VirtualFile>(
+    await this.eventManagerService.EventManager.sendEvent<VirtualFile>(
       {
         eventType: EventType.WriteComponentFile,
         uniqueIdentifier: EventManager.generateUniqueIdentifire(),
         data: file
+      }, false);
+
+    await this.eventManagerService.EventManager.sendEvent<IdeFormatDocumentCommandData>(
+      {
+        eventType: EventType.IdeFormatDocument,
+        uniqueIdentifier: EventManager.generateUniqueIdentifire(),
+        data: { uri: file.fileName }
       }, false);
   }
 
