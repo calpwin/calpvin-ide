@@ -20,10 +20,10 @@ export const hmrBootstrap = async (module: any, bootstrap: () => Promise<NgModul
 
       document.getElementsByTagName('cide-wysiwyg-ui-editor')[0].insertAdjacentElement('beforeend', devModuleNode);
 
-      devModuleRef = await platformBrowserDynamic().bootstrapModule(devModule);
+      // devModuleRef = await platformBrowserDynamic().bootstrapModule(devModule);
 
-      const devModuleManagerService = mainModule.injector.get(DevModuleManagerService);
-      devModuleManagerService.applyCideComponentDirective();
+      // const devModuleManagerService = mainModule.injector.get(DevModuleManagerService);
+      // devModuleManagerService.applyCideComponentDirective();
     });
   }
 
@@ -32,11 +32,11 @@ export const hmrBootstrap = async (module: any, bootstrap: () => Promise<NgModul
   if (el) {
     el.insertAdjacentElement('beforeend', devModuleNode);
 
-    devModuleRef = await platformBrowserDynamic().bootstrapModule(devModule);
+    // devModuleRef = await platformBrowserDynamic().bootstrapModule(devModule);
 
-    const devModuleManagerService = mainModule.injector.get(DevModuleManagerService);
-    await devModuleManagerService.updateVirtualTreeAsync();
-    devModuleManagerService.applyCideComponentDirective();
+    // const devModuleManagerService = mainModule.injector.get(DevModuleManagerService);
+    // await devModuleManagerService.updateVirtualTreeAsync();
+    // devModuleManagerService.applyCideComponentDirective();
   }
 
   module.hot.dispose(() => {

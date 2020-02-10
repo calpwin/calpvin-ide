@@ -1,4 +1,4 @@
-import { Component, ViewChild, OnInit, ElementRef, HostListener } from '@angular/core';
+import { Component, ViewChild, OnInit, ElementRef, HostListener, Inject, forwardRef } from '@angular/core';
 import { EventType, IdeEvent, Workspace } from 'calpvin-ide-shared/IdeCommand';
 import { EventManagerService } from 'projects/ide-ui-lib/src/lib/services/event-manager.service';
 import { VirtualFileTreeService } from 'projects/ide-ui-lib/src/lib/services/virtual-tree.service';

@@ -41,7 +41,7 @@
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.app.json",
-            "aot": false,
+            "aot": true,
             "assets": [
               "src/favicon.ico",
               "src/assets"
@@ -64,7 +64,6 @@
               "sourceMap": false,
               "extractCss": true,
               "namedChunks": false,
-              "aot": true,
               "extractLicenses": true,
               "vendorChunk": false,
               "buildOptimizer": true,
@@ -82,6 +81,12 @@
               ]
             },
             "hmr": {
+              "budgets": [
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb"
+                }
+              ],
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
@@ -167,6 +172,11 @@
           "options": {
             "tsConfig": "projects/ide-ui-lib/tsconfig.lib.json",
             "project": "projects/ide-ui-lib/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/ide-ui-lib/tsconfig.lib.prod.json"
+            }
           }
         },
         "test": {
@@ -192,5 +202,8 @@
       }
     }
   },
-  "defaultProject": "calpvin-ide"
+  "defaultProject": "calpvin-ide",
+  "cli": {
+    "analytics": false
+  }
 }
