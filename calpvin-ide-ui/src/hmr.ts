@@ -1,4 +1,4 @@
-import { NgModuleRef, ApplicationRef } from '@angular/core';
+import { NgModuleRef, ApplicationRef, PlatformRef } from '@angular/core';
 import { createNewHosts } from '@angularclass/hmr';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { AppModule } from './app/app.module';
@@ -12,31 +12,34 @@ export const hmrBootstrap = async (module: any, bootstrap: () => Promise<NgModul
   const devModule = require('./app/test-module/test-module.module').TestModuleModule;
   const devModuleNode = document.createElement('cide-test-component');
   let mainModule = (window as any).NgModule as NgModuleRef<AppModule>;
+  let platformRef = (window as any).PlatformRef as PlatformRef;
 
   if (!mainModule) {
     bootstrap().then(async mod => {
       (window as any).NgModule = mod;
       mainModule = mod as NgModuleRef<AppModule>;
+      (window as any).PlatformRef = mainModule.injector.get(PlatformRef);
+      platformRef = (window as any).PlatformRef as PlatformRef;
 
       document.getElementsByTagName('cide-wysiwyg-ui-editor')[0].insertAdjacentElement('beforeend', devModuleNode);
 
-      // devModuleRef = await platformBrowserDynamic().bootstrapModule(devModule);
+      devModuleRef = await platformRef.bootstrapModule(devModule);
 
-      // const devModuleManagerService = mainModule.injector.get(DevModuleManagerService);
-      // devModuleManagerService.applyCideComponentDirective();
+      const devModuleManagerService = mainModule.injector.get(DevModuleManagerService);
+      devModuleManagerService.applyCideComponentDirective();
     });
-  }
+  } else {
+    const el = document.getElementsByTagName('cide-wysiwyg-ui-editor')[0];
 
-  const el = document.getElementsByTagName('cide-wysiwyg-ui-editor')[0];
+    if (el) {
+      el.insertAdjacentElement('beforeend', devModuleNode);
 
-  if (el) {
-    el.insertAdjacentElement('beforeend', devModuleNode);
+      devModuleRef = await platformRef.bootstrapModule(devModule);
 
-    // devModuleRef = await platformBrowserDynamic().bootstrapModule(devModule);
-
-    // const devModuleManagerService = mainModule.injector.get(DevModuleManagerService);
-    // await devModuleManagerService.updateVirtualTreeAsync();
-    // devModuleManagerService.applyCideComponentDirective();
+      const devModuleManagerService = mainModule.injector.get(DevModuleManagerService);
+      await devModuleManagerService.updateVirtualTreeAsync();
+      devModuleManagerService.applyCideComponentDirective();
+    }
   }
 
   module.hot.dispose(() => {
