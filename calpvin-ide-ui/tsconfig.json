@@ -29,6 +29,10 @@
       "@stansil/component-property-editor": [
         "dist/stansil/component-property-editor/stansil-component-property-editor",
         "dist/stansil/component-property-editor"
+      ],
+      "@plankio/component-visual-editor": [
+        "dist/plankio/component-visual-editor/plankio-component-visual-editor",
+        "dist/plankio/component-visual-editor"
       ]
     }
   },

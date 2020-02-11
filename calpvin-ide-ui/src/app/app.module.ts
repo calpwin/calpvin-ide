@@ -7,6 +7,7 @@ import { WysiwygUiEditorComponent } from './wysiwyg-ui-editor/wysiwyg-ui-editor.
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { IdeComponent } from './ide/ide.component';
 import { IdeUiLibModule } from 'projects/ide-ui-lib/src/public-api';
+import { ComponentVisualEditorModule } from 'projects/plankio/component-visual-editor/src/public-api';
 
 @NgModule({
   declarations: [
@@ -18,7 +19,8 @@ import { IdeUiLibModule } from 'projects/ide-ui-lib/src/public-api';
     BrowserModule,
     AppRoutingModule,
     DragDropModule,
-    IdeUiLibModule.forRoot()
+    IdeUiLibModule.forRoot(),
+    ComponentVisualEditorModule
   ],
   providers: [],
   bootstrap: [AppComponent]

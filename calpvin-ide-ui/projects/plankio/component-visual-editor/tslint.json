@@ -1,0 +1,17 @@
+{
+  "extends": "../../../tslint.json",
+  "rules": {
+    "directive-selector": [
+      true,
+      "attribute",
+      "plunkio",
+      "camelCase"
+    ],
+    "component-selector": [
+      true,
+      "element",
+      "plunkio",
+      "kebab-case"
+    ]
+  }
+}

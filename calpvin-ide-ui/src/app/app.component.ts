@@ -1,4 +1,4 @@
-import { Component, ViewChild, OnInit, ElementRef, HostListener, Inject, forwardRef } from '@angular/core';
+import { Component, ViewChild, OnInit, ElementRef, HostListener, } from '@angular/core';
 import { EventType, IdeEvent, Workspace } from 'calpvin-ide-shared/IdeCommand';
 import { EventManagerService } from 'projects/ide-ui-lib/src/lib/services/event-manager.service';
 import { VirtualFileTreeService } from 'projects/ide-ui-lib/src/lib/services/virtual-tree.service';
@@ -34,10 +34,6 @@ export class AppComponent implements OnInit {
 
     if (command.eventType === EventType.IdeStartEvent) {
       await this.virtualFileTree.addComponentFiles('test-component');
-
-      // setTimeout(() => {
-      //   this._workspaceService.activeComponent = 'test-component';
-      // }, 6000);
     } else if (command.eventType === EventType.AppHideIde) {
       this.hideIde();
     } else if (command.eventType === EventType.SetWorkspace) {

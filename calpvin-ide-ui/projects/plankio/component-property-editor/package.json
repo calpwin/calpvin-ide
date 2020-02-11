@@ -1,5 +1,5 @@
 {
-  "name": "@plambr/component-property-editor",
+  "name": "@plankio/component-property-editor",
   "version": "0.0.1",
   "peerDependencies": {
     "@angular/common": "^9.0.0",
