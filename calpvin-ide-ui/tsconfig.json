@@ -25,6 +25,10 @@
       ],
       "ide-ui-lib/*": [
         "dist/ide-ui-lib/*"
+      ],
+      "@stansil/component-property-editor": [
+        "dist/stansil/component-property-editor/stansil-component-property-editor",
+        "dist/stansil/component-property-editor"
       ]
     }
   },

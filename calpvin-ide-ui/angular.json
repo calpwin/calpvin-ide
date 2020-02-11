@@ -200,6 +200,46 @@
           }
         }
       }
+    },
+    "@stansil/component-property-editor": {
+      "projectType": "library",
+      "root": "projects/stansil/component-property-editor",
+      "sourceRoot": "projects/stansil/component-property-editor/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-ng-packagr:build",
+          "options": {
+            "tsConfig": "projects/stansil/component-property-editor/tsconfig.lib.json",
+            "project": "projects/stansil/component-property-editor/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/stansil/component-property-editor/tsconfig.lib.prod.json"
+            }
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/stansil/component-property-editor/src/test.ts",
+            "tsConfig": "projects/stansil/component-property-editor/tsconfig.spec.json",
+            "karmaConfig": "projects/stansil/component-property-editor/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/stansil/component-property-editor/tsconfig.lib.json",
+              "projects/stansil/component-property-editor/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
     }
   },
   "defaultProject": "calpvin-ide",
