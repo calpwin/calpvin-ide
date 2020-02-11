@@ -7,10 +7,6 @@ import { WysiwygUiEditorComponent } from './wysiwyg-ui-editor/wysiwyg-ui-editor.
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { IdeComponent } from './ide/ide.component';
 import { IdeUiLibModule } from 'projects/ide-ui-lib/src/public-api';
-import { EventManagerService } from 'projects/ide-ui-lib/src/lib/services/event-manager.service';
-import { VirtualFileTreeService } from 'projects/ide-ui-lib/src/lib/services/virtual-tree.service';
-import { DevModuleManagerService } from 'projects/ide-ui-lib/src/lib/services/dev-module-manager.service';
-import { WorkspaceService } from 'projects/ide-ui-lib/src/lib/services/workspace.service';
 
 @NgModule({
   declarations: [

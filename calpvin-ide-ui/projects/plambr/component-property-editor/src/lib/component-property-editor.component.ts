@@ -2,8 +2,11 @@ import { Component, OnInit } from '@angular/core';
 
 @Component({
   selector: 'lib-component-property-editor',
-  templateUrl: './component-property-editor.component.html',
-  styleUrls: ['./component-property-editor.component.scss'],
+  template: `
+    <p>
+      component-property-editor works!
+    </p>
+  `,
   styles: []
 })
 export class ComponentPropertyEditorComponent implements OnInit {
