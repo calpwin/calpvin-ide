@@ -19,7 +19,7 @@ export const hmrBootstrap = async (module: any, bootstrap: () => Promise<NgModul
       (window as any).PlatformRef = mainModule.injector.get(PlatformRef);
       platformRef = (window as any).PlatformRef as PlatformRef;
 
-      document.getElementsByTagName('plunkio-component-visual-editor')[0].insertAdjacentElement('beforeend', devModuleNode);
+      document.getElementsByClassName('component-canva-wrapper')[0].insertAdjacentElement('beforeend', devModuleNode);
 
       devModuleRef = await platformRef.bootstrapModule(devModule);
 
@@ -27,7 +27,7 @@ export const hmrBootstrap = async (module: any, bootstrap: () => Promise<NgModul
       devModuleManagerService.applyCideComponentDirective();
     });
   } else {
-    const el = document.getElementsByTagName('plunkio-component-visual-editor')[0];
+    const el = document.getElementsByClassName('component-canva-wrapper')[0];
 
     if (el) {
       el.insertAdjacentElement('beforeend', devModuleNode);

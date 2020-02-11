@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ComponentFactoryResolver, ViewChild, ElementRef } from '@angular/core';
+import { ComponentVisualEditorService } from '../public-api';
 
 @Component({
   selector: 'plunkio-component-visual-editor',
@@ -7,9 +8,15 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ComponentVisualEditorComponent implements OnInit {
 
-  constructor() { }
+  @ViewChild('componentPropertyWrapper') componentPropertyWrapper: ElementRef<HTMLElement>;
+
+  constructor(
+    private readonly _componentFactoryResolver: ComponentFactoryResolver,
+    private readonly _componentVisualEditorService: ComponentVisualEditorService
+  ) { }
 
   ngOnInit(): void {
+    this._componentFactoryResolver.resolveComponentFactory()
   }
 
 }

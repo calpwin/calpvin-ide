@@ -3,6 +3,7 @@ import { CideComponentDirective } from '../directive/cide-component.directive';
 import { DragDrop } from '@angular/cdk/drag-drop';
 import { VirtualFileTreeService } from './virtual-tree.service';
 import { EventManagerService } from './event-manager.service';
+import { ComponentVisualEditorService } from 'projects/plankio/component-visual-editor/src/public-api';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +14,8 @@ export class DevModuleManagerService {
     @Inject(DragDrop) private dragDrop: DragDrop,
     private rendererFactory: RendererFactory2,
     private virtualTree: VirtualFileTreeService,
-    private readonly eventManagerService: EventManagerService) {
+    private readonly eventManagerService: EventManagerService,
+    private readonly _componentVisualEditorService: ComponentVisualEditorService) {
 
   }
 
@@ -33,7 +35,8 @@ export class DevModuleManagerService {
         this.rendererFactory.createRenderer(null, null),
         new ElementRef(compEl as HTMLElement),
         this.virtualTree,
-        this.eventManagerService);
+        this.eventManagerService,
+        this._componentVisualEditorService);
 
       directive.baseComponentTagName = compEl.getAttribute('cide-belongs-to-component');
 

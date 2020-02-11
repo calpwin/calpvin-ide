@@ -1,4 +1,4 @@
-import { Directive, Renderer2, ElementRef, Input, OnInit, Inject } from '@angular/core';
+import { Directive, Renderer2, ElementRef, Input, OnInit, Inject, HostListener } from '@angular/core';
 import { Element, ParseTreeResult } from '@angular/compiler';
 import { findElement } from '../extension/angular-html-elements.extension';
 import { EventManager, EventType, VirtualFile, IdeFormatDocumentCommandData } from 'calpvin-ide-shared/IdeCommand';
@@ -9,6 +9,7 @@ import { CssNode, Rule } from 'css-tree';
 import { VirtualFileTreeService } from '../services/virtual-tree.service';
 import { EventManagerService } from '../services/event-manager.service';
 import { Point } from '@angular/cdk/drag-drop/drag-ref';
+import { ComponentVisualEditorService } from 'projects/plankio/component-visual-editor/src/public-api';
 
 @Directive({
   selector: '[cideComponent]'
@@ -25,7 +26,8 @@ export class CideComponentDirective implements OnInit {
     private renderer: Renderer2,
     private hostElement: ElementRef<HTMLElement>,
     private virtualTree: VirtualFileTreeService,
-    private readonly eventManagerService: EventManagerService) {
+    private readonly eventManagerService: EventManagerService,
+    private readonly _componentVisualEditorService: ComponentVisualEditorService) {
 
     renderer.addClass(hostElement.nativeElement, CideComponentDirective.ComponentCssClass);
 
@@ -75,6 +77,8 @@ export class CideComponentDirective implements OnInit {
   }
 
   private onClick = async (event: MouseEvent) => {
+    this._componentVisualEditorService.selectedElement = this.hostElement;
+
     if (event.ctrlKey) {
       const componentName = VirtualFileTreeService.getComponentName(this.baseComponentTagName);
       const file = this.virtualTree.getFile(componentName, `${componentName}.component.html`);
