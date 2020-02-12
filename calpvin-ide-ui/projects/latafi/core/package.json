@@ -7,8 +7,5 @@
     "tslib": "^1.10.0",
     "rxjs": "~6.5.4",
     "zone.js": "~0.10.2"
-  },
-  "dependencies": {
-    "@latafi/component-visual-editor": "0.0.1"
   }
 }

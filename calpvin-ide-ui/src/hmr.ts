@@ -1,6 +1,7 @@
 import { NgModuleRef, PlatformRef } from '@angular/core';
 import { AppModule } from './app/app.module';
-import { DevModuleManagerService } from 'projects/ide-ui-lib/src/lib/services/dev-module-manager.service';
+import { DevModuleManagerService } from '@latafi/core/src/lib/services/dev-module-manager.service';
+import { ComponentVisualEditorService } from '@latafi/component-visual-editor/src/lib/component-visual-editor.service';
 
 export const hmrBootstrap = async (module: any, bootstrap: () => Promise<NgModuleRef<any>>) => {
   module.hot.accept();
@@ -23,8 +24,8 @@ export const hmrBootstrap = async (module: any, bootstrap: () => Promise<NgModul
 
       devModuleRef = await platformRef.bootstrapModule(devModule);
 
-      const devModuleManagerService = mainModule.injector.get(DevModuleManagerService);
-      devModuleManagerService.applyCideComponentDirective();
+      const componentVisualEditorService = mainModule.injector.get(ComponentVisualEditorService);
+      componentVisualEditorService.applyLatafiComponentDirective();
     });
   } else {
     const el = document.getElementsByClassName('component-canva-wrapper')[0];
@@ -36,7 +37,9 @@ export const hmrBootstrap = async (module: any, bootstrap: () => Promise<NgModul
 
       const devModuleManagerService = mainModule.injector.get(DevModuleManagerService);
       await devModuleManagerService.updateVirtualTreeAsync();
-      devModuleManagerService.applyCideComponentDirective();
+
+      const componentVisualEditorService = mainModule.injector.get(ComponentVisualEditorService);
+      componentVisualEditorService.applyLatafiComponentDirective();
     }
   }
 

@@ -161,46 +161,6 @@
         }
       }
     },
-    "ide-ui-lib": {
-      "projectType": "library",
-      "root": "projects/ide-ui-lib",
-      "sourceRoot": "projects/ide-ui-lib/src",
-      "prefix": "lib",
-      "architect": {
-        "build": {
-          "builder": "@angular-devkit/build-ng-packagr:build",
-          "options": {
-            "tsConfig": "projects/ide-ui-lib/tsconfig.lib.json",
-            "project": "projects/ide-ui-lib/ng-package.json"
-          },
-          "configurations": {
-            "production": {
-              "tsConfig": "projects/ide-ui-lib/tsconfig.lib.prod.json"
-            }
-          }
-        },
-        "test": {
-          "builder": "@angular-devkit/build-angular:karma",
-          "options": {
-            "main": "projects/ide-ui-lib/src/test.ts",
-            "tsConfig": "projects/ide-ui-lib/tsconfig.spec.json",
-            "karmaConfig": "projects/ide-ui-lib/karma.conf.js"
-          }
-        },
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": [
-              "projects/ide-ui-lib/tsconfig.lib.json",
-              "projects/ide-ui-lib/tsconfig.spec.json"
-            ],
-            "exclude": [
-              "**/node_modules/**"
-            ]
-          }
-        }
-      }
-    },
     "@latafi/component-property-editor": {
       "projectType": "library",
       "root": "projects/latafi/component-property-editor",

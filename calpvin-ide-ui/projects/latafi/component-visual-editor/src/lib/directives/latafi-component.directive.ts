@@ -1,20 +1,20 @@
-import { Directive, Renderer2, ElementRef, Input, OnInit, Inject, HostListener } from '@angular/core';
+import { Directive, Renderer2, ElementRef, Input, OnInit, Inject } from '@angular/core';
 import { Element, ParseTreeResult } from '@angular/compiler';
-import { findElement } from '../extension/angular-html-elements.extension';
 import { EventManager, EventType, VirtualFile, IdeFormatDocumentCommandData } from 'calpvin-ide-shared/IdeCommand';
 import { DragDrop, DragRef } from '@angular/cdk/drag-drop';
-import { tryGetNode, setCssValue } from '../extension/csstree-walker.extension';
 import * as csstree from 'css-tree';
 import { CssNode, Rule } from 'css-tree';
-import { VirtualFileTreeService } from '../services/virtual-tree.service';
-import { EventManagerService } from '../services/event-manager.service';
+import { VirtualFileTreeService } from '@latafi/core/src/lib/services/virtual-tree.service';
+import { EventManagerService } from '@latafi/core/src/lib/services/event-manager.service';
+import { findElement } from '@latafi/core/src/lib/extension/angular-html-elements.extension';
+import { tryGetNode, setCssValue } from '@latafi/core/src/lib/extension/csstree-walker.extension';
 import { Point } from '@angular/cdk/drag-drop/drag-ref';
-import { ComponentVisualEditorService } from 'projects/latafi/component-visual-editor/src/public-api';
+import { ComponentVisualEditorService } from '../component-visual-editor.service';
 
 @Directive({
-  selector: '[cideComponent]'
+  selector: '[latafiComponent]'
 })
-export class CideComponentDirective implements OnInit {
+export class LatafiComponentDirective implements OnInit {
   public static readonly ComponentCssClass = 'cide-component';
   public static readonly ComponentUniqueCssClass = 'cide-unique';
 
@@ -29,7 +29,7 @@ export class CideComponentDirective implements OnInit {
     private readonly eventManagerService: EventManagerService,
     private readonly _componentVisualEditorService: ComponentVisualEditorService) {
 
-    renderer.addClass(hostElement.nativeElement, CideComponentDirective.ComponentCssClass);
+    renderer.addClass(hostElement.nativeElement, LatafiComponentDirective.ComponentCssClass);
 
     hostElement.nativeElement.addEventListener('click', this.onClick);
   }
@@ -103,7 +103,7 @@ export class CideComponentDirective implements OnInit {
     let uniqueClassName: string;
 
     (el || this.hostElement.nativeElement).classList.forEach(element => {
-      if (element.startsWith(CideComponentDirective.ComponentUniqueCssClass + '-')) { uniqueClassName = element; }
+      if (element.startsWith(LatafiComponentDirective.ComponentUniqueCssClass + '-')) { uniqueClassName = element; }
     });
 
     return uniqueClassName;

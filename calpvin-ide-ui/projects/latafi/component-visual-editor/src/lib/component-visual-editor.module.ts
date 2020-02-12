@@ -1,6 +1,7 @@
 import { NgModule, ModuleWithProviders } from '@angular/core';
 import { ComponentVisualEditorComponent } from './component-visual-editor.component';
 import { ComponentVisualEditorService } from './component-visual-editor.service';
+import { ILatafiExtension } from '@latafi/core/src/lib/services/i-extenson.service';
 
 
 @NgModule({
@@ -14,7 +15,7 @@ export class ComponentVisualEditorModule {
     return {
       ngModule: ComponentVisualEditorModule,
       providers: [
-        ComponentVisualEditorService]
+        { provide: ILatafiExtension, useClass: ComponentVisualEditorService, multi: true }]
     };
   }
 }

@@ -11,7 +11,6 @@ export class ComponentPropertyEditorComponent implements OnInit {
   constructor(
     private readonly _componentVisualEditorService: ComponentVisualEditorService
   ) {
-    _componentVisualEditorService.onPropertyEditorWrapperInit.subscribe(this.onComponentVisualEditorPropertyWrapperInit);
   }
 
   ngOnInit(): void {

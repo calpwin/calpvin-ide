@@ -20,12 +20,6 @@
       "dom"
     ],
     "paths": {
-      "ide-ui-lib": [
-        "dist/ide-ui-lib"
-      ],
-      "ide-ui-lib/*": [
-        "dist/ide-ui-lib/*"
-      ],
       "@latafi/component-property-editor": [
         "dist/latafi/component-property-editor/latafi-component-property-editor",
         "dist/latafi/component-property-editor"

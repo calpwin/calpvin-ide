@@ -12,6 +12,7 @@
     "src/**/*.d.ts",
     "lib/**/*.ts",
     "src/app/test-module/**/*.ts",
+    "projects/**/*.ts"
   ],
   "exclude": [
     "src/test.ts",

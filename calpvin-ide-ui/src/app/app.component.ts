@@ -1,8 +1,9 @@
-import { Component, ViewChild, OnInit, ElementRef, HostListener, } from '@angular/core';
+import { Component, ViewChild, OnInit, ElementRef, HostListener, PlatformRef, ApplicationRef, Injector, } from '@angular/core';
 import { EventType, IdeEvent, Workspace } from 'calpvin-ide-shared/IdeCommand';
-import { EventManagerService } from 'projects/ide-ui-lib/src/lib/services/event-manager.service';
-import { VirtualFileTreeService } from 'projects/ide-ui-lib/src/lib/services/virtual-tree.service';
-import { WorkspaceService } from 'projects/ide-ui-lib/src/lib/services/workspace.service';
+import { EventManagerService } from '@latafi/core/src/lib/services/event-manager.service';
+import { VirtualFileTreeService } from '@latafi/core/src/lib/services/virtual-tree.service';
+import { WorkspaceService } from '@latafi/core/src/lib/services/workspace.service';
+import { ILatafiExtension } from '@latafi/core/src/lib/services/i-extenson.service';
 
 @Component({
   selector: 'cide-root',
@@ -15,8 +16,9 @@ export class AppComponent implements OnInit {
     private virtualFileTree: VirtualFileTreeService,
     private _workspaceService: WorkspaceService,
     private _el: ElementRef<HTMLElement>,
-    private _eventManagerService: EventManagerService) {
-
+    private _eventManagerService: EventManagerService,
+    private readonly _injector: Injector) {
+    this.constractExtensions();
   }
 
   title = 'calpvin-ide';
@@ -25,6 +27,24 @@ export class AppComponent implements OnInit {
 
   async ngOnInit() {
     this._eventManagerService.init(window, (this._ide.nativeElement as any).contentWindow, this.messageEventListener);
+
+    this.initExtensions();
+  }
+
+  private initExtensions() {
+    const exts = this._injector.get(ILatafiExtension) as unknown as ILatafiExtension[];
+
+    exts.forEach(ext => {
+      ext.onAppInit();
+    });
+  }
+
+  private constractExtensions() {
+    const exts = this._injector.get(ILatafiExtension) as unknown as ILatafiExtension[];
+
+    exts.forEach(ext => {
+      ext.onBaseAppConstruct();
+    });
   }
 
   private messageEventListener = async (e: MessageEvent) => {

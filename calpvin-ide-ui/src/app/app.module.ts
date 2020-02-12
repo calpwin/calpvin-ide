@@ -5,9 +5,9 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { IdeComponent } from './ide/ide.component';
-import { IdeUiLibModule } from 'projects/ide-ui-lib/src/public-api';
-import { ComponentVisualEditorModule } from 'projects/latafi/component-visual-editor/src/public-api';
-import { ComponentPropertyEditorModule } from 'projects/latafi/component-property-editor/src/public-api';
+import { LatafiCoreModule } from '@latafi/core/src/lib/core.module';
+import { ComponentVisualEditorModule } from '@latafi/component-visual-editor/src/lib/component-visual-editor.module';
+import { ComponentPropertyEditorModule } from '@latafi/component-property-editor/src/lib/component-property-editor.module';
 
 @NgModule({
   declarations: [
@@ -18,7 +18,7 @@ import { ComponentPropertyEditorModule } from 'projects/latafi/component-propert
     BrowserModule,
     AppRoutingModule,
     DragDropModule,
-    IdeUiLibModule.forRoot(),
+    LatafiCoreModule.forRoot(),
     ComponentVisualEditorModule.forRoot(),
     ComponentPropertyEditorModule.forRoot()
   ],
