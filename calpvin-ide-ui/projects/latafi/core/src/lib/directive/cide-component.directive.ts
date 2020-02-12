@@ -9,7 +9,7 @@ import { CssNode, Rule } from 'css-tree';
 import { VirtualFileTreeService } from '../services/virtual-tree.service';
 import { EventManagerService } from '../services/event-manager.service';
 import { Point } from '@angular/cdk/drag-drop/drag-ref';
-import { ComponentVisualEditorService } from 'projects/latafi/component-visual-editor/src/public-api';
+import { ComponentVisualEditorService } from '@latafi/component-visual-editor/src/public-api';
 
 @Directive({
   selector: '[cideComponent]'

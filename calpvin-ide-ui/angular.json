@@ -201,38 +201,38 @@
         }
       }
     },
-    "@plankio/component-property-editor": {
+    "@latafi/component-property-editor": {
       "projectType": "library",
-      "root": "projects/plankio/component-property-editor",
-      "sourceRoot": "projects/plankio/component-property-editor/src",
+      "root": "projects/latafi/component-property-editor",
+      "sourceRoot": "projects/latafi/component-property-editor/src",
       "prefix": "lib",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-ng-packagr:build",
           "options": {
-            "tsConfig": "projects/plankio/component-property-editor/tsconfig.lib.json",
-            "project": "projects/plankio/component-property-editor/ng-package.json"
+            "tsConfig": "projects/latafi/component-property-editor/tsconfig.lib.json",
+            "project": "projects/latafi/component-property-editor/ng-package.json"
           },
           "configurations": {
             "production": {
-              "tsConfig": "projects/plankio/component-property-editor/tsconfig.lib.prod.json"
+              "tsConfig": "projects/latafi/component-property-editor/tsconfig.lib.prod.json"
             }
           }
         },
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
-            "main": "projects/plankio/component-property-editor/src/test.ts",
-            "tsConfig": "projects/plankio/component-property-editor/tsconfig.spec.json",
-            "karmaConfig": "projects/plankio/component-property-editor/karma.conf.js"
+            "main": "projects/latafi/component-property-editor/src/test.ts",
+            "tsConfig": "projects/latafi/component-property-editor/tsconfig.spec.json",
+            "karmaConfig": "projects/latafi/component-property-editor/karma.conf.js"
           }
         },
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
             "tsConfig": [
-              "projects/plankio/component-property-editor/tsconfig.lib.json",
-              "projects/plankio/component-property-editor/tsconfig.spec.json"
+              "projects/latafi/component-property-editor/tsconfig.lib.json",
+              "projects/latafi/component-property-editor/tsconfig.spec.json"
             ],
             "exclude": [
               "**/node_modules/**"
@@ -241,38 +241,78 @@
         }
       }
     },
-    "@plankio/component-visual-editor": {
+    "@latafi/component-visual-editor": {
       "projectType": "library",
-      "root": "projects/plankio/component-visual-editor",
-      "sourceRoot": "projects/plankio/component-visual-editor/src",
+      "root": "projects/latafi/component-visual-editor",
+      "sourceRoot": "projects/latafi/component-visual-editor/src",
       "prefix": "lib",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-ng-packagr:build",
           "options": {
-            "tsConfig": "projects/plankio/component-visual-editor/tsconfig.lib.json",
-            "project": "projects/plankio/component-visual-editor/ng-package.json"
+            "tsConfig": "projects/latafi/component-visual-editor/tsconfig.lib.json",
+            "project": "projects/latafi/component-visual-editor/ng-package.json"
           },
           "configurations": {
             "production": {
-              "tsConfig": "projects/plankio/component-visual-editor/tsconfig.lib.prod.json"
+              "tsConfig": "projects/latafi/component-visual-editor/tsconfig.lib.prod.json"
             }
           }
         },
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
-            "main": "projects/plankio/component-visual-editor/src/test.ts",
-            "tsConfig": "projects/plankio/component-visual-editor/tsconfig.spec.json",
-            "karmaConfig": "projects/plankio/component-visual-editor/karma.conf.js"
+            "main": "projects/latafi/component-visual-editor/src/test.ts",
+            "tsConfig": "projects/latafi/component-visual-editor/tsconfig.spec.json",
+            "karmaConfig": "projects/latafi/component-visual-editor/karma.conf.js"
           }
         },
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
             "tsConfig": [
-              "projects/plankio/component-visual-editor/tsconfig.lib.json",
-              "projects/plankio/component-visual-editor/tsconfig.spec.json"
+              "projects/latafi/component-visual-editor/tsconfig.lib.json",
+              "projects/latafi/component-visual-editor/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    },
+    "@latafi/core": {
+      "projectType": "library",
+      "root": "projects/latafi/core",
+      "sourceRoot": "projects/latafi/core/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-ng-packagr:build",
+          "options": {
+            "tsConfig": "projects/latafi/core/tsconfig.lib.json",
+            "project": "projects/latafi/core/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/latafi/core/tsconfig.lib.prod.json"
+            }
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/latafi/core/src/test.ts",
+            "tsConfig": "projects/latafi/core/tsconfig.spec.json",
+            "karmaConfig": "projects/latafi/core/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/latafi/core/tsconfig.lib.json",
+              "projects/latafi/core/tsconfig.spec.json"
             ],
             "exclude": [
               "**/node_modules/**"

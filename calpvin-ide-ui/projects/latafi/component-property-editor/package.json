@@ -1,0 +1,13 @@
+{
+  "name": "@latafi/component-property-editor",
+  "version": "0.0.1",
+  "peerDependencies": {
+    "@angular/common": "^9.0.0",
+    "@angular/core": "^9.0.0",
+    "tslib": "^1.10.0"
+  },
+  "dependencies": {
+    "@angular/material": "^9.0.0",
+    "@latafi/component-visual-editor": "0.0.1"
+  }
+}

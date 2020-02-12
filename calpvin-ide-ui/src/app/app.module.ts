@@ -6,8 +6,8 @@ import { AppComponent } from './app.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { IdeComponent } from './ide/ide.component';
 import { IdeUiLibModule } from 'projects/ide-ui-lib/src/public-api';
-import { ComponentVisualEditorModule } from 'projects/plankio/component-visual-editor/src/public-api';
-import { ComponentPropertyEditorModule } from 'projects/plankio/component-property-editor/src/public-api';
+import { ComponentVisualEditorModule } from 'projects/latafi/component-visual-editor/src/public-api';
+import { ComponentPropertyEditorModule } from 'projects/latafi/component-property-editor/src/public-api';
 
 @NgModule({
   declarations: [

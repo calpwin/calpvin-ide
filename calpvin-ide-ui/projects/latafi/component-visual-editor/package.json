@@ -1,12 +1,10 @@
 {
-  "name": "@plankio/component-property-editor",
+  "name": "@latafi/component-visual-editor",
   "version": "0.0.1",
+  "main": "src/public-api.ts",
   "peerDependencies": {
     "@angular/common": "^9.0.0",
     "@angular/core": "^9.0.0",
     "tslib": "^1.10.0"
-  },
-  "dependencies": {
-    "@angular/material": "^9.0.0"
   }
 }

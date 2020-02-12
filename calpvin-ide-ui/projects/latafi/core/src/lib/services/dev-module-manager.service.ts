@@ -1,9 +1,9 @@
-import { Injectable, Inject, ElementRef, RendererFactory2 } from "@angular/core";
+import { Injectable, Inject, ElementRef, RendererFactory2 } from '@angular/core';
 import { CideComponentDirective } from '../directive/cide-component.directive';
 import { DragDrop } from '@angular/cdk/drag-drop';
 import { VirtualFileTreeService } from './virtual-tree.service';
 import { EventManagerService } from './event-manager.service';
-import { ComponentVisualEditorService } from 'projects/latafi/component-visual-editor/src/public-api';
+import { ComponentVisualEditorService } from '@latafi/component-visual-editor/src/public-api';
 
 @Injectable({
   providedIn: 'root'

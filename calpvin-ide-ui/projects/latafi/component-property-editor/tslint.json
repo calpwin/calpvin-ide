@@ -4,13 +4,13 @@
     "directive-selector": [
       true,
       "attribute",
-      "plunkio",
+      "latafi",
       "camelCase"
     ],
     "component-selector": [
       true,
       "element",
-      "plunkio",
+      "latafi",
       "kebab-case"
     ]
   }

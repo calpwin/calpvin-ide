@@ -26,13 +26,17 @@
       "ide-ui-lib/*": [
         "dist/ide-ui-lib/*"
       ],
-      "@stansil/component-property-editor": [
-        "dist/stansil/component-property-editor/stansil-component-property-editor",
-        "dist/stansil/component-property-editor"
+      "@latafi/component-property-editor": [
+        "dist/latafi/component-property-editor/latafi-component-property-editor",
+        "dist/latafi/component-property-editor"
       ],
-      "@plankio/component-visual-editor": [
-        "dist/plankio/component-visual-editor/plankio-component-visual-editor",
-        "dist/plankio/component-visual-editor"
+      "@latafi/component-visual-editor": [
+        "dist/latafi/component-visual-editor/latafi-component-visual-editor",
+        "dist/latafi/component-visual-editor"
+      ],
+      "@latafi/core": [
+        "dist/latafi/core/latafi-core",
+        "dist/latafi/core"
       ]
     }
   },

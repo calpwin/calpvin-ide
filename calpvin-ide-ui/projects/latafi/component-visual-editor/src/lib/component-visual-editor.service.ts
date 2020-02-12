@@ -1,4 +1,4 @@
-import { Injectable, ElementRef, Type, EventEmitter } from '@angular/core';
+import { Injectable, ElementRef, EventEmitter } from '@angular/core';
 
 @Injectable({
   providedIn: 'root'
@@ -16,5 +16,5 @@ export class ComponentVisualEditorService {
     this._selectedElement = v;
   }
 
-  add = new EventEmitter();
+  onPropertyEditorWrapperInit = new EventEmitter<ElementRef<HTMLElement>>();
 }
