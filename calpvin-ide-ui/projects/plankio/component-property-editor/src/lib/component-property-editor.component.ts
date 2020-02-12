@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ComponentVisualEditorService } from 'projects/plankio/component-visual-editor/src/public-api';
 
 @Component({
   selector: 'lib-component-property-editor',
@@ -11,7 +12,9 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ComponentPropertyEditorComponent implements OnInit {
 
-  constructor() { }
+  constructor(
+    private readonly _componentVisualEditorService: ComponentVisualEditorService
+  ) { }
 
   ngOnInit(): void {
   }
