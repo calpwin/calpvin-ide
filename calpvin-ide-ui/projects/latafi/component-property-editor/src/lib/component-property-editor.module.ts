@@ -4,6 +4,7 @@ import { ComponentPropertyEditorService } from './component-property-editor.serv
 import { ILatafiExtension } from '@latafi/core/src/lib/services/i-extenson.service';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [ComponentPropertyEditorComponent],
@@ -14,7 +15,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
   exports: [
     ComponentPropertyEditorComponent,
     MatInputModule,
-    MatFormFieldModule]
+    MatFormFieldModule,
+    BrowserAnimationsModule]
 })
 export class ComponentPropertyEditorModule {
   static forRoot(): ModuleWithProviders<ComponentPropertyEditorModule> {

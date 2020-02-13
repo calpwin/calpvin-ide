@@ -1,4 +1,4 @@
-import { Component, OnInit, ElementRef, Input } from '@angular/core';
+import { Component, OnInit, ElementRef, Input, ChangeDetectorRef } from '@angular/core';
 import { ComponentVisualEditorService } from '@latafi/component-visual-editor/src/public-api';
 
 @Component({
@@ -9,11 +9,22 @@ import { ComponentVisualEditorService } from '@latafi/component-visual-editor/sr
 export class ComponentPropertyEditorComponent implements OnInit {
 
   constructor(
-    private readonly _componentVisualEditorService: ComponentVisualEditorService
+    private readonly _componentVisualEditorService: ComponentVisualEditorService,
+    private readonly _changeDedectionRef: ChangeDetectorRef
   ) {
   }
 
-  @Input() editorSelectedEl: ElementRef<HTMLElement>;
+
+  private _editorSelectedEl: ElementRef<HTMLElement>;
+  public get editorSelectedEl(): ElementRef<HTMLElement> {
+    return this._editorSelectedEl;
+  }
+  public set editorSelectedEl(v: ElementRef<HTMLElement>) {
+    this._editorSelectedEl = v;
+
+    this._changeDedectionRef.detectChanges();
+  }
+
 
   ngOnInit(): void {
   }
