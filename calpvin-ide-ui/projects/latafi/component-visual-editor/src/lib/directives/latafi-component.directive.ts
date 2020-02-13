@@ -41,7 +41,7 @@ export class LatafiComponentDirective implements OnInit {
       console.log('Base Component name not set!');
     }
 
-    this._uniqueClassName = this.tryGetComponentUniqueClassName();
+    this._uniqueClassName = LatafiComponentDirective.tryGetComponentUniqueClassName(this.hostElement.nativeElement);
 
     this._dargRef = this.dragDrop.createDrag(this.hostElement.nativeElement);
 
@@ -99,10 +99,10 @@ export class LatafiComponentDirective implements OnInit {
     }
   }
 
-  private tryGetComponentUniqueClassName(el?: HTMLElement): string | undefined {
+  public static tryGetComponentUniqueClassName(el?: HTMLElement): string | undefined {
     let uniqueClassName: string;
 
-    (el || this.hostElement.nativeElement).classList.forEach(element => {
+    el.classList.forEach(element => {
       if (element.startsWith(LatafiComponentDirective.ComponentUniqueCssClass + '-')) { uniqueClassName = element; }
     });
 

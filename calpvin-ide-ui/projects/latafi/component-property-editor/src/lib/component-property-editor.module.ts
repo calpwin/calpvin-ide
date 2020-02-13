@@ -5,18 +5,23 @@ import { ILatafiExtension } from '@latafi/core/src/lib/services/i-extenson.servi
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [ComponentPropertyEditorComponent],
   imports: [
     MatInputModule,
-    MatFormFieldModule
+    MatFormFieldModule,
+    FormsModule,
+    ReactiveFormsModule
   ],
   exports: [
     ComponentPropertyEditorComponent,
     MatInputModule,
     MatFormFieldModule,
-    BrowserAnimationsModule]
+    BrowserAnimationsModule,
+    FormsModule,
+    ReactiveFormsModule]
 })
 export class ComponentPropertyEditorModule {
   static forRoot(): ModuleWithProviders<ComponentPropertyEditorModule> {

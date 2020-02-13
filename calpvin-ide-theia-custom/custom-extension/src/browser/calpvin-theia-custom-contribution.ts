@@ -1,6 +1,7 @@
 import { injectable, inject } from "inversify";
 import { CommandContribution, CommandService, MenuContribution, MenuModelRegistry, MessageService, CommandRegistry } from "@theia/core/lib/common";
 import { CommonMenus, FrontendApplicationContribution, FrontendApplication, PreferenceServiceImpl } from "@theia/core/lib/browser";
+import { BrowserMenuBarContribution } from "@theia/core/lib/browser/menu/browser-menu-plugin";
 import { FileSystem } from '@theia/filesystem/lib/common/filesystem';
 import { EventManager, EventType, IdeEvent, VirtualFile, Workspace } from "calpvin-ide-shared";
 import { WorkspaceService, WorkspaceData } from '@theia/workspace/lib/browser/workspace-service';
@@ -75,11 +76,16 @@ export class CalpvinTheiaFrontendApplicationContribution implements FrontendAppl
     @inject(MonacoEditorProvider)
     protected monacoEditorProvider: MonacoEditorProvider;
 
+    @inject(BrowserMenuBarContribution)
+    protected browserMenuBarContribution: BrowserMenuBarContribution;
+
     private eventManager: EventManager;
     _workspaceFileUri: URI;
     private _activeWorkspace = new Workspace();
 
     async onStart?(app: FrontendApplication): Promise<void> {
+
+        this.browserMenuBarContribution.menuBar?.hide();
 
         const userHome = await this.fileSystem.getCurrentUserHome();
         const homeDirPath = await this.fileSystem.getFsPath(userHome!.uri);
@@ -139,10 +145,10 @@ export class CalpvinTheiaFrontendApplicationContribution implements FrontendAppl
             const fileName = (command.data as VirtualFile).fileName;
             const fileStat = await this.fileSystem.getFileStat(`file:///home/project/calpvin-ide-ui/src/app/test-module/${componentName}/${fileName}`);
             const fileUri = new URI(fileStat?.uri);
-            const editor = await this.monacoEditorProvider.get(fileUri);            
+            const editor = await this.monacoEditorProvider.get(fileUri);
             editor.focus();
             editor.document.textEditorModel.setValue((command.data as VirtualFile).content!);
-            await editor.commandService.executeCommand('editor.action.formatDocument');  
+            await editor.commandService.executeCommand('editor.action.formatDocument');
             await editor.document.save();
             console.log(editor.document.getText());
         }
@@ -159,7 +165,7 @@ export class CalpvinTheiaFrontendApplicationContribution implements FrontendAppl
             }, false);
         }
         else if (command.eventType === EventType.IdeFormatDocument) {
-        }        
+        }
     }
 
     private async setActiveWorkplace() {

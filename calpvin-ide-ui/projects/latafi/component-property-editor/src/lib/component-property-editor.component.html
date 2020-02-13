@@ -1,13 +1,13 @@
-<div class="input-group input-group-custom">
-  <mat-form-field appearance="fill">
-    <mat-label>Css property</mat-label>
-    <input matInput>
-  </mat-form-field>
+<div class="property-editor-wrapper">
+  <div class="input-group input-group-custom">
+    <mat-form-field appearance="outline">
+      <mat-label>Css property</mat-label>
+      <input matInput [(ngModel)]="cssProperty">
+    </mat-form-field>
 
-  <mat-form-field appearance="fill">
-    <mat-label>Css value</mat-label>
-    <input matInput>
-  </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Css value</mat-label>
+      <input matInput [(ngModel)]="cssValue" (keyup.enter)="onCssValueChange($event)">
+    </mat-form-field>
+  </div>
 </div>
-
-<div>{{editorSelectedEl?.nativeElement?.outerHTML}}</div>

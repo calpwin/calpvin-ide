@@ -7,11 +7,11 @@
 
 .component-canva-wrapper {
   position: relative;
-  flex: 0.8;
+  width: calc(100% - 360px);
   border: 1px solid yellow;
 }
 
 .component-property-wrapper {
   position: relative;
-  flex: 0.2;
+  width: 360px;
 }

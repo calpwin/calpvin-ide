@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@angular/material": "^9.0.0",
-    "@latafi/component-visual-editor": "0.0.1"
+    "@latafi/component-visual-editor": "0.0.1",
+    "@latafi/core": "0.0.1"
   }
 }

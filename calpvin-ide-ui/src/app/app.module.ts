@@ -8,6 +8,7 @@ import { IdeComponent } from './ide/ide.component';
 import { LatafiCoreModule } from '@latafi/core/src/lib/core.module';
 import { ComponentVisualEditorModule } from '@latafi/component-visual-editor/src/lib/component-visual-editor.module';
 import { ComponentPropertyEditorModule } from '@latafi/component-property-editor/src/lib/component-property-editor.module';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -18,6 +19,8 @@ import { ComponentPropertyEditorModule } from '@latafi/component-property-editor
     BrowserModule,
     AppRoutingModule,
     DragDropModule,
+    FormsModule,
+    ReactiveFormsModule,
     LatafiCoreModule.forRoot(),
     ComponentVisualEditorModule.forRoot(),
     ComponentPropertyEditorModule.forRoot()
