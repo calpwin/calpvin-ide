@@ -29,7 +29,11 @@ export class ComponentVisualEditorService extends ILatafiExtension {
   }
   public set selectedElement(v: ElementRef | undefined) {
     this._selectedElement = v;
+
+    this.onSelectElement.emit(v);
   }
+
+  onSelectElement = new EventEmitter<ElementRef>();
 
   onPropertyEditorWrapperInit = new EventEmitter<ViewContainerRef>();
 

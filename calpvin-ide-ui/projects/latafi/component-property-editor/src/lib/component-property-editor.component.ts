@@ -1,4 +1,4 @@
-import { Component, OnInit, ElementRef } from '@angular/core';
+import { Component, OnInit, ElementRef, Input } from '@angular/core';
 import { ComponentVisualEditorService } from '@latafi/component-visual-editor/src/public-api';
 
 @Component({
@@ -13,10 +13,8 @@ export class ComponentPropertyEditorComponent implements OnInit {
   ) {
   }
 
-  ngOnInit(): void {
-  }
+  @Input() editorSelectedEl: ElementRef<HTMLElement>;
 
-  onComponentVisualEditorPropertyWrapperInit = (propertyWrapper: ElementRef<HTMLElement>) => {
-    console.log(propertyWrapper);
+  ngOnInit(): void {
   }
 }
