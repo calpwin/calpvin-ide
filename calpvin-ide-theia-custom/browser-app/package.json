@@ -34,7 +34,6 @@
     "@theia/task": "latest",
     "@theia/terminal": "latest",
     "@theia/textmate-grammars": "latest",
-    "@theia/themes": "latest",
     "@theia/tslint": "latest",
     "@theia/typescript": "latest",
     "@theia/userstorage": "latest",

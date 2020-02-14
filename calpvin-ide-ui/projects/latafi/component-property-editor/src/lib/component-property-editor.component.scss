@@ -1,10 +1,12 @@
+@import '../../../../../src/theming';
+
 :host {
   display: block;
   position: relative;
   padding: 20px;
   height: 100%;
-  background-color: #252526;
   color: white;
+  background-color: map-get($mat-dark-theme-background, "background");
 
   .input-group-custom {
     display: flex;
@@ -14,5 +16,10 @@
 
   .property-editor-wrapper {
     position: relative;
+  }
+
+  .mat-form-field {
+    width: 50%;
+    font-weight: 100;
   }
 }
