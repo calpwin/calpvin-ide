@@ -77,6 +77,8 @@ export class LatafiComponentDirective implements OnInit {
   }
 
   private onClick = async (event: MouseEvent) => {
+    event.stopPropagation();
+
     this._componentVisualEditorService.selectedElement = this.hostElement;
 
     if (event.ctrlKey) {

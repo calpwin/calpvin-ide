@@ -8,10 +8,12 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { CommonModule } from '@angular/common';
 
 @NgModule({
   declarations: [ComponentPropertyEditorComponent],
   imports: [
+    CommonModule,
     MatInputModule,
     MatFormFieldModule,
     FormsModule,
@@ -20,6 +22,7 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
     MatButtonToggleModule
   ],
   exports: [
+    CommonModule,
     ComponentPropertyEditorComponent,
     MatInputModule,
     MatFormFieldModule,

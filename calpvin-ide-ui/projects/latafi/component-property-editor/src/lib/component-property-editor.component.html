@@ -1,12 +1,18 @@
 <div class="property-editor-wrapper">
   <div class="parent-flexbox-actions">
-    <mat-button-toggle-group #group="matButtonToggleGroup">
+    <mat-button-toggle-group #group="matButtonToggleGroup" (change)="onFlexboxActionChange($event)">
 
       <mat-button-toggle value="left" aria-label="Text align left">
         <mat-icon>border_left</mat-icon>
       </mat-button-toggle>
+      <mat-button-toggle value="bottom" aria-label="Text align left">
+        <mat-icon>border_bottom</mat-icon>
+      </mat-button-toggle>
       <mat-button-toggle value="center" aria-label="Text align left">
         <mat-icon>border_inner</mat-icon>
+      </mat-button-toggle>
+      <mat-button-toggle value="top" aria-label="Text align left">
+        <mat-icon>border_top</mat-icon>
       </mat-button-toggle>
       <mat-button-toggle value="right" aria-label="Text align left">
         <mat-icon>border_right</mat-icon>
@@ -15,15 +21,15 @@
     </mat-button-toggle-group>
   </div>
 
-  <div class="input-group input-group-custom">
+  <div class="input-group input-group-custom" *ngIf="editorSelectedEl">
     <mat-form-field appearance="outline">
       <mat-label>Css property</mat-label>
-      <input matInput [(ngModel)]="cssProperty">
+      <input matInput [(ngModel)]="cssProperty" autocomplete="off">
     </mat-form-field>
 
     <mat-form-field appearance="outline">
       <mat-label>Css value</mat-label>
-      <input matInput [(ngModel)]="cssValue" (keyup.enter)="onCssValueChange($event)">
+      <input matInput [(ngModel)]="cssValue" (keyup.enter)="onCssValueChange($event)" autocomplete="off">
     </mat-form-field>
   </div>
 </div>

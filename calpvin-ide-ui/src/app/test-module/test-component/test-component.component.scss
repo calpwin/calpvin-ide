@@ -4,6 +4,9 @@
   width: 100%;
   position: relative;
 }
+.cide-unique-component-container {
+  display: block;
+}
 .cide-component-container {
   position: relative;
   height: 100%;
@@ -15,15 +18,15 @@
   background-color: red;
 }
 .cide-unique-1 {
-  left: 919px;
+  left: 673px;
   top: 131px;
   position: absolute;
   background-color: blue;
-  width: 185px;
+  width: 70px;
 }
 .cide-unique-5 {
-  left: 446px;
-  top: 98px;
+  left: 339px;
+  top: 131px;
   position: absolute;
   background-color: red;
   width: 334px;

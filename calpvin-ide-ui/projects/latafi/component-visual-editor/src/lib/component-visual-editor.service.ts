@@ -23,17 +23,32 @@ export class ComponentVisualEditorService extends ILatafiExtension {
   onBaseAppConstruct() {
   }
 
+
+  private _wrapperElement : HTMLElement;
+  public get wrapperElement() : HTMLElement {
+    return this._wrapperElement;
+  }
+  public set wrapperElement(v : HTMLElement) {
+    this._wrapperElement = v;
+  }
+
+  private _previousSelectedElement : ElementRef<HTMLElement>;
+  public get previousSelectedElement() : ElementRef<HTMLElement> {
+    return this._previousSelectedElement;
+  }
+
   private _selectedElement: ElementRef | undefined;
   public get selectedElement(): ElementRef | undefined {
     return this._selectedElement;
   }
   public set selectedElement(v: ElementRef | undefined) {
+    this._previousSelectedElement = this._selectedElement;
     this._selectedElement = v;
 
     this.onSelectElement.emit(v);
   }
 
-  onSelectElement = new EventEmitter<ElementRef>();
+  onSelectElement = new EventEmitter<ElementRef | undefined>();
 
   onPropertyEditorWrapperInit = new EventEmitter<ViewContainerRef>();
 

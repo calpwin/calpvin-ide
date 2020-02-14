@@ -27,7 +27,6 @@ export class ComponentPropertyEditorComponent implements OnInit {
   cssProperty: string;
   cssValue: string;
 
-
   private _editorSelectedEl: ElementRef<HTMLElement>;
   public get editorSelectedEl(): ElementRef<HTMLElement> {
     return this._editorSelectedEl;
@@ -70,5 +69,12 @@ export class ComponentPropertyEditorComponent implements OnInit {
         uniqueIdentifier: EventManager.generateUniqueIdentifire(),
         data: { uri: file.fileName }
       }, false);
+
+    this._componentVisualEditorService.selectedElement = undefined;
+  }
+
+  onFlexboxActionChange(e) {
+    console.log(e);
+
   }
 }

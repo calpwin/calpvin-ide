@@ -19,7 +19,14 @@
   }
 
   .mat-form-field {
-    width: 50%;
+    width: 49%;
     font-weight: 100;
+  }
+
+  .parent-flexbox-actions {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
   }
 }
