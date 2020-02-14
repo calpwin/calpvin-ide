@@ -1,6 +1,6 @@
 import { injectable, inject } from "inversify";
 import { CommandContribution, CommandService, MenuContribution, MenuModelRegistry, MessageService, CommandRegistry } from "@theia/core/lib/common";
-import { CommonMenus, FrontendApplicationContribution, FrontendApplication, PreferenceServiceImpl } from "@theia/core/lib/browser";
+import { CommonMenus, FrontendApplicationContribution, FrontendApplication, PreferenceServiceImpl, ApplicationShell } from "@theia/core/lib/browser";
 import { BrowserMenuBarContribution } from "@theia/core/lib/browser/menu/browser-menu-plugin";
 import { FileSystem } from '@theia/filesystem/lib/common/filesystem';
 import { EventManager, EventType, IdeEvent, VirtualFile, Workspace } from "calpvin-ide-shared";
@@ -79,13 +79,17 @@ export class CalpvinTheiaFrontendApplicationContribution implements FrontendAppl
     @inject(BrowserMenuBarContribution)
     protected browserMenuBarContribution: BrowserMenuBarContribution;
 
+    @inject(ApplicationShell)
+    protected applicationShell: ApplicationShell;
+
     private eventManager: EventManager;
     _workspaceFileUri: URI;
     private _activeWorkspace = new Workspace();
 
     async onStart?(app: FrontendApplication): Promise<void> {
 
-        this.browserMenuBarContribution.menuBar?.hide();
+        // this.browserMenuBarContribution.menuBar?.hide();
+        this.applicationShell.topPanel.hide();
 
         const userHome = await this.fileSystem.getCurrentUserHome();
         const homeDirPath = await this.fileSystem.getFsPath(userHome!.uri);

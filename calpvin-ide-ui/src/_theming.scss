@@ -1,8 +1,8 @@
 @import "~@angular/material/theming";
 
-$mat-dark-theme-background: (
-  background: #2f333d
-);
+$mat-dark-theme-background: map-merge($mat-dark-theme-background, (
+  background: #21252b,
+  card: #21252b));
 
 $latafi-app-primary: mat-palette($mat-pink);
 $latafi-app-accent: mat-palette($mat-pink, A200, A100, A400);

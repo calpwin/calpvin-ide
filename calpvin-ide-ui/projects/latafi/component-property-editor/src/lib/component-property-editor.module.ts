@@ -6,6 +6,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 
 @NgModule({
   declarations: [ComponentPropertyEditorComponent],
@@ -13,7 +15,9 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     MatInputModule,
     MatFormFieldModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    MatIconModule,
+    MatButtonToggleModule
   ],
   exports: [
     ComponentPropertyEditorComponent,
@@ -21,7 +25,9 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     MatFormFieldModule,
     BrowserAnimationsModule,
     FormsModule,
-    ReactiveFormsModule]
+    ReactiveFormsModule,
+    MatIconModule,
+    MatButtonToggleModule]
 })
 export class ComponentPropertyEditorModule {
   static forRoot(): ModuleWithProviders<ComponentPropertyEditorModule> {
