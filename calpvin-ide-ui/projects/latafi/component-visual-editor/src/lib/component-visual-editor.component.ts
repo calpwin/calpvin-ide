@@ -18,7 +18,6 @@ export class ComponentVisualEditorComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this._componentVisualEditorService.onSelectElement.subscribe(this.onSelectelement);
-    this._componentVisualEditorService.wrapperElement = this._document.querySelector('.cide-unique-component-container');
   }
 
   ngAfterViewInit(): void {

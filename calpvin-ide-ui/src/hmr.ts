@@ -24,6 +24,9 @@ export const hmrBootstrap = async (module: any, bootstrap: () => Promise<NgModul
 
       devModuleRef = await platformRef.bootstrapModule(devModule);
 
+      const devModuleManagerService = mainModule.injector.get(DevModuleManagerService);
+      devModuleManagerService.setComponentWrapperElement();
+
       const componentVisualEditorService = mainModule.injector.get(ComponentVisualEditorService);
       componentVisualEditorService.applyLatafiComponentDirective();
     });
@@ -37,6 +40,7 @@ export const hmrBootstrap = async (module: any, bootstrap: () => Promise<NgModul
 
       const devModuleManagerService = mainModule.injector.get(DevModuleManagerService);
       await devModuleManagerService.updateVirtualTreeAsync();
+      devModuleManagerService.setComponentWrapperElement();
 
       const componentVisualEditorService = mainModule.injector.get(ComponentVisualEditorService);
       componentVisualEditorService.applyLatafiComponentDirective();
