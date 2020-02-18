@@ -6,7 +6,10 @@
 }
 .cide-unique-component-container {
   position: relative;
-  display: flex;
+  display: block;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 .cide-component-container {
   position: relative;
@@ -19,18 +22,20 @@
   background-color: red;
 }
 .cide-unique-1 {
-  left: 673px;
-  top: 131px;
   position: absolute;
   background-color: blue;
-  width: 70px;
+  width: 200px;
+  transform: translate3d(440px, 4px, 0px);
 }
 .cide-unique-5 {
-  left: 339px;
-  top: 131px;
   position: absolute;
-  background-color: red;
+  background-color: green;
   width: 334px;
+  border-radius: 0;
+  justify-content: center;
+  align-items: center;
+  display: block;
+  transform: translate3d(808px, 234px, 0px);
 }
 .ide-wrapper {
   position: absolute;

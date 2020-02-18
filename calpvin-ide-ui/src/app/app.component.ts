@@ -78,6 +78,8 @@ export class AppComponent implements OnInit {
   onKeydownHandler(event: KeyboardEvent) {
     if (event.altKey && event.key === 'q') {
       this._ide.nativeElement.style.display === 'block' ? this.hideIde() : this.showIde();
+    } else if (event.altKey && event.key === 's') {
+      this.virtualFileTree.saveAsync();
     }
   }
 }

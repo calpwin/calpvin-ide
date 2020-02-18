@@ -48,32 +48,43 @@ export class LatafiComponentDirective implements OnInit {
     this._dargRef.ended.subscribe(this.onMoveEnded);
   }
 
+  private _lastLeftPosition: number = undefined;
+  private _lastTopPosition: number = undefined;
+
   private onMoveEnded = async (event: { source: DragRef<any>, distance: Point }) => {
-    const componentName = VirtualFileTreeService.getComponentName(this.baseComponentTagName);
-    const file = this.virtualTree.getFile(componentName, `${componentName}.component.scss`);
 
-    const elStyle = getComputedStyle(this.hostElement.nativeElement);
+    if (!this._lastLeftPosition || !this._lastTopPosition) {
+      const elStyle = getComputedStyle(this.hostElement.nativeElement);
+      const transformMatch = /matrix\([-0-9]+, [-0-9]+, [-0-9]+, [-0-9]+, ([-0-9]+), ([-0-9]+)\)/.exec(elStyle.transform);
+      this._lastLeftPosition = Number.parseInt(transformMatch[1]);
+      this._lastTopPosition = Number.parseInt(transformMatch[2]);
+    }
 
-    const node = tryGetNode(file.astTree as CssNode, this._uniqueClassName);
-    setCssValue(node as Rule, 'position', 'absolute');
-    setCssValue(node as Rule, 'left', Number.parseInt(elStyle.left, 0) + event.distance.x + 'px');
-    setCssValue(node as Rule, 'top', Number.parseInt(elStyle.top, 0) + event.distance.y + 'px');
+    // const elStyle = getComputedStyle(this.hostElement.nativeElement);
 
-    file.content = csstree.generate(file.astTree);
+    // const newLeftPosition = (this._lastLeftPosition || Number.parseInt(elStyle.left, 0)) + event.distance.x;
+    // const newTopPosition = (this._lastTopPosition || Number.parseInt(elStyle.top, 0)) + event.distance.y;
 
-    await this.eventManagerService.EventManager.sendEvent<VirtualFile>(
-      {
-        eventType: EventType.WriteComponentFile,
-        uniqueIdentifier: EventManager.generateUniqueIdentifire(),
-        data: file
-      }, false);
+    this._lastLeftPosition += event.distance.x;
+    this._lastTopPosition += event.distance.y;
 
-    await this.eventManagerService.EventManager.sendEvent<IdeFormatDocumentCommandData>(
-      {
-        eventType: EventType.IdeFormatDocument,
-        uniqueIdentifier: EventManager.generateUniqueIdentifire(),
-        data: { uri: file.fileName }
-      }, false);
+    this._componentVisualEditorService.setElementStyle(
+      'transform',
+      `translate3d(${this._lastLeftPosition}px, ${this._lastTopPosition}px, 0px)`,
+      this.hostElement.nativeElement, false, false);
+
+    // this._componentVisualEditorService.setElementStyle(
+    //   'left',
+    //   newLeftPosition + 'px',
+    //   this.hostElement.nativeElement, false, false);
+
+    // this._componentVisualEditorService.setElementStyle(
+    //   'top',
+    //   newTopPosition + 'px',
+    //   this.hostElement.nativeElement, false, false);
+
+    // this._lastLeftPosition = newLeftPosition;
+    // this._lastTopPosition = newTopPosition;
   }
 
   private onClick = async (event: MouseEvent) => {

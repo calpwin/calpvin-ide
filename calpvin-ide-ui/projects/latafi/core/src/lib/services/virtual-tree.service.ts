@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
-import { VirtualFileType, VirtualFile, EventType, EventManager } from 'calpvin-ide-shared/IdeCommand';
+import { VirtualFileType, VirtualFile, EventType, EventManager, IdeFormatDocumentCommandData } from 'calpvin-ide-shared/IdeCommand';
 import { HtmlParser } from '@angular/compiler';
 import * as csstree from 'css-tree';
 import { EventManagerService } from './event-manager.service';
+import { WorkspaceService } from './workspace.service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +16,9 @@ export class VirtualFileTreeService {
     return byTagName.replace('cide-', '');
   }
 
-  constructor(private readonly eventManagerService: EventManagerService) {
+  constructor(
+    private readonly eventManagerService: EventManagerService,
+    private readonly _workspaceService: WorkspaceService) {
   }
 
   addFile(file: VirtualFile): VirtualFile {
@@ -74,5 +77,22 @@ export class VirtualFileTreeService {
     this.addFile(cssFileRes.data);
 
     return [htmlFileRes.data, cssFileRes.data];
+  }
+
+  async saveAsync(... files: VirtualFile[]) {
+    files = files && files.length > 0 ? files : this._virtualFiles;
+
+    files.forEach(async (file) => {
+      await this.eventManagerService.EventManager.sendEvent<VirtualFile>({
+        eventType: EventType.WriteComponentFile,
+        uniqueIdentifier: EventManager.generateUniqueIdentifire(),
+        data: file
+      }, false);
+      await this.eventManagerService.EventManager.sendEvent<IdeFormatDocumentCommandData>({
+        eventType: EventType.IdeFormatDocument,
+        uniqueIdentifier: EventManager.generateUniqueIdentifire(),
+        data: { uri: file.fileName }
+      }, false);
+    });
   }
 }

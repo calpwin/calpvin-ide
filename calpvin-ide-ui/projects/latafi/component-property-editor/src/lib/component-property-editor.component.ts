@@ -48,37 +48,39 @@ export class ComponentPropertyEditorComponent implements OnInit {
   }
 
   async onCssValueChange(event: KeyboardEvent) {
-    const file = this._virtualFileTreeService.getFile(
-      this._workspaceService.activeComponent,
-      `${this._workspaceService.activeComponent}.component.scss`);
+    // const file = this._virtualFileTreeService.getFile(
+    //   this._workspaceService.activeComponent,
+    //   `${this._workspaceService.activeComponent}.component.scss`);
 
-    const elStyle = getComputedStyle(this._editorSelectedEl.nativeElement);
+    // const elStyle = getComputedStyle(this._editorSelectedEl.nativeElement);
 
-    const uniqueClassName = LatafiComponentDirective.tryGetComponentUniqueClassName(this._editorSelectedEl.nativeElement);
+    // const uniqueClassName = LatafiComponentDirective.tryGetComponentUniqueClassName(this._editorSelectedEl.nativeElement);
 
-    const node = tryGetNode(file.astTree as CssNode, uniqueClassName);
-    setCssValue(node as Rule, this.cssProperty, this.cssValue);
+    // const node = tryGetNode(file.astTree as CssNode, uniqueClassName);
+    // setCssValue(node as Rule, this.cssProperty, this.cssValue);
 
-    file.content = csstree.generate(file.astTree);
+    // file.content = csstree.generate(file.astTree);
 
-    await this._eventManagerService.EventManager.sendEvent<VirtualFile>(
-      {
-        eventType: EventType.WriteComponentFile,
-        uniqueIdentifier: EventManager.generateUniqueIdentifire(),
-        data: file
-      }, false);
+    // await this._eventManagerService.EventManager.sendEvent<VirtualFile>(
+    //   {
+    //     eventType: EventType.WriteComponentFile,
+    //     uniqueIdentifier: EventManager.generateUniqueIdentifire(),
+    //     data: file
+    //   }, false);
 
-    await this._eventManagerService.EventManager.sendEvent<IdeFormatDocumentCommandData>(
-      {
-        eventType: EventType.IdeFormatDocument,
-        uniqueIdentifier: EventManager.generateUniqueIdentifire(),
-        data: { uri: file.fileName }
-      }, false);
+    // await this._eventManagerService.EventManager.sendEvent<IdeFormatDocumentCommandData>(
+    //   {
+    //     eventType: EventType.IdeFormatDocument,
+    //     uniqueIdentifier: EventManager.generateUniqueIdentifire(),
+    //     data: { uri: file.fileName }
+    //   }, false);
 
-    this._componentVisualEditorService.selectedElement = undefined;
+    await this._componentVisualEditorService.setElementStyle(this.cssProperty, this.cssValue);
+
+    // this._componentVisualEditorService.selectedElement = undefined;
   }
 
-  onFlexboxActionChange(event: MatButtonToggleChange) {
+  async onFlexboxActionChange(event: MatButtonToggleChange) {
     if (!this._componentVisualEditorService.wrapperElement) { return; }
 
     const mainAxis = this._flexboxWrapperModel.flexDirection === 'row' ? 'justify-content' : 'align-items';
@@ -86,64 +88,65 @@ export class ComponentPropertyEditorComponent implements OnInit {
 
     switch (event.value) {
       case 'left':
-        this._renderer2.setStyle(this._componentVisualEditorService.wrapperElement, mainAxis, 'flex-start');
+        await this._componentVisualEditorService.setElementStyle(mainAxis, 'flex-start', this._componentVisualEditorService.wrapperElement);
         break;
       case 'center_vertical':
-        this._renderer2.setStyle(this._componentVisualEditorService.wrapperElement, mainAxis, 'center');
+        await this._componentVisualEditorService.setElementStyle(mainAxis, 'center', this._componentVisualEditorService.wrapperElement);
         break;
       case 'right':
-        this._renderer2.setStyle(this._componentVisualEditorService.wrapperElement, mainAxis, 'flex-end');
+        await this._componentVisualEditorService.setElementStyle(mainAxis, 'flex-end', this._componentVisualEditorService.wrapperElement);
         break;
 
       case 'top':
-        this._renderer2.setStyle(this._componentVisualEditorService.wrapperElement, assendAxis, 'flex-start');
+        await this._componentVisualEditorService.setElementStyle(
+          assendAxis, 'flex-start', this._componentVisualEditorService.wrapperElement);
         break;
       case 'center_horizontal':
-        this._renderer2.setStyle(this._componentVisualEditorService.wrapperElement, assendAxis, 'center');
+        await this._componentVisualEditorService.setElementStyle(assendAxis, 'center', this._componentVisualEditorService.wrapperElement);
         break;
       case 'bottom':
-        this._renderer2.setStyle(this._componentVisualEditorService.wrapperElement, assendAxis, 'flex-end');
+        await this._componentVisualEditorService.setElementStyle(assendAxis, 'flex-end', this._componentVisualEditorService.wrapperElement);
         break;
       default:
         break;
     }
   }
 
-  onWrapperElFlexDirectionChange(event: MatButtonToggleChange) {
+  async onWrapperElFlexDirectionChange(event: MatButtonToggleChange) {
     if (!this._componentVisualEditorService.wrapperElement) { return; }
 
     if (event.value === 'none') {
       this._flexboxWrapperModel.flexDirection = 'none';
-      this.setWrapperElDisplayMod(this._componentVisualEditorService.wrapperElement, 'none');
+      await this.setWrapperElDisplayMod(this._componentVisualEditorService.wrapperElement, 'none');
     } else if (event.value === 'absolute') {
       this._flexboxWrapperModel.flexDirection = 'absolute';
-      this.setWrapperElDisplayMod(this._componentVisualEditorService.wrapperElement, 'absolute');
+      await this.setWrapperElDisplayMod(this._componentVisualEditorService.wrapperElement, 'absolute');
     } else if (event.value === 'row') {
       this._flexboxWrapperModel.flexDirection = 'row';
-      this.setWrapperElDisplayMod(this._componentVisualEditorService.wrapperElement, 'row');
-      this._renderer2.setStyle(this._componentVisualEditorService.wrapperElement, 'flex-direction', 'row');
+      await this.setWrapperElDisplayMod(this._componentVisualEditorService.wrapperElement, 'row');
+      await this._componentVisualEditorService.setElementStyle('flex-direction', 'row', this._componentVisualEditorService.wrapperElement);
     } else if (event.value === 'column') {
       this._flexboxWrapperModel.flexDirection = 'column';
-      this.setWrapperElDisplayMod(this._componentVisualEditorService.wrapperElement, 'column');
-      this._renderer2.setStyle(this._componentVisualEditorService.wrapperElement, 'flex-direction', 'column');
+      await this.setWrapperElDisplayMod(this._componentVisualEditorService.wrapperElement, 'column');
+      await this._componentVisualEditorService.setElementStyle(
+        'flex-direction', 'column', this._componentVisualEditorService.wrapperElement);
     }
   }
 
-  private setWrapperElDisplayMod(wrapperEl: HTMLElement, displayVal: 'none' | 'absolute' | 'row' | 'column') {
-
+  private async setWrapperElDisplayMod(wrapperEl: HTMLElement, displayVal: 'none' | 'absolute' | 'row' | 'column') {
     if (displayVal === 'row' || displayVal === 'column') {
-      this._renderer2.setStyle(wrapperEl, 'display', 'flex');
+      await this._componentVisualEditorService.setElementStyle('display', 'flex', wrapperEl);
     } else {
-      this._renderer2.setStyle(wrapperEl, 'display', 'block');
+      await this._componentVisualEditorService.setElementStyle('display', 'block', wrapperEl);
     }
 
     for (let index = 0; index < wrapperEl.children.length; index++) {
       const element = wrapperEl.children[index];
 
       if (displayVal === 'absolute') {
-        this._renderer2.setStyle(element, 'position', 'absolute');
+        await this._componentVisualEditorService.setElementStyle('position', 'absolute', element as HTMLElement);
       } else {
-        this._renderer2.setStyle(element, 'position', 'relative');
+        await this._componentVisualEditorService.setElementStyle('position', 'relative', element as HTMLElement);
       }
     }
   }
