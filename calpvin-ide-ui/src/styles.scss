@@ -17,6 +17,15 @@ body {
     box-sizing: border-box;
   }
 
+  .gutter-vertical {
+    background-color: map-get(map-get($latafi-app-theme, 'background'), 'backgroundAccent');
+    cursor: n-resize;
+  }
+  .gutter-horizontal {
+    background-color: map-get(map-get($latafi-app-theme, 'background'), 'backgroundAccent');
+    cursor: w-resize;
+  }
+
   .mat-icon {
     width: 18px;
     height: 18px;

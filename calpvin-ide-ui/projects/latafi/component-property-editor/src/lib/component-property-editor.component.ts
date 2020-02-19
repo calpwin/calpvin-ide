@@ -21,6 +21,7 @@ export class ComponentPropertyEditorComponent implements OnInit {
   constructor(
     private readonly _componentVisualEditorService: ComponentVisualEditorService,
     private readonly _changeDedectionRef: ChangeDetectorRef,
+    private readonly _elementRef: ElementRef,
     private readonly _workspaceService: WorkspaceService,
     private readonly _virtualFileTreeService: VirtualFileTreeService,
     private readonly _eventManagerService: EventManagerService,

@@ -4,6 +4,7 @@ import { EventManagerService } from '@latafi/core/src/lib/services/event-manager
 import { VirtualFileTreeService } from '@latafi/core/src/lib/services/virtual-tree.service';
 import { WorkspaceService } from '@latafi/core/src/lib/services/workspace.service';
 import { ILatafiExtension } from '@latafi/core/src/lib/services/i-extenson.service';
+import Split from 'split.js';
 
 @Component({
   selector: 'cide-root',
@@ -24,11 +25,26 @@ export class AppComponent implements OnInit {
   title = 'calpvin-ide';
 
   @ViewChild('ide', { read: ElementRef, static: true }) _ide: ElementRef<HTMLElement>;
+  @ViewChild('ideEditor', { read: ElementRef, static: true }) _ideEditor: ElementRef<HTMLElement>;
 
   async ngOnInit() {
-    this._eventManagerService.init(window, (this._ide.nativeElement as any).contentWindow, this.messageEventListener);
+    this._eventManagerService.init(
+      window,
+      (this._ide.nativeElement.querySelector('iframe') as any).contentWindow,
+      this.messageEventListener);
 
     this.initExtensions();
+
+    this.enablePanelSplit();
+  }
+
+  private _splitPanels;
+  private enablePanelSplit() {
+    this._splitPanels = Split([this._ideEditor.nativeElement, this._ide.nativeElement], {
+      direction: 'vertical',
+      sizes: [50, 50],
+      gutterSize: 15
+    });
   }
 
   private initExtensions() {
@@ -48,7 +64,7 @@ export class AppComponent implements OnInit {
   }
 
   private messageEventListener = async (e: MessageEvent) => {
-    console.log('Main: ', e);
+    // console.log('Main: ', e);
 
     const command = (e.data as IdeEvent<any>);
 

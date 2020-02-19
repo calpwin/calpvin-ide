@@ -2,6 +2,7 @@
 
 $mat-dark-theme-background: map-merge($mat-dark-theme-background, (
   background: #21252b,
+  backgroundAccent: #2f333d,
   card: #21252b));
 
 $latafi-app-primary: mat-palette($mat-pink);

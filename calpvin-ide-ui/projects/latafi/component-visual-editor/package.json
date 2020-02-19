@@ -5,7 +5,8 @@
   "peerDependencies": {
     "@angular/common": "^9.0.0",
     "@angular/core": "^9.0.0",
-    "tslib": "^1.10.0"
+    "tslib": "^1.10.0",
+    "split.js": "^1.5.11"
   },
   "dependencies": {
     "@latafi/core": "0.0.1"

@@ -1,4 +1,4 @@
-import { Injectable, ElementRef, EventEmitter, Inject, RendererFactory2, ViewContainerRef } from '@angular/core';
+import { Injectable, ElementRef, EventEmitter, Inject, RendererFactory2, ViewContainerRef, ComponentRef } from '@angular/core';
 import { LatafiComponentDirective } from './directives/latafi-component.directive';
 import { DragDrop } from '@angular/cdk/drag-drop';
 import { VirtualFileTreeService } from '@latafi/core/src/lib/services/virtual-tree.service';
@@ -10,6 +10,7 @@ import { tryGetNode, setCssValue, removeCssProperty } from '@latafi/core/src/lib
 import { CssNode, Rule } from 'css-tree';
 import * as csstree from 'css-tree';
 import { throwError } from 'rxjs';
+import { ComponentVisualEditorComponent } from './component-visual-editor.component';
 
 @Injectable({
   providedIn: 'root'
@@ -17,6 +18,8 @@ import { throwError } from 'rxjs';
 export class ComponentVisualEditorService extends ILatafiExtension {
 
   private readonly _renderer;
+
+  canvaEditorComponent: ComponentVisualEditorComponent;
 
   constructor(
     @Inject(DragDrop) private dragDrop: DragDrop,

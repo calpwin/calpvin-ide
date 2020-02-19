@@ -6,8 +6,8 @@
 }
 .cide-unique-component-container {
   position: relative;
-  display: block;
-  flex-direction: column;
+  display: flex;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
 }
@@ -22,20 +22,19 @@
   background-color: red;
 }
 .cide-unique-1 {
-  position: absolute;
+  position: relative;
   background-color: blue;
   width: 200px;
-  transform: translate3d(557px, 62px, 0px);
 }
 .cide-unique-5 {
-  position: absolute;
+  position: relative;
   background-color: green;
   width: 334px;
   border-radius: 0;
   justify-content: center;
   align-items: center;
   display: block;
-  transform: translate3d(315px, 172px, 0px);
+  transform: translate3d(101px, -3px, 0px);
 }
 .ide-wrapper {
   position: absolute;
