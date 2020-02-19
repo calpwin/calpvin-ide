@@ -46,6 +46,15 @@ export class LatafiComponentDirective implements OnInit {
     this._dargRef = this.dragDrop.createDrag(this.hostElement.nativeElement);
 
     this._dargRef.ended.subscribe(this.onMoveEnded);
+
+    this.updateElementPosition();
+  }
+
+  private updateElementPosition() {
+    const elStyle = getComputedStyle(this.hostElement.nativeElement);
+    const transformMatch = /matrix\([-0-9]+, [-0-9]+, [-0-9]+, [-0-9]+, ([-0-9]+), ([-0-9]+)\)/.exec(elStyle.transform);
+    this._lastLeftPosition = Number.parseInt(transformMatch[1]);
+    this._lastTopPosition = Number.parseInt(transformMatch[2]);
   }
 
   private _lastLeftPosition: number = undefined;
@@ -53,12 +62,12 @@ export class LatafiComponentDirective implements OnInit {
 
   private onMoveEnded = async (event: { source: DragRef<any>, distance: Point }) => {
 
-    if (!this._lastLeftPosition || !this._lastTopPosition) {
-      const elStyle = getComputedStyle(this.hostElement.nativeElement);
-      const transformMatch = /matrix\([-0-9]+, [-0-9]+, [-0-9]+, [-0-9]+, ([-0-9]+), ([-0-9]+)\)/.exec(elStyle.transform);
-      this._lastLeftPosition = Number.parseInt(transformMatch[1]);
-      this._lastTopPosition = Number.parseInt(transformMatch[2]);
-    }
+    // if (!this._lastLeftPosition || !this._lastTopPosition) {
+    //   const elStyle = getComputedStyle(this.hostElement.nativeElement);
+    //   const transformMatch = /matrix\([-0-9]+, [-0-9]+, [-0-9]+, [-0-9]+, ([-0-9]+), ([-0-9]+)\)/.exec(elStyle.transform);
+    //   this._lastLeftPosition = Number.parseInt(transformMatch[1]);
+    //   this._lastTopPosition = Number.parseInt(transformMatch[2]);
+    // }
 
     // const elStyle = getComputedStyle(this.hostElement.nativeElement);
 

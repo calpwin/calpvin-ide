@@ -47,40 +47,11 @@ export class ComponentPropertyEditorComponent implements OnInit {
     this._changeDedectionRef.detectChanges();
   }
 
-  async onCssValueChange(event: KeyboardEvent) {
-    // const file = this._virtualFileTreeService.getFile(
-    //   this._workspaceService.activeComponent,
-    //   `${this._workspaceService.activeComponent}.component.scss`);
-
-    // const elStyle = getComputedStyle(this._editorSelectedEl.nativeElement);
-
-    // const uniqueClassName = LatafiComponentDirective.tryGetComponentUniqueClassName(this._editorSelectedEl.nativeElement);
-
-    // const node = tryGetNode(file.astTree as CssNode, uniqueClassName);
-    // setCssValue(node as Rule, this.cssProperty, this.cssValue);
-
-    // file.content = csstree.generate(file.astTree);
-
-    // await this._eventManagerService.EventManager.sendEvent<VirtualFile>(
-    //   {
-    //     eventType: EventType.WriteComponentFile,
-    //     uniqueIdentifier: EventManager.generateUniqueIdentifire(),
-    //     data: file
-    //   }, false);
-
-    // await this._eventManagerService.EventManager.sendEvent<IdeFormatDocumentCommandData>(
-    //   {
-    //     eventType: EventType.IdeFormatDocument,
-    //     uniqueIdentifier: EventManager.generateUniqueIdentifire(),
-    //     data: { uri: file.fileName }
-    //   }, false);
-
-    await this._componentVisualEditorService.setElementStyle(this.cssProperty, this.cssValue);
-
-    // this._componentVisualEditorService.selectedElement = undefined;
+  onCssValueChange(event: KeyboardEvent) {
+    this._componentVisualEditorService.setElementStyle(this.cssProperty, this.cssValue);
   }
 
-  async onFlexboxActionChange(event: MatButtonToggleChange) {
+  onFlexboxActionChange(event: MatButtonToggleChange) {
     if (!this._componentVisualEditorService.wrapperElement) { return; }
 
     const mainAxis = this._flexboxWrapperModel.flexDirection === 'row' ? 'justify-content' : 'align-items';
@@ -88,24 +59,24 @@ export class ComponentPropertyEditorComponent implements OnInit {
 
     switch (event.value) {
       case 'left':
-        await this._componentVisualEditorService.setElementStyle(mainAxis, 'flex-start', this._componentVisualEditorService.wrapperElement);
+        this._componentVisualEditorService.setElementStyle(mainAxis, 'flex-start', this._componentVisualEditorService.wrapperElement);
         break;
       case 'center_vertical':
-        await this._componentVisualEditorService.setElementStyle(mainAxis, 'center', this._componentVisualEditorService.wrapperElement);
+        this._componentVisualEditorService.setElementStyle(mainAxis, 'center', this._componentVisualEditorService.wrapperElement);
         break;
       case 'right':
-        await this._componentVisualEditorService.setElementStyle(mainAxis, 'flex-end', this._componentVisualEditorService.wrapperElement);
+        this._componentVisualEditorService.setElementStyle(mainAxis, 'flex-end', this._componentVisualEditorService.wrapperElement);
         break;
 
       case 'top':
-        await this._componentVisualEditorService.setElementStyle(
+        this._componentVisualEditorService.setElementStyle(
           assendAxis, 'flex-start', this._componentVisualEditorService.wrapperElement);
         break;
       case 'center_horizontal':
-        await this._componentVisualEditorService.setElementStyle(assendAxis, 'center', this._componentVisualEditorService.wrapperElement);
+        this._componentVisualEditorService.setElementStyle(assendAxis, 'center', this._componentVisualEditorService.wrapperElement);
         break;
       case 'bottom':
-        await this._componentVisualEditorService.setElementStyle(assendAxis, 'flex-end', this._componentVisualEditorService.wrapperElement);
+        this._componentVisualEditorService.setElementStyle(assendAxis, 'flex-end', this._componentVisualEditorService.wrapperElement);
         break;
       default:
         break;

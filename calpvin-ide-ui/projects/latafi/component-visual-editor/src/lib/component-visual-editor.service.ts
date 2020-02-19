@@ -96,13 +96,13 @@ export class ComponentVisualEditorService extends ILatafiExtension {
   }
 
   async setElementStyle(style: string, value: string, element?: HTMLElement, hardSave = false, softSave = true, file?: VirtualFile) {
+    const selectedElementUniqueClassName = !element
+      ? this._selectedElementUniqueClassName
+      : LatafiComponentDirective.tryGetComponentUniqueClassName(element);
+
     element = element || this.selectedElement?.nativeElement;
     if (!element) throwError('Can not find element for styling');
     if (!this._workspaceService.activeComponent) throwError('ActiveComponent not set');
-
-    const selectedElementUniqueClassName = this.selectedElement?.nativeElement
-      ? this._selectedElementUniqueClassName
-      : LatafiComponentDirective.tryGetComponentUniqueClassName(element);
 
     if (!selectedElementUniqueClassName) throwError('Can not get Unique element css class. Must start with unique');
 
