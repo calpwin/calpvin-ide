@@ -8,9 +8,11 @@
 .component-canva-wrapper {
   position: relative;
   width: calc(100% - 360px);
+  overflow: hidden;
 }
 
 .component-property-wrapper {
   position: relative;
   width: 360px;
+  overflow: hidden;
 }

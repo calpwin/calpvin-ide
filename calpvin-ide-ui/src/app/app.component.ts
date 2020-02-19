@@ -5,6 +5,7 @@ import { VirtualFileTreeService } from '@latafi/core/src/lib/services/virtual-tr
 import { WorkspaceService } from '@latafi/core/src/lib/services/workspace.service';
 import { ILatafiExtension } from '@latafi/core/src/lib/services/i-extenson.service';
 import Split from 'split.js';
+import { LayoutService } from '@latafi/core/src/lib/services/layout.service';
 
 @Component({
   selector: 'cide-root',
@@ -18,33 +19,28 @@ export class AppComponent implements OnInit {
     private _workspaceService: WorkspaceService,
     private _el: ElementRef<HTMLElement>,
     private _eventManagerService: EventManagerService,
-    private readonly _injector: Injector) {
+    private readonly _injector: Injector,
+    private readonly _layoutService: LayoutService) {
     this.constractExtensions();
   }
 
   title = 'calpvin-ide';
 
-  @ViewChild('ide', { read: ElementRef, static: true }) _ide: ElementRef<HTMLElement>;
-  @ViewChild('ideEditor', { read: ElementRef, static: true }) _ideEditor: ElementRef<HTMLElement>;
+  @ViewChild('ide', { read: ElementRef, static: true }) _ideLayoutElRef: ElementRef<HTMLElement>;
+  @ViewChild('ideEditor', { read: ElementRef, static: true }) _canvaEditorLayoutElRef: ElementRef<HTMLElement>;
 
   async ngOnInit() {
     this._eventManagerService.init(
       window,
-      (this._ide.nativeElement.querySelector('iframe') as any).contentWindow,
+      (this._ideLayoutElRef.nativeElement.querySelector('iframe') as any).contentWindow,
       this.messageEventListener);
 
     this.initExtensions();
 
-    this.enablePanelSplit();
-  }
+    this._layoutService.canvaEditorLayoutElRef = this._canvaEditorLayoutElRef;
+    this._layoutService.ideLayoutElRef = this._ideLayoutElRef;
 
-  private _splitPanels;
-  private enablePanelSplit() {
-    this._splitPanels = Split([this._ideEditor.nativeElement, this._ide.nativeElement], {
-      direction: 'vertical',
-      sizes: [50, 50],
-      gutterSize: 15
-    });
+    // this.enablePanelSplit();
   }
 
   private initExtensions() {
@@ -71,7 +67,7 @@ export class AppComponent implements OnInit {
     if (command.eventType === EventType.IdeStartEvent) {
       await this.virtualFileTree.addComponentFiles('test-component');
     } else if (command.eventType === EventType.AppHideIde) {
-      this.hideIde();
+      this._layoutService.collapse(false);
     } else if (command.eventType === EventType.SetWorkspace) {
       this._workspaceService.activeWorkspace = command.data as Workspace;
     }
@@ -81,19 +77,10 @@ export class AppComponent implements OnInit {
 
   }
 
-  private hideIde() {
-    this._ide.nativeElement.style.display = 'none';
-    window.focus();
-  }
-
-  private async showIde() {
-    this._ide.nativeElement.style.display = 'block';
-  }
-
   @HostListener('document:keydown', ['$event'])
   onKeydownHandler(event: KeyboardEvent) {
     if (event.altKey && event.key === 'q') {
-      this._ide.nativeElement.style.display === 'block' ? this.hideIde() : this.showIde();
+      this._layoutService.collapse();
     } else if (event.altKey && event.key === 's') {
       this.virtualFileTree.saveAsync();
     }

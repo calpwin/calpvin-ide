@@ -3,6 +3,7 @@ import { EventManagerService } from './services/event-manager.service';
 import { VirtualFileTreeService } from './services/virtual-tree.service';
 import { DevModuleManagerService } from './services/dev-module-manager.service';
 import { WorkspaceService } from './services/workspace.service';
+import { LayoutService } from './services/layout.service';
 
 @NgModule({
   declarations: [],
@@ -18,7 +19,8 @@ export class LatafiCoreModule {
         EventManagerService,
         VirtualFileTreeService,
         DevModuleManagerService,
-        WorkspaceService]
+        WorkspaceService,
+        LayoutService]
     };
   }
 }

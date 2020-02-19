@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, ViewContainerR
 import { ComponentVisualEditorService } from './component-visual-editor.service';
 import { DOCUMENT } from '@angular/common';
 import Split from 'split.js';
+import { LayoutService } from '@latafi/core/src/lib/services/layout.service';
 
 @Component({
   selector: 'latafi-component-visual-editor',
@@ -18,7 +19,8 @@ export class ComponentVisualEditorComponent implements OnInit, AfterViewInit {
     private readonly _changeDedectionRef: ChangeDetectorRef,
     private readonly _renderer2: Renderer2,
     @Inject(DOCUMENT) private readonly _document: Document,
-    public readonly elementRef: ElementRef<HTMLElement>) { }
+    public readonly elementRef: ElementRef<HTMLElement>,
+    private readonly _layoutService: LayoutService) { }
 
 
   ngOnInit(): void {
@@ -30,10 +32,7 @@ export class ComponentVisualEditorComponent implements OnInit, AfterViewInit {
     this._componentVisualEditorService.onPropertyEditorWrapperInit.emit(this.componentPropertyContainer);
     this._changeDedectionRef.detectChanges();
 
-    Split([this.componentCanvaEditorWrapper.nativeElement, this.componentPropertyWrapper.nativeElement], {
-      sizes: [75, 25],
-      gutterSize: 15
-    });
+    this._layoutService.propertyEditorLayoutElRef = this.componentPropertyWrapper;
   }
 
   onSelectelement = (el: ElementRef<HTMLElement>) => {
