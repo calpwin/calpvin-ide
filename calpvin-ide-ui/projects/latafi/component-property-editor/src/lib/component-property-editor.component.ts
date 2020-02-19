@@ -102,9 +102,13 @@ export class ComponentPropertyEditorComponent implements OnInit {
       await this._componentVisualEditorService.setElementStyle(
         'flex-direction', 'column', this._componentVisualEditorService.wrapperElement);
     }
+
+
   }
 
   private async setWrapperElDisplayMod(wrapperEl: HTMLElement, displayVal: 'none' | 'absolute' | 'row' | 'column') {
+    await this._componentVisualEditorService.resetWrapperElementsPosition();
+
     if (displayVal === 'row' || displayVal === 'column') {
       await this._componentVisualEditorService.setElementStyle('display', 'flex', wrapperEl);
     } else {

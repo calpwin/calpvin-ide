@@ -6,7 +6,7 @@ import { EventManagerService } from '@latafi/core/src/lib/services/event-manager
 import { ILatafiExtension } from '@latafi/core/src/lib/services/i-extenson.service';
 import { VirtualFile, EventType, EventManager, IdeFormatDocumentCommandData } from 'calpvin-ide-shared';
 import { WorkspaceService } from '@latafi/core/src/lib/services/workspace.service';
-import { tryGetNode, setCssValue } from '@latafi/core/src/lib/extension/csstree-walker.extension';
+import { tryGetNode, setCssValue, removeCssProperty } from '@latafi/core/src/lib/extension/csstree-walker.extension';
 import { CssNode, Rule } from 'css-tree';
 import * as csstree from 'css-tree';
 import { throwError } from 'rxjs';
@@ -33,6 +33,18 @@ export class ComponentVisualEditorService extends ILatafiExtension {
   }
 
   onBaseAppConstruct() {
+  }
+
+  readonly onResetWrapperElementsPosition = new EventEmitter<HTMLElement>();
+
+  async resetWrapperElementsPosition() {
+    for (let index = 0; index < this._wrapperElement.children.length; index++) {
+      const element = this._wrapperElement.children[index];
+
+      await this.setElementStyle('transform', null, element as HTMLElement);
+    }
+
+    this.onResetWrapperElementsPosition.emit(this._wrapperElement);
   }
 
 
@@ -69,17 +81,23 @@ export class ComponentVisualEditorService extends ILatafiExtension {
 
   onPropertyEditorWrapperInit = new EventEmitter<ViewContainerRef>();
 
+  private _directives: LatafiComponentDirective[] = []
+
   applyLatafiComponentDirective() {
     const componentEls = document.getElementsByClassName('cide-component');
 
+    this._directives.forEach(directive => directive.ngOnDestroy());
+    this._directives = [];
 
     for (let index = 0; index < componentEls.length; index++) {
       const compEl = componentEls[index];
 
       const elStyle = getComputedStyle(compEl);
 
-      const transformMatch = /matrix\([-0-9]+, [-0-9]+, [-0-9]+, [-0-9]+, ([-0-9]+), ([-0-9]+)\)/.exec(elStyle.transform);
-      this._renderer.setStyle(compEl, 'transform', `translate3d(${transformMatch[1]}px, ${transformMatch[2]}px, 0px)`);
+      if (elStyle.transform !== 'none') {
+        const transformMatch = /matrix\([-0-9]+, [-0-9]+, [-0-9]+, [-0-9]+, ([-0-9]+), ([-0-9]+)\)/.exec(elStyle.transform);
+        this._renderer.setStyle(compEl, 'transform', `translate3d(${transformMatch[1]}px, ${transformMatch[2]}px, 0px)`);
+      }
 
       const directive = new LatafiComponentDirective(
         this.dragDrop,
@@ -92,10 +110,12 @@ export class ComponentVisualEditorService extends ILatafiExtension {
       directive.baseComponentTagName = compEl.getAttribute('cide-belongs-to-component');
 
       directive.ngOnInit();
+
+      this._directives.push(directive);
     }
   }
 
-  async setElementStyle(style: string, value: string, element?: HTMLElement, hardSave = false, softSave = true, file?: VirtualFile) {
+  async setElementStyle(style: string, value?: string, element?: HTMLElement, hardSave = false, softSave = true, file?: VirtualFile) {
     const selectedElementUniqueClassName = !element
       ? this._selectedElementUniqueClassName
       : LatafiComponentDirective.tryGetComponentUniqueClassName(element);
@@ -110,15 +130,17 @@ export class ComponentVisualEditorService extends ILatafiExtension {
       file = this.virtualTreeService.getFile(this._workspaceService.activeComponent, `${this._workspaceService.activeComponent}.component.scss`);
     }
 
-    const elStyle = getComputedStyle(element);
-
     const node = tryGetNode(file.astTree as CssNode, selectedElementUniqueClassName);
-    setCssValue(node as Rule, style, value);
+
+    if (value)
+      setCssValue(node as Rule, style, value);
+    else
+      removeCssProperty(node as Rule, style);
 
     file.content = csstree.generate(file.astTree);
 
     if (softSave)
-      this._renderer.setStyle(element, style, value);
+      this._renderer.setStyle(element, style, this.ensureSoftStyleValue(style, value));
 
     if (hardSave) {
       await this.eventManagerService.EventManager.sendEvent<VirtualFile>(
@@ -135,5 +157,11 @@ export class ComponentVisualEditorService extends ILatafiExtension {
           data: { uri: file.fileName }
         }, false);
     }
+  }
+
+  private ensureSoftStyleValue(style: string, value: string): string {
+    if (style === 'transform' && !value) return 'translate3d(0px, 0px, 0px)';
+
+    return value;
   }
 }

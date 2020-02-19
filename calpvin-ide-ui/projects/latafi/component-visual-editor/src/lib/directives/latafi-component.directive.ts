@@ -1,4 +1,4 @@
-import { Directive, Renderer2, ElementRef, Input, OnInit, Inject } from '@angular/core';
+import { Directive, Renderer2, ElementRef, Input, OnInit, Inject, OnDestroy } from '@angular/core';
 import { Element, ParseTreeResult } from '@angular/compiler';
 import { EventManager, EventType, VirtualFile, IdeFormatDocumentCommandData } from 'calpvin-ide-shared/IdeCommand';
 import { DragDrop, DragRef } from '@angular/cdk/drag-drop';
@@ -10,11 +10,12 @@ import { findElement } from '@latafi/core/src/lib/extension/angular-html-element
 import { tryGetNode, setCssValue } from '@latafi/core/src/lib/extension/csstree-walker.extension';
 import { Point } from '@angular/cdk/drag-drop/drag-ref';
 import { ComponentVisualEditorService } from '../component-visual-editor.service';
+import { Subscription } from 'rxjs';
 
 @Directive({
   selector: '[latafiComponent]'
 })
-export class LatafiComponentDirective implements OnInit {
+export class LatafiComponentDirective implements OnInit, OnDestroy {
   public static readonly ComponentCssClass = 'cide-component';
   public static readonly ComponentUniqueCssClass = 'cide-unique';
 
@@ -44,21 +45,39 @@ export class LatafiComponentDirective implements OnInit {
     this._uniqueClassName = LatafiComponentDirective.tryGetComponentUniqueClassName(this.hostElement.nativeElement);
 
     this._dargRef = this.dragDrop.createDrag(this.hostElement.nativeElement);
-
     this._dargRef.ended.subscribe(this.onMoveEnded);
 
     this.updateElementPosition();
+
+    this._wrapperElement = this.hostElement.nativeElement.parentElement;
+
+    this._onResetWrapperElementsPositionSubscription =
+      this._componentVisualEditorService.onResetWrapperElementsPosition.subscribe(this.onResetWrapperElementsPosition);
+  }
+
+  private _wrapperElement: HTMLElement;
+
+  private _onResetWrapperElementsPositionSubscription: Subscription;
+  private onResetWrapperElementsPosition = (wrapperElement: HTMLElement) => {
+    if (wrapperElement === this._wrapperElement) {
+      this._lastLeftPosition = 0;
+      this._lastTopPosition = 0;
+      this._dargRef.setFreeDragPosition({ x: 0, y: 0 });
+    }
   }
 
   private updateElementPosition() {
     const elStyle = getComputedStyle(this.hostElement.nativeElement);
-    const transformMatch = /matrix\([-0-9]+, [-0-9]+, [-0-9]+, [-0-9]+, ([-0-9]+), ([-0-9]+)\)/.exec(elStyle.transform);
-    this._lastLeftPosition = Number.parseInt(transformMatch[1]);
-    this._lastTopPosition = Number.parseInt(transformMatch[2]);
+
+    if (elStyle.transform !== 'none') {
+      const transformMatch = /matrix\([-0-9]+, [-0-9]+, [-0-9]+, [-0-9]+, ([-0-9]+), ([-0-9]+)\)/.exec(elStyle.transform);
+      this._lastLeftPosition = Number.parseInt(transformMatch[1]);
+      this._lastTopPosition = Number.parseInt(transformMatch[2]);
+    }
   }
 
-  private _lastLeftPosition: number = undefined;
-  private _lastTopPosition: number = undefined;
+  private _lastLeftPosition = 0;
+  private _lastTopPosition = 0;
 
   private onMoveEnded = async (event: { source: DragRef<any>, distance: Point }) => {
 
@@ -129,5 +148,9 @@ export class LatafiComponentDirective implements OnInit {
     });
 
     return uniqueClassName;
+  }
+
+  ngOnDestroy() {
+    this._onResetWrapperElementsPositionSubscription?.unsubscribe();
   }
 }

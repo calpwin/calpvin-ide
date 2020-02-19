@@ -20,10 +20,13 @@ export function tryGetNode(cssNode: CssNode, byClassSelector: string): CssNode |
 export function setCssValue(node: Rule, property: string, value: string) {
   let result = false;
 
-  csstree.walk(node, (_blockNode) => {
-    if (_blockNode.type === 'Declaration' && _blockNode.property === property) {
-      _blockNode.value = { type: 'Raw', value };
-      result = true;
+  csstree.walk(node, {
+    visit: 'Declaration',
+    enter: (_blockNode) => {
+      if (_blockNode.property === property) {
+        _blockNode.value = { type: 'Raw', value };
+        result = true;
+      }
     }
   });
 
@@ -36,4 +39,14 @@ export function setCssValue(node: Rule, property: string, value: string) {
       loc: null
     } as csstree.Declaration);
   }
+}
+
+export function removeCssProperty(node: Rule, property: string) {
+  csstree.walk(node, {
+    visit: 'Declaration',
+    enter: (_blockNode, _item, _list) => {
+      if (_blockNode.property === property)
+        _list.remove(_item);
+    }
+  });
 }
