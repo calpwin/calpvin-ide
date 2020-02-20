@@ -1,12 +1,12 @@
 import { Injectable, ElementRef, ComponentFactoryResolver, ViewContainerRef, ComponentRef } from '@angular/core';
-import { ILatafiExtension } from '@latafi/core/src/lib/services/i-extenson.service';
+import { LatafiInjectableService } from '@latafi/core/src/lib/services/injectable.service';
 import { ComponentVisualEditorService } from '@latafi/component-visual-editor/src/lib/component-visual-editor.service';
 import { ComponentPropertyEditorComponent } from './component-property-editor.component';
 
 @Injectable({
   providedIn: 'root'
 })
-export class ComponentPropertyEditorService extends ILatafiExtension {
+export class ComponentPropertyEditorService extends LatafiInjectableService {
   constructor(
     private readonly _componentVisualEditorService: ComponentVisualEditorService,
     private readonly componentFactoryResolver: ComponentFactoryResolver) {

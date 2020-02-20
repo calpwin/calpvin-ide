@@ -3,7 +3,7 @@ import { LatafiComponentDirective } from './directives/latafi-component.directiv
 import { DragDrop } from '@angular/cdk/drag-drop';
 import { VirtualFileTreeService } from '@latafi/core/src/lib/services/virtual-tree.service';
 import { EventManagerService } from '@latafi/core/src/lib/services/event-manager.service';
-import { ILatafiExtension } from '@latafi/core/src/lib/services/i-extenson.service';
+import { LatafiInjectableService } from '@latafi/core/src/lib/services/injectable.service';
 import { VirtualFile, EventType, EventManager, IdeFormatDocumentCommandData } from 'calpvin-ide-shared';
 import { WorkspaceService } from '@latafi/core/src/lib/services/workspace.service';
 import { tryGetNode, setCssValue, removeCssProperty } from '@latafi/core/src/lib/extension/csstree-walker.extension';
@@ -15,7 +15,7 @@ import { ComponentVisualEditorComponent } from './component-visual-editor.compon
 @Injectable({
   providedIn: 'root'
 })
-export class ComponentVisualEditorService extends ILatafiExtension {
+export class ComponentVisualEditorService extends LatafiInjectableService {
 
   private readonly _renderer;
 
@@ -38,7 +38,15 @@ export class ComponentVisualEditorService extends ILatafiExtension {
   onBaseAppConstruct() {
   }
 
+  //#region Events
+
   readonly onResetWrapperElementsPosition = new EventEmitter<HTMLElement>();
+
+  readonly onPropertyEditorWrapperInit = new EventEmitter<ViewContainerRef>();
+
+  readonly onSelectElement = new EventEmitter<ElementRef | undefined>();
+
+  //#endregion
 
   async resetWrapperElementsPosition() {
     for (let index = 0; index < this._wrapperElement.children.length; index++) {
@@ -79,10 +87,6 @@ export class ComponentVisualEditorService extends ILatafiExtension {
 
     this.onSelectElement.emit(v);
   }
-
-  onSelectElement = new EventEmitter<ElementRef | undefined>();
-
-  onPropertyEditorWrapperInit = new EventEmitter<ViewContainerRef>();
 
   private _directives: LatafiComponentDirective[] = []
 

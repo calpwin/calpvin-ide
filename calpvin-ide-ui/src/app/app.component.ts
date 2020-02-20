@@ -3,7 +3,7 @@ import { EventType, IdeEvent, Workspace } from 'calpvin-ide-shared/IdeCommand';
 import { EventManagerService } from '@latafi/core/src/lib/services/event-manager.service';
 import { VirtualFileTreeService } from '@latafi/core/src/lib/services/virtual-tree.service';
 import { WorkspaceService } from '@latafi/core/src/lib/services/workspace.service';
-import { ILatafiExtension } from '@latafi/core/src/lib/services/i-extenson.service';
+import { LatafiInjectableService } from '@latafi/core/src/lib/services/injectable.service';
 import Split from 'split.js';
 import { LayoutService } from '@latafi/core/src/lib/services/layout.service';
 
@@ -44,7 +44,7 @@ export class AppComponent implements OnInit {
   }
 
   private initExtensions() {
-    const exts = this._injector.get(ILatafiExtension) as unknown as ILatafiExtension[];
+    const exts = this._injector.get(LatafiInjectableService) as unknown as LatafiInjectableService[];
 
     exts.forEach(ext => {
       ext.onAppInit();
@@ -52,7 +52,7 @@ export class AppComponent implements OnInit {
   }
 
   private constractExtensions() {
-    const exts = this._injector.get(ILatafiExtension) as unknown as ILatafiExtension[];
+    const exts = this._injector.get(LatafiInjectableService) as unknown as LatafiInjectableService[];
 
     exts.forEach(ext => {
       ext.onBaseAppConstruct();
