@@ -93,16 +93,16 @@ export class ComponentVisualEditorService extends LatafiInjectableService {
   }
 
 
-  private _selectedElementGroup : ElementRef[] = [];
-  public get selectedElementGroup() : ElementRef[] {
+  private _selectedElementGroup: ElementRef[] = [];
+  public get selectedElementGroup(): ElementRef[] {
     return this._selectedElementGroup;
   }
-  public addSelectElementToGroup(v : ElementRef) {
+  public addSelectElementToGroup(v: ElementRef) {
     this._selectedElementGroup.push(v);
 
     this.onAddSelectElementToGroup.emit(v);
   }
-  public removeSelectElementFromGroup(v : ElementRef) {
+  public removeSelectElementFromGroup(v: ElementRef) {
     this._selectedElementGroup = this._selectedElementGroup.filter(x => x != v);
 
     this.onRemoveSelectElementFromGroup.emit(v);
@@ -111,11 +111,19 @@ export class ComponentVisualEditorService extends LatafiInjectableService {
 
   private _directives: LatafiComponentDirective[] = []
 
-  applyLatafiComponentDirective() {
-    const componentEls = document.getElementsByClassName('cide-component');
+  updateLatafiComponentDirective() {
 
     this._directives.forEach(directive => directive.ngOnDestroy());
     this._directives = [];
+
+    const componentEls: HTMLElement[] = [];
+
+    for (let i = 0; i < this.wrapperElement.children.length; i++) {
+      const element = this.wrapperElement.children[i];
+
+      if (element.classList.contains('cide-component'))
+        componentEls.push(element as HTMLElement);
+    }
 
     for (let index = 0; index < componentEls.length; index++) {
       const compEl = componentEls[index];

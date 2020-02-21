@@ -61,6 +61,8 @@ export class ComponentGroupingService extends LatafiInjectableService {
             uniqueIdentifier: EventManager.generateUniqueIdentifire(),
             data: file
           }, false);
+
+        this._componentVisualEditorService.updateLatafiComponentDirective();
       }
     }
   }
