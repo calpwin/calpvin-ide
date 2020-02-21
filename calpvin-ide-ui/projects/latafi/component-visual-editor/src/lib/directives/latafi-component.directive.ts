@@ -120,16 +120,19 @@ export class LatafiComponentDirective implements OnInit, OnDestroy {
 
     this._componentVisualEditorService.selectedElement = this.hostElement;
 
+    if (event.altKey)
+      this._componentVisualEditorService.addSelectElementToGroup(this.hostElement);
+
     if (event.ctrlKey) {
       const componentName = VirtualFileTreeService.getComponentName(this.baseComponentTagName);
       const file = this.virtualTree.getFile(componentName, `${componentName}.component.html`);
 
       const parsedTreeResult = file.astTree as ParseTreeResult;
 
-      const findNode = findElement(parsedTreeResult.rootNodes.map(x => x as Element), this._uniqueClassName);
+      const findResult = findElement(parsedTreeResult.rootNodes.map(x => x as Element), this._uniqueClassName);
 
-      file.content = file.content.substr(0, findNode.startSourceSpan.start.offset)
-        + file.content.substr(findNode.endSourceSpan.end.offset, file.content.length);
+      file.content = file.content.substr(0, findResult.findNode.startSourceSpan.start.offset)
+        + file.content.substr(findResult.findNode.endSourceSpan.end.offset, file.content.length);
 
       const res = await this.eventManagerService.EventManager.sendEvent<VirtualFile>(
         {

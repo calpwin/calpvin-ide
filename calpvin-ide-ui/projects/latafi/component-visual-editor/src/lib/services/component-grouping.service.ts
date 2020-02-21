@@ -1,0 +1,67 @@
+import { Injectable, ElementRef, RendererFactory2 } from '@angular/core';
+import { ComponentVisualEditorService } from '../../public-api';
+import { LatafiInjectableService } from '@latafi/core/src/lib/services/injectable.service';
+import { VirtualFileTreeService } from '@latafi/core/src/lib/services/virtual-tree.service';
+import { WorkspaceService } from '@latafi/core/src/lib/services/workspace.service';
+import { ParseTreeResult, Element } from '@angular/compiler';
+import { findElement } from '@latafi/core/src/lib/extension/angular-html-elements.extension';
+import { LatafiComponentDirective } from '../directives/latafi-component.directive';
+import { EventManagerService } from '@latafi/core/src/lib/services/event-manager.service';
+import { VirtualFile, EventType, EventManager } from 'calpvin-ide-shared';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ComponentGroupingService extends LatafiInjectableService {
+
+  constructor(
+    private readonly _componentVisualEditorService: ComponentVisualEditorService,
+    private readonly _virtualFileTreeService: VirtualFileTreeService,
+    private readonly _workspaceService: WorkspaceService,
+    private readonly _eventManagerService: EventManagerService,
+    _rendererFactory: RendererFactory2) {
+    super();
+
+    const rendrer = _rendererFactory.createRenderer(null, null);
+    rendrer.listen('document', 'keydown', event => { this.onDocumentKeydown(event); });
+  }
+
+  onBaseAppConstruct() {
+    this._componentVisualEditorService.onAddSelectElementToGroup.subscribe(this.onVisualEditorAddSelectedElementToGroup);
+  }
+
+  private onVisualEditorAddSelectedElementToGroup = (el: ElementRef<HTMLElement>) => {
+    console.log('Added!');
+  }
+
+  onDocumentKeydown = async (event: KeyboardEvent) => {
+    if (event.ctrlKey && event.key === 'g' && this._componentVisualEditorService.selectedElementGroup.length >= 2) {
+      const file = this._virtualFileTreeService.getFile(
+        this._workspaceService.activeComponent,
+        `${this._workspaceService.activeComponent}.component.html`);
+
+      const parsedTreeResult = file.astTree as ParseTreeResult;
+
+      const uniqueClassName =
+        LatafiComponentDirective.tryGetComponentUniqueClassName(this._componentVisualEditorService.selectedElementGroup[0].nativeElement);
+
+      const findResult = findElement(parsedTreeResult.rootNodes.map(x => x as Element), uniqueClassName);
+
+      if (findResult) {
+        file.content =
+          file.content.slice(0, findResult.parentNode.startSourceSpan.end.offset)
+          + '<div class=\"appended\">'
+          + file.content.slice(findResult.parentNode.startSourceSpan.end.offset, findResult.parentNode.endSourceSpan.start.offset)
+          + '</div>'
+          + file.content.slice(findResult.parentNode.endSourceSpan.start.offset, file.content.length);
+
+        const res = await this._eventManagerService.EventManager.sendEvent<VirtualFile>(
+          {
+            eventType: EventType.WriteComponentFile,
+            uniqueIdentifier: EventManager.generateUniqueIdentifire(),
+            data: file
+          }, false);
+      }
+    }
+  }
+}

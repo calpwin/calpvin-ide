@@ -46,6 +46,10 @@ export class ComponentVisualEditorService extends LatafiInjectableService {
 
   readonly onSelectElement = new EventEmitter<ElementRef | undefined>();
 
+  readonly onAddSelectElementToGroup = new EventEmitter<ElementRef>();
+
+  readonly onRemoveSelectElementFromGroup = new EventEmitter<ElementRef>();
+
   //#endregion
 
   async resetWrapperElementsPosition() {
@@ -87,6 +91,23 @@ export class ComponentVisualEditorService extends LatafiInjectableService {
 
     this.onSelectElement.emit(v);
   }
+
+
+  private _selectedElementGroup : ElementRef[] = [];
+  public get selectedElementGroup() : ElementRef[] {
+    return this._selectedElementGroup;
+  }
+  public addSelectElementToGroup(v : ElementRef) {
+    this._selectedElementGroup.push(v);
+
+    this.onAddSelectElementToGroup.emit(v);
+  }
+  public removeSelectElementFromGroup(v : ElementRef) {
+    this._selectedElementGroup = this._selectedElementGroup.filter(x => x != v);
+
+    this.onRemoveSelectElementFromGroup.emit(v);
+  }
+
 
   private _directives: LatafiComponentDirective[] = []
 
