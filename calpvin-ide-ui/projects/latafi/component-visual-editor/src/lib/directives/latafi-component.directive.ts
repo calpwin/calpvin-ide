@@ -151,5 +151,7 @@ export class LatafiComponentDirective implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this._onResetWrapperElementsPositionSubscription?.unsubscribe();
+    this._dargRef.dispose();
+    this.hostElement.nativeElement.removeEventListener('click', this.onClick);
   }
 }

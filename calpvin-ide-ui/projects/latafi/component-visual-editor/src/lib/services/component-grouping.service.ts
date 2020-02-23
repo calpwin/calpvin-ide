@@ -64,6 +64,34 @@ export class ComponentGroupingService extends LatafiInjectableService {
 
         this._componentVisualEditorService.updateLatafiComponentDirective();
       }
+    } else if (event.ctrlKey && !event.altKey && event.key === 'b') {
+      this.setEditorToBlock();
+    } else if (event.ctrlKey && event.altKey && event.key === 'b') {
+      this.setPreviouseBlock();
     }
+  }
+
+  private readonly _previouseBlockElemets: HTMLElement[] = [];
+
+  private setPreviouseBlock() {
+    if (this._previouseBlockElemets.length > 0) {
+      const previouseBlockEl = this._previouseBlockElemets.pop();
+
+      this._componentVisualEditorService.wrapperElement = previouseBlockEl;
+      this._componentVisualEditorService.updateLatafiComponentDirective();
+    }
+  }
+
+  private setEditorToBlock() {
+    if (!this._componentVisualEditorService.selectedElement
+      || !ComponentVisualEditorService.isComponentContainer(this._componentVisualEditorService.selectedElement.nativeElement)) {
+      console.warn('Selected element is empty or not Component Container');
+      return;
+    }
+
+    this._previouseBlockElemets.push(this._componentVisualEditorService.wrapperElement);
+
+    this._componentVisualEditorService.wrapperElement = this._componentVisualEditorService.selectedElement.nativeElement;
+    this._componentVisualEditorService.updateLatafiComponentDirective();
   }
 }

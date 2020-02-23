@@ -16,12 +16,22 @@
 .cide-component-container {
   position: relative;
 }
+.cide-component-container::after {
+  display: block;
+  content: " ";
+  clear: both;
+}
+.cide-component-container::before {
+  display: block;
+  content: " ";
+  clear: both;
+}
 .cide-unique-1 {
   position: absolute;
-  background-color: #68598093;
+  background-color: green;
   width: 200px;
   height: 50px;
-  transform: translate3d(305px, 54px, 0px);
+  transform: translate3d(731px, 184px, 0px);
 }
 .cide-unique-5 {
   position: absolute;
@@ -32,8 +42,8 @@
   justify-content: center;
   align-items: center;
   display: block;
-  transform: translate3d(406px, 145px, 0px);
+  transform: translate3d(275px, 69px, 0px);
 }
 .cide-unique-a85ac46d-8810-45e8-b4b2-c5f77db8bca2 {
-  transform: translate3d(3px, 4px, 0px);
+  transform: translate3d(5px, 9px, 0px);
 }

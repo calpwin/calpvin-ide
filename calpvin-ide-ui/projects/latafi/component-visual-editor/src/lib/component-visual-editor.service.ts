@@ -40,9 +40,11 @@ export class ComponentVisualEditorService extends LatafiInjectableService {
 
   //#region Events
 
-  readonly onResetWrapperElementsPosition = new EventEmitter<HTMLElement>();
-
   readonly onPropertyEditorWrapperInit = new EventEmitter<ViewContainerRef>();
+
+  readonly onWrapperElementUpdate = new EventEmitter<HTMLElement | undefined>();
+
+  readonly onResetWrapperElementsPosition = new EventEmitter<HTMLElement>();
 
   readonly onSelectElement = new EventEmitter<ElementRef | undefined>();
 
@@ -52,16 +54,9 @@ export class ComponentVisualEditorService extends LatafiInjectableService {
 
   //#endregion
 
-  async resetWrapperElementsPosition() {
-    for (let index = 0; index < this._wrapperElement.children.length; index++) {
-      const element = this._wrapperElement.children[index];
+  //#region Interface
 
-      await this.setElementStyle('transform', null, element as HTMLElement);
-    }
-
-    this.onResetWrapperElementsPosition.emit(this._wrapperElement);
-  }
-
+  public static readonly COMPONENT_CONTAINER_CLASS = 'cide-component-container';
 
   private _wrapperElement: HTMLElement;
   public get wrapperElement(): HTMLElement {
@@ -69,6 +64,8 @@ export class ComponentVisualEditorService extends LatafiInjectableService {
   }
   public set wrapperElement(v: HTMLElement) {
     this._wrapperElement = v;
+
+    this.onWrapperElementUpdate.emit(v);
   }
 
   private _previousSelectedElement: ElementRef<HTMLElement>;
@@ -92,7 +89,6 @@ export class ComponentVisualEditorService extends LatafiInjectableService {
     this.onSelectElement.emit(v);
   }
 
-
   private _selectedElementGroup: ElementRef[] = [];
   public get selectedElementGroup(): ElementRef[] {
     return this._selectedElementGroup;
@@ -107,6 +103,23 @@ export class ComponentVisualEditorService extends LatafiInjectableService {
 
     this.onRemoveSelectElementFromGroup.emit(v);
   }
+
+  static isComponentContainer(element: HTMLElement) {
+    return element.classList.contains(this.COMPONENT_CONTAINER_CLASS);
+  }
+
+  //#endregion
+
+  async resetWrapperElementsPosition() {
+    for (let index = 0; index < this._wrapperElement.children.length; index++) {
+      const element = this._wrapperElement.children[index];
+
+      await this.setElementStyle('transform', null, element as HTMLElement);
+    }
+
+    this.onResetWrapperElementsPosition.emit(this._wrapperElement);
+  }
+
 
 
   private _directives: LatafiComponentDirective[] = []

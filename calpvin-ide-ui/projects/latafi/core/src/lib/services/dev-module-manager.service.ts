@@ -20,10 +20,8 @@ export class DevModuleManagerService {
   }
 
   setComponentWrapperElement() {
-    this._componentVisualEditorService.wrapperElement = this._document.querySelector('.cide-unique-component-container');
-
-    console.log('Update wrapper', this._componentVisualEditorService.wrapperElement);
-
+    this._componentVisualEditorService.wrapperElement =
+      this._document.querySelector(`.${ComponentVisualEditorService.COMPONENT_CONTAINER_CLASS}`);
   }
 
   async updateVirtualTreeAsync() {
