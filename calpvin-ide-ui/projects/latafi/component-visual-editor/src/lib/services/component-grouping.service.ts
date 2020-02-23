@@ -8,6 +8,7 @@ import { findElement } from '@latafi/core/src/lib/extension/angular-html-element
 import { LatafiComponentDirective } from '../directives/latafi-component.directive';
 import { EventManagerService } from '@latafi/core/src/lib/services/event-manager.service';
 import { VirtualFile, EventType, EventManager } from 'calpvin-ide-shared';
+import { Guid } from 'guid-typescript';
 
 @Injectable({
   providedIn: 'root'
@@ -31,7 +32,6 @@ export class ComponentGroupingService extends LatafiInjectableService {
   }
 
   private onVisualEditorAddSelectedElementToGroup = (el: ElementRef<HTMLElement>) => {
-    console.log('Added!');
   }
 
   onDocumentKeydown = async (event: KeyboardEvent) => {
@@ -50,7 +50,7 @@ export class ComponentGroupingService extends LatafiInjectableService {
       if (findResult) {
         file.content =
           file.content.slice(0, findResult.parentNode.startSourceSpan.end.offset)
-          + '<div class=\"appended\">'
+          + `<div class=\"cide-component-container cide-component cide-unique-${Guid.create().toString()}\">`
           + file.content.slice(findResult.parentNode.startSourceSpan.end.offset, findResult.parentNode.endSourceSpan.start.offset)
           + '</div>'
           + file.content.slice(findResult.parentNode.endSourceSpan.start.offset, file.content.length);

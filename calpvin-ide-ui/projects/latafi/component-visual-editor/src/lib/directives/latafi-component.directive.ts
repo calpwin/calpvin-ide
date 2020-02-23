@@ -11,6 +11,7 @@ import { tryGetNode, setCssValue } from '@latafi/core/src/lib/extension/csstree-
 import { Point } from '@angular/cdk/drag-drop/drag-ref';
 import { ComponentVisualEditorService } from '../component-visual-editor.service';
 import { Subscription } from 'rxjs';
+import { WorkspaceService } from '@latafi/core/src/lib/services/workspace.service';
 
 @Directive({
   selector: '[latafiComponent]'
@@ -28,20 +29,15 @@ export class LatafiComponentDirective implements OnInit, OnDestroy {
     private hostElement: ElementRef<HTMLElement>,
     private virtualTree: VirtualFileTreeService,
     private readonly eventManagerService: EventManagerService,
-    private readonly _componentVisualEditorService: ComponentVisualEditorService) {
+    private readonly _componentVisualEditorService: ComponentVisualEditorService,
+    private readonly _workspaceService: WorkspaceService) {
 
     renderer.addClass(hostElement.nativeElement, LatafiComponentDirective.ComponentCssClass);
 
     hostElement.nativeElement.addEventListener('click', this.onClick);
   }
 
-  @Input() baseComponentTagName: string;
-
   ngOnInit(): void {
-    if (!this.baseComponentTagName) {
-      console.log('Base Component name not set!');
-    }
-
     this._uniqueClassName = LatafiComponentDirective.tryGetComponentUniqueClassName(this.hostElement.nativeElement);
 
     this._dargRef = this.dragDrop.createDrag(this.hostElement.nativeElement);
@@ -124,7 +120,7 @@ export class LatafiComponentDirective implements OnInit, OnDestroy {
       this._componentVisualEditorService.addSelectElementToGroup(this.hostElement);
 
     if (event.ctrlKey) {
-      const componentName = VirtualFileTreeService.getComponentName(this.baseComponentTagName);
+      const componentName = VirtualFileTreeService.getComponentName(this._workspaceService.activeComponent);
       const file = this.virtualTree.getFile(componentName, `${componentName}.component.html`);
 
       const parsedTreeResult = file.astTree as ParseTreeResult;

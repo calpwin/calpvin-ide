@@ -1,7 +1,8 @@
 import * as csstree from 'css-tree';
-import { CssNode, Rule } from 'css-tree';
+import { CssNode, Rule, StyleSheet } from 'css-tree';
+import { listLazyRoutes } from '@angular/compiler/src/aot/lazy_routes';
 
-export function tryGetNode(cssNode: CssNode, byClassSelector: string): CssNode | undefined {
+export function tryGetNode(cssNode: CssNode, byClassSelector: string, forceCreate = true): CssNode | undefined {
   let findNode;
 
   csstree.walk(cssNode, node => {
@@ -13,6 +14,54 @@ export function tryGetNode(cssNode: CssNode, byClassSelector: string): CssNode |
       });
     }
   });
+
+  if (!findNode && forceCreate) {
+
+    const preludeList = new csstree.List();
+    preludeList.append(preludeList.createItem({
+      type: 'ClassSelector',
+      name: byClassSelector
+    } as csstree.ClassSelector));
+
+    const newRule = {
+      type: 'Rule',
+      loc: {
+        start: {
+          column: 0,
+          line: cssNode.loc.end.line + 2,
+          offset: cssNode.loc.end.offset + 2
+        },
+        end: {
+          column: byClassSelector.length + 2,
+          line: cssNode.loc.end.line + 2,
+          offset: cssNode.loc.end.offset + 2 + byClassSelector.length + 2
+        }
+      },
+      prelude: {
+        type: "SelectorList",
+        children: preludeList
+      },
+      block: {
+        type: 'Block',
+        loc: {
+          start: {
+            column: byClassSelector.length + 2,
+            line: cssNode.loc.end.line + 2,
+            offset: cssNode.loc.end.offset + 2 + byClassSelector.length + 2
+          },
+          end: {
+            column: byClassSelector.length + 2,
+            line: cssNode.loc.end.line + 2,
+            offset: cssNode.loc.end.offset + 2 + byClassSelector.length + 2
+          }
+        },
+        children: new csstree.List()
+      }
+    } as csstree.Rule;
+
+    (cssNode as StyleSheet).children.appendData(newRule);
+    findNode = newRule;
+  }
 
   return findNode;
 }

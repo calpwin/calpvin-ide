@@ -141,9 +141,8 @@ export class ComponentVisualEditorService extends LatafiInjectableService {
         new ElementRef(compEl as HTMLElement),
         this.virtualTreeService,
         this.eventManagerService,
-        this);
-
-      directive.baseComponentTagName = compEl.getAttribute('cide-belongs-to-component');
+        this,
+        this._workspaceService);
 
       directive.ngOnInit();
 
