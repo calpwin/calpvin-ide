@@ -1,4 +1,4 @@
-import { Injectable, ElementRef, EventEmitter, Inject, RendererFactory2, ViewContainerRef, ComponentRef } from '@angular/core';
+import { Injectable, ElementRef, EventEmitter, Inject, RendererFactory2, ViewContainerRef, ComponentRef, Renderer2 } from '@angular/core';
 import { LatafiComponentDirective } from './directives/latafi-component.directive';
 import { DragDrop } from '@angular/cdk/drag-drop';
 import { VirtualFileTreeService } from '@latafi/core/src/lib/services/virtual-tree.service';
@@ -17,7 +17,7 @@ import { ComponentVisualEditorComponent } from './component-visual-editor.compon
 })
 export class ComponentVisualEditorService extends LatafiInjectableService {
 
-  private readonly _renderer;
+  private readonly _renderer: Renderer2;
 
   canvaEditorComponent: ComponentVisualEditorComponent;
 
@@ -188,7 +188,7 @@ export class ComponentVisualEditorService extends LatafiInjectableService {
     file.content = csstree.generate(file.astTree);
 
     if (softSave)
-      this._renderer.setStyle(element, style, this.ensureSoftStyleValue(style, value));
+      this.setSoftStyleValue(element, style, value);
 
     if (hardSave) {
       await this.eventManagerService.EventManager.sendEvent<VirtualFile>(
@@ -207,9 +207,9 @@ export class ComponentVisualEditorService extends LatafiInjectableService {
     }
   }
 
-  private ensureSoftStyleValue(style: string, value: string): string {
-    if (style === 'transform' && !value) return 'translate3d(0px, 0px, 0px)';
+  private setSoftStyleValue(el: HTMLElement, style: string, value: string) {
+    if (style === 'transform' && !value) this._renderer.removeStyle(el, 'transform');
 
-    return value;
+    this._renderer.setStyle(el, style, value);
   }
 }
