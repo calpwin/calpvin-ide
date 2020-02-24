@@ -80,7 +80,7 @@ export class LayoutService {
 
       this._canvaEditorToPropertyEditorSpliter = Split([canvaWrapper, this._propertyEditorLayoutElRef.nativeElement], {
         sizes: [75, 25],
-        minSize: [350, 350],
+        minSize: [480, 0],
         gutterSize: 15
       });
     }
