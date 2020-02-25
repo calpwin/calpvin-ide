@@ -6,6 +6,7 @@ import { WorkspaceService } from '@latafi/core/src/lib/services/workspace.servic
 import { LatafiInjectableService } from '@latafi/core/src/lib/services/injectable.service';
 import Split from 'split.js';
 import { LayoutService } from '@latafi/core/src/lib/services/layout.service';
+import interact from 'interactjs';
 
 @Component({
   selector: 'cide-root',

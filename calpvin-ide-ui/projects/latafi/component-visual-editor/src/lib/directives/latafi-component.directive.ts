@@ -12,6 +12,7 @@ import { Point } from '@angular/cdk/drag-drop/drag-ref';
 import { ComponentVisualEditorService } from '../component-visual-editor.service';
 import { Subscription } from 'rxjs';
 import { WorkspaceService } from '@latafi/core/src/lib/services/workspace.service';
+import interact from 'interactjs';
 
 @Directive({
   selector: '[latafiComponent]'
@@ -21,6 +22,7 @@ export class LatafiComponentDirective implements OnInit, OnDestroy {
   public static readonly ComponentUniqueCssClass = 'cide-unique';
 
   private _dargRef: DragRef;
+  private _interactable;
   private _uniqueClassName: string;
 
   constructor(
@@ -40,8 +42,60 @@ export class LatafiComponentDirective implements OnInit, OnDestroy {
   ngOnInit(): void {
     this._uniqueClassName = LatafiComponentDirective.tryGetComponentUniqueClassName(this.hostElement.nativeElement);
 
-    this._dargRef = this.dragDrop.createDrag(this.hostElement.nativeElement);
-    this._dargRef.ended.subscribe(this.onMoveEnded);
+    // this._dargRef = this.dragDrop.createDrag(this.hostElement.nativeElement);
+    // this._dargRef.ended.subscribe(this.onMoveEnded);
+
+
+    this._interactable = interact(this.hostElement.nativeElement)
+      .resizable({
+        // resize from all edges and corners
+        edges: { left: true, right: true, bottom: true, top: true },
+
+        modifiers: [
+          // keep the edges inside the parent
+          interact.modifiers.restrictEdges({
+            outer: 'parent'
+          }),
+
+          // minimum size
+          interact.modifiers.restrictSize({
+            min: { width: 100, height: 50 }
+          })
+        ],
+
+        inertia: true
+      })
+      .draggable({
+        onmove: this.onMoveEnded,
+        inertia: true,
+        modifiers: [
+          interact.modifiers.restrictRect({
+            restriction: 'parent',
+            endOnly: true
+          })
+        ]
+      })
+      .on('resizemove', (event) => {
+        var target = event.target;
+        // var x = (parseFloat(target.getAttribute('data-x')) || 0);
+        // var y = (parseFloat(target.getAttribute('data-y')) || 0);
+
+        // update the element's style
+        target.style.width = event.rect.width + 'px';
+        target.style.height = event.rect.height + 'px';
+
+        // translate when resizing from top or left edges
+        this._lastLeftPosition += event.deltaRect.left;
+        this._lastTopPosition += event.deltaRect.top;
+
+        target.style.webkitTransform = target.style.transform =
+          'translate(' + this._lastLeftPosition + 'px,' + this._lastTopPosition + 'px)';
+
+        // target.setAttribute('data-x', x);
+        // target.setAttribute('data-y', y);
+        target.textContent = Math.round(event.rect.width) + '\u00D7' + Math.round(event.rect.height);
+      });
+
 
     this.updateElementPosition();
 
@@ -58,7 +112,7 @@ export class LatafiComponentDirective implements OnInit, OnDestroy {
     if (wrapperElement === this._wrapperElement) {
       this._lastLeftPosition = 0;
       this._lastTopPosition = 0;
-      this._dargRef.setFreeDragPosition({ x: 0, y: 0 });
+      // this._dargRef.setFreeDragPosition({ x: 0, y: 0 });
     }
   }
 
@@ -66,7 +120,7 @@ export class LatafiComponentDirective implements OnInit, OnDestroy {
     const elStyle = getComputedStyle(this.hostElement.nativeElement);
 
     if (elStyle.transform !== 'none') {
-      const transformMatch = /matrix\([-0-9]+, [-0-9]+, [-0-9]+, [-0-9]+, ([-0-9]+), ([-0-9]+)\)/.exec(elStyle.transform);
+      const transformMatch = /matrix\([-\.0-9]+, [-\.0-9]+, [-\.0-9]+, [-\.0-9]+, ([-\.0-9]+), ([-\.0-9]+)\)/.exec(elStyle.transform);
       this._lastLeftPosition = Number.parseInt(transformMatch[1]);
       this._lastTopPosition = Number.parseInt(transformMatch[2]);
     }
@@ -75,7 +129,8 @@ export class LatafiComponentDirective implements OnInit, OnDestroy {
   private _lastLeftPosition = 0;
   private _lastTopPosition = 0;
 
-  private onMoveEnded = async (event: { source: DragRef<any>, distance: Point }) => {
+  // private onMoveEnded = async (event: { source: DragRef<any>, distance: Point }) => {
+  private onMoveEnded = async (event) => {
 
     // if (!this._lastLeftPosition || !this._lastTopPosition) {
     //   const elStyle = getComputedStyle(this.hostElement.nativeElement);
@@ -89,13 +144,22 @@ export class LatafiComponentDirective implements OnInit, OnDestroy {
     // const newLeftPosition = (this._lastLeftPosition || Number.parseInt(elStyle.left, 0)) + event.distance.x;
     // const newTopPosition = (this._lastTopPosition || Number.parseInt(elStyle.top, 0)) + event.distance.y;
 
-    this._lastLeftPosition += event.distance.x;
-    this._lastTopPosition += event.distance.y;
+    var target = event.target;
+    // keep the dragged position in the data-x/data-y attributes
+    // var x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx
+    // var y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy
+
+    this._lastLeftPosition += event.dx;
+    this._lastTopPosition += event.dy;
 
     this._componentVisualEditorService.setElementStyle(
       'transform',
       `translate3d(${this._lastLeftPosition}px, ${this._lastTopPosition}px, 0px)`,
-      this.hostElement.nativeElement, false, false);
+      this.hostElement.nativeElement, false, true);
+
+    //update the posiion attributes
+    // target.setAttribute('data-x', this._lastLeftPosition);
+    // target.setAttribute('data-y', this._lastTopPosition);
 
     // this._componentVisualEditorService.setElementStyle(
     //   'left',
@@ -151,7 +215,8 @@ export class LatafiComponentDirective implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this._onResetWrapperElementsPositionSubscription?.unsubscribe();
-    this._dargRef.dispose();
+    this._interactable.unset();
+    // this._dargRef.dispose();
     this.hostElement.nativeElement.removeEventListener('click', this.onClick);
   }
 }
