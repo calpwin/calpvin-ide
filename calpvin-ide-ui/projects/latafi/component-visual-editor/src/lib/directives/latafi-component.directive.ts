@@ -2,8 +2,6 @@ import { Directive, Renderer2, ElementRef, Input, OnInit, Inject, OnDestroy } fr
 import { Element, ParseTreeResult } from '@angular/compiler';
 import { EventManager, EventType, VirtualFile, IdeFormatDocumentCommandData } from 'calpvin-ide-shared/IdeCommand';
 import { DragDrop, DragRef } from '@angular/cdk/drag-drop';
-import * as csstree from 'css-tree';
-import { CssNode, Rule } from 'css-tree';
 import { VirtualFileTreeService } from '@latafi/core/src/lib/services/virtual-tree.service';
 import { EventManagerService } from '@latafi/core/src/lib/services/event-manager.service';
 import { findElement } from '@latafi/core/src/lib/extension/angular-html-elements.extension';
@@ -21,13 +19,12 @@ export class LatafiComponentDirective implements OnInit, OnDestroy {
   public static readonly ComponentCssClass = 'cide-component';
   public static readonly ComponentUniqueCssClass = 'cide-unique';
 
-  private _dargRef: DragRef;
   private _interactable;
   private _uniqueClassName: string;
 
   constructor(
     @Inject(DragDrop) private dragDrop: DragDrop,
-    private renderer: Renderer2,
+    renderer: Renderer2,
     private hostElement: ElementRef<HTMLElement>,
     private virtualTree: VirtualFileTreeService,
     private readonly eventManagerService: EventManagerService,
@@ -42,27 +39,30 @@ export class LatafiComponentDirective implements OnInit, OnDestroy {
   ngOnInit(): void {
     this._uniqueClassName = LatafiComponentDirective.tryGetComponentUniqueClassName(this.hostElement.nativeElement);
 
-    // this._dargRef = this.dragDrop.createDrag(this.hostElement.nativeElement);
-    // this._dargRef.ended.subscribe(this.onMoveEnded);
+    this.makeInteractable(this.hostElement.nativeElement);
 
+    this.updateElementPosition();
 
+    // Should always be parent
+    //
+    this._wrapperElement = this.hostElement.nativeElement.parentElement;
+
+    this._onResetWrapperElementsPositionSubscription =
+      this._componentVisualEditorService.onResetWrapperElementsPosition.subscribe(this.onResetWrapperElementsPosition);
+  }
+
+  private makeInteractable(el: HTMLElement) {
     this._interactable = interact(this.hostElement.nativeElement)
       .resizable({
-        // resize from all edges and corners
         edges: { left: true, right: true, bottom: true, top: true },
-
         modifiers: [
-          // keep the edges inside the parent
           interact.modifiers.restrictEdges({
             outer: 'parent'
           }),
-
-          // minimum size
           interact.modifiers.restrictSize({
-            min: { width: 100, height: 50 }
+            min: { width: 20, height: 20 }
           })
         ],
-
         inertia: true
       })
       .draggable({
@@ -75,34 +75,7 @@ export class LatafiComponentDirective implements OnInit, OnDestroy {
           })
         ]
       })
-      .on('resizemove', (event) => {
-        var target = event.target;
-        // var x = (parseFloat(target.getAttribute('data-x')) || 0);
-        // var y = (parseFloat(target.getAttribute('data-y')) || 0);
-
-        // update the element's style
-        target.style.width = event.rect.width + 'px';
-        target.style.height = event.rect.height + 'px';
-
-        // translate when resizing from top or left edges
-        this._lastLeftPosition += event.deltaRect.left;
-        this._lastTopPosition += event.deltaRect.top;
-
-        target.style.webkitTransform = target.style.transform =
-          'translate(' + this._lastLeftPosition + 'px,' + this._lastTopPosition + 'px)';
-
-        // target.setAttribute('data-x', x);
-        // target.setAttribute('data-y', y);
-        target.textContent = Math.round(event.rect.width) + '\u00D7' + Math.round(event.rect.height);
-      });
-
-
-    this.updateElementPosition();
-
-    this._wrapperElement = this.hostElement.nativeElement.parentElement;
-
-    this._onResetWrapperElementsPositionSubscription =
-      this._componentVisualEditorService.onResetWrapperElementsPosition.subscribe(this.onResetWrapperElementsPosition);
+      .on('resizemove', this.onResizeMoveEl);
   }
 
   private _wrapperElement: HTMLElement;
@@ -112,7 +85,6 @@ export class LatafiComponentDirective implements OnInit, OnDestroy {
     if (wrapperElement === this._wrapperElement) {
       this._lastLeftPosition = 0;
       this._lastTopPosition = 0;
-      // this._dargRef.setFreeDragPosition({ x: 0, y: 0 });
     }
   }
 
@@ -126,53 +98,47 @@ export class LatafiComponentDirective implements OnInit, OnDestroy {
     }
   }
 
+  private onResizeMoveEl = (event: { target: any; rect: { width: string | number; height: string | number; }; deltaRect: { left: number; top: number; }; }) => {
+    // var target = event.target;
+
+    this._componentVisualEditorService.setElementStyle(
+      'width',
+      event.rect.width + 'px',
+      this.hostElement.nativeElement);
+
+      this._componentVisualEditorService.setElementStyle(
+        'height',
+        event.rect.height + 'px',
+        this.hostElement.nativeElement);
+
+    // target.style.width = event.rect.width + 'px';
+    // target.style.height = event.rect.height + 'px';
+
+    this._lastLeftPosition += Math.round(event.deltaRect.left);
+    this._lastTopPosition += Math.round(event.deltaRect.top);
+
+    this._componentVisualEditorService.setElementStyle(
+      'transform',
+      `translate3d(${this._lastLeftPosition}px, ${this._lastTopPosition}px, 0px)`,
+      this.hostElement.nativeElement);
+    // target.textContent = Math.round(event.rect.width as number) + '\u00D7' + Math.round(event.rect.height as number);
+  }
+
+
   private _lastLeftPosition = 0;
   private _lastTopPosition = 0;
 
-  // private onMoveEnded = async (event: { source: DragRef<any>, distance: Point }) => {
   private onMoveEnded = async (event) => {
 
-    // if (!this._lastLeftPosition || !this._lastTopPosition) {
-    //   const elStyle = getComputedStyle(this.hostElement.nativeElement);
-    //   const transformMatch = /matrix\([-0-9]+, [-0-9]+, [-0-9]+, [-0-9]+, ([-0-9]+), ([-0-9]+)\)/.exec(elStyle.transform);
-    //   this._lastLeftPosition = Number.parseInt(transformMatch[1]);
-    //   this._lastTopPosition = Number.parseInt(transformMatch[2]);
-    // }
+    var target = event.target as HTMLElement;
 
-    // const elStyle = getComputedStyle(this.hostElement.nativeElement);
-
-    // const newLeftPosition = (this._lastLeftPosition || Number.parseInt(elStyle.left, 0)) + event.distance.x;
-    // const newTopPosition = (this._lastTopPosition || Number.parseInt(elStyle.top, 0)) + event.distance.y;
-
-    var target = event.target;
-    // keep the dragged position in the data-x/data-y attributes
-    // var x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx
-    // var y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy
-
-    this._lastLeftPosition += event.dx;
-    this._lastTopPosition += event.dy;
+    this._lastLeftPosition += Math.round(event.dx);
+    this._lastTopPosition += Math.round(event.dy);
 
     this._componentVisualEditorService.setElementStyle(
       'transform',
       `translate3d(${this._lastLeftPosition}px, ${this._lastTopPosition}px, 0px)`,
       this.hostElement.nativeElement, false, true);
-
-    //update the posiion attributes
-    // target.setAttribute('data-x', this._lastLeftPosition);
-    // target.setAttribute('data-y', this._lastTopPosition);
-
-    // this._componentVisualEditorService.setElementStyle(
-    //   'left',
-    //   newLeftPosition + 'px',
-    //   this.hostElement.nativeElement, false, false);
-
-    // this._componentVisualEditorService.setElementStyle(
-    //   'top',
-    //   newTopPosition + 'px',
-    //   this.hostElement.nativeElement, false, false);
-
-    // this._lastLeftPosition = newLeftPosition;
-    // this._lastTopPosition = newTopPosition;
   }
 
   private onClick = async (event: MouseEvent) => {
@@ -214,9 +180,8 @@ export class LatafiComponentDirective implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this._onResetWrapperElementsPositionSubscription?.unsubscribe();
     this._interactable.unset();
-    // this._dargRef.dispose();
+    this._onResetWrapperElementsPositionSubscription?.unsubscribe();
     this.hostElement.nativeElement.removeEventListener('click', this.onClick);
   }
 }

@@ -208,8 +208,11 @@ export class ComponentVisualEditorService extends LatafiInjectableService {
   }
 
   private setSoftStyleValue(el: HTMLElement, style: string, value: string) {
-    if (style === 'transform' && !value) this._renderer.removeStyle(el, 'transform');
-
-    this._renderer.setStyle(el, style, value);
+    if (style === 'transform' && !value) {
+      this._renderer.removeStyle(el, 'transform');
+      this._renderer.setStyle(el, 'transform', 'translate3d(0,0,0)');
+    }
+    else
+      this._renderer.setStyle(el, style, value);
   }
 }
