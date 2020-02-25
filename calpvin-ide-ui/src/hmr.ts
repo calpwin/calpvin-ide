@@ -1,7 +1,7 @@
 import { NgModuleRef, PlatformRef } from '@angular/core';
 import { AppModule } from './app/app.module';
 import { DevModuleManagerService } from '@latafi/core/src/lib/services/dev-module-manager.service';
-import { ComponentVisualEditorService } from '@latafi/component-visual-editor/src/lib/component-visual-editor.service';
+import { ComponentVisualEditorService } from '@latafi/component-visual-editor';
 
 export const hmrBootstrap = async (module: any, bootstrap: () => Promise<NgModuleRef<any>>) => {
   module.hot.accept();

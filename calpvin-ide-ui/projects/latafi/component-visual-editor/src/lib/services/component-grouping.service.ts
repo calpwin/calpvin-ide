@@ -1,5 +1,5 @@
 import { Injectable, ElementRef, RendererFactory2 } from '@angular/core';
-import { ComponentVisualEditorService } from '../../public-api';
+import { ComponentVisualEditorService } from '../services/component-visual-editor.service/component-visual-editor.service';
 import { LatafiInjectableService } from '@latafi/core/src/lib/services/injectable.service';
 import { VirtualFileTreeService } from '@latafi/core/src/lib/services/virtual-tree.service';
 import { WorkspaceService } from '@latafi/core/src/lib/services/workspace.service';

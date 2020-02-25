@@ -1,7 +1,5 @@
-import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, ViewContainerRef, ChangeDetectorRef, Renderer2, Inject } from '@angular/core';
-import { ComponentVisualEditorService } from './component-visual-editor.service';
-import { DOCUMENT } from '@angular/common';
-import Split from 'split.js';
+import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, ViewContainerRef, ChangeDetectorRef, Renderer2 } from '@angular/core';
+import { ComponentVisualEditorService } from './services/component-visual-editor.service/component-visual-editor.service';
 import { LayoutService } from '@latafi/core/src/lib/services/layout.service';
 
 @Component({
@@ -18,7 +16,6 @@ export class ComponentVisualEditorComponent implements OnInit, AfterViewInit {
     private readonly _componentVisualEditorService: ComponentVisualEditorService,
     private readonly _changeDedectionRef: ChangeDetectorRef,
     private readonly _renderer2: Renderer2,
-    @Inject(DOCUMENT) private readonly _document: Document,
     public readonly elementRef: ElementRef<HTMLElement>,
     private readonly _layoutService: LayoutService) { }
 
@@ -36,10 +33,6 @@ export class ComponentVisualEditorComponent implements OnInit, AfterViewInit {
   }
 
   onSelectelement = (el: ElementRef<HTMLElement>) => {
-    if (el) {
-      this._renderer2.setStyle(el.nativeElement, 'border-bottom', '3px solid #333');
-    }
-
     if (this._componentVisualEditorService.previousSelectedElement) {
       this._renderer2.setStyle(this._componentVisualEditorService.previousSelectedElement.nativeElement, 'border-bottom', '0');
     }

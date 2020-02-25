@@ -1,6 +1,6 @@
 import { NgModule, ModuleWithProviders } from '@angular/core';
 import { ComponentVisualEditorComponent } from './component-visual-editor.component';
-import { ComponentVisualEditorService } from './component-visual-editor.service';
+import { ComponentVisualEditorService } from './services/component-visual-editor.service/component-visual-editor.service';
 import { LatafiInjectableService } from '@latafi/core/src/lib/services/injectable.service';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { ComponentGroupingService } from './services/component-grouping.service';

@@ -36,21 +36,40 @@ body {
   .mat-button-toggle-appearance-standard .mat-button-toggle-label-content {
     line-height: 36px;
   }
+
+
+  .cide-component {
+
+    &.latafi-resizable {
+      border: 1px solid blue;
+    }
+
+    .latafi-resizer {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border: 1px solid blue;
+      transform: translate(-50%, -50%);
+      background-color: white;
+    }
+    .latafi-resizer-top {
+      left: 50%;
+      top: 0;
+    }
+    .latafi-resizer-right {
+      left: 100%;
+      top: 50%;
+    }
+    .latafi-resizer-bottom {
+      left: 50%;
+      top: 100%;
+    }
+    .latafi-resizer-left {
+      left: 0;
+      top: 50%;
+    }
+  }
 }
 
 @include mat-core();
 @include angular-material-theme($latafi-app-theme);
-
-// html, body { height: 100%; }
-// body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
-
-//#region Angular components override
-// .property-editor-wrapper {
-//   @include latafi-app-theme();
-
-//   .mat-form-field {
-//     width: 50%;
-//     font-weight: 100;
-//   }
-// }
-//#endregion

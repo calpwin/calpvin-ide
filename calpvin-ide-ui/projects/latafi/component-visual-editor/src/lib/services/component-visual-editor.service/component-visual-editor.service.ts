@@ -1,5 +1,5 @@
 import { Injectable, ElementRef, EventEmitter, Inject, RendererFactory2, ViewContainerRef, ComponentRef, Renderer2 } from '@angular/core';
-import { LatafiComponentDirective } from './directives/latafi-component.directive';
+import { LatafiComponentDirective } from '../../directives/latafi-component.directive';
 import { DragDrop } from '@angular/cdk/drag-drop';
 import { VirtualFileTreeService } from '@latafi/core/src/lib/services/virtual-tree.service';
 import { EventManagerService } from '@latafi/core/src/lib/services/event-manager.service';
@@ -10,16 +10,13 @@ import { tryGetNode, setCssValue, removeCssProperty } from '@latafi/core/src/lib
 import { CssNode, Rule } from 'css-tree';
 import * as csstree from 'css-tree';
 import { throwError } from 'rxjs';
-import { ComponentVisualEditorComponent } from './component-visual-editor.component';
+import { ComponentVisualEditorComponent } from '../../component-visual-editor.component';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ComponentVisualEditorService extends LatafiInjectableService {
 
-  private readonly _renderer: Renderer2;
-
-  canvaEditorComponent: ComponentVisualEditorComponent;
 
   constructor(
     @Inject(DragDrop) private dragDrop: DragDrop,
@@ -32,11 +29,40 @@ export class ComponentVisualEditorService extends LatafiInjectableService {
     this._renderer = rendererFactory.createRenderer(null, null);
   }
 
-  onAppInit() {
+  public get wrapperElement(): HTMLElement {
+    return this._wrapperElement;
+  }
+  public set wrapperElement(v: HTMLElement) {
+    this._wrapperElement = v;
+
+    this.onWrapperElementUpdate.emit(v);
   }
 
-  onBaseAppConstruct() {
+  public get previousSelectedElement(): ElementRef<HTMLElement> {
+    return this._previousSelectedElement;
   }
+
+  public get selectedElement(): ElementRef | undefined {
+    return this._selectedElement;
+  }
+  public set selectedElement(v: ElementRef | undefined) {
+    this._previousSelectedElement = this._selectedElement;
+    this._selectedElement = v;
+
+    if (v) {
+      this._selectedElementUniqueClassName = LatafiComponentDirective.tryGetComponentUniqueClassName(v.nativeElement);
+    }
+
+    this.onSelectElement.emit(v);
+  }
+
+  public get selectedElementGroup(): ElementRef[] {
+    return this._selectedElementGroup;
+  }
+
+  public static readonly COMPONENT_CONTAINER_CLASS = 'cide-component-container';
+
+  public static readonly COMPONENT_CLASS = 'cide-component';
 
   //#region Events
 
@@ -54,44 +80,32 @@ export class ComponentVisualEditorService extends LatafiInjectableService {
 
   //#endregion
 
+  private readonly _renderer: Renderer2;
+
+  canvaEditorComponent: ComponentVisualEditorComponent;
+
   //#region Interface
 
-  public static readonly COMPONENT_CONTAINER_CLASS = 'cide-component-container';
-
   private _wrapperElement: HTMLElement;
-  public get wrapperElement(): HTMLElement {
-    return this._wrapperElement;
-  }
-  public set wrapperElement(v: HTMLElement) {
-    this._wrapperElement = v;
-
-    this.onWrapperElementUpdate.emit(v);
-  }
 
   private _previousSelectedElement: ElementRef<HTMLElement>;
-  public get previousSelectedElement(): ElementRef<HTMLElement> {
-    return this._previousSelectedElement;
-  }
 
   private _selectedElementUniqueClassName: string = undefined;
 
   private _selectedElement: ElementRef | undefined;
-  public get selectedElement(): ElementRef | undefined {
-    return this._selectedElement;
-  }
-  public set selectedElement(v: ElementRef | undefined) {
-    this._previousSelectedElement = this._selectedElement;
-    this._selectedElement = v;
-
-    if (v)
-      this._selectedElementUniqueClassName = LatafiComponentDirective.tryGetComponentUniqueClassName(v.nativeElement);
-
-    this.onSelectElement.emit(v);
-  }
 
   private _selectedElementGroup: ElementRef[] = [];
-  public get selectedElementGroup(): ElementRef[] {
-    return this._selectedElementGroup;
+
+  private _directives: LatafiComponentDirective[] = []
+
+  static isComponentContainer(element: HTMLElement) {
+    return element.classList.contains(this.COMPONENT_CONTAINER_CLASS);
+  }
+
+  onAppInit() {
+  }
+
+  onBaseAppConstruct() {
   }
   public addSelectElementToGroup(v: ElementRef) {
     this._selectedElementGroup.push(v);
@@ -102,10 +116,6 @@ export class ComponentVisualEditorService extends LatafiInjectableService {
     this._selectedElementGroup = this._selectedElementGroup.filter(x => x != v);
 
     this.onRemoveSelectElementFromGroup.emit(v);
-  }
-
-  static isComponentContainer(element: HTMLElement) {
-    return element.classList.contains(this.COMPONENT_CONTAINER_CLASS);
   }
 
   //#endregion
@@ -120,10 +130,6 @@ export class ComponentVisualEditorService extends LatafiInjectableService {
     this.onResetWrapperElementsPosition.emit(this._wrapperElement);
   }
 
-
-
-  private _directives: LatafiComponentDirective[] = []
-
   updateLatafiComponentDirective() {
 
     this._directives.forEach(directive => directive.ngOnDestroy());
@@ -134,7 +140,7 @@ export class ComponentVisualEditorService extends LatafiInjectableService {
     for (let i = 0; i < this.wrapperElement.children.length; i++) {
       const element = this.wrapperElement.children[i];
 
-      if (element.classList.contains('cide-component'))
+      if (element.classList.contains(ComponentVisualEditorService.COMPONENT_CLASS))
         componentEls.push(element as HTMLElement);
     }
 
@@ -169,12 +175,13 @@ export class ComponentVisualEditorService extends LatafiInjectableService {
       : LatafiComponentDirective.tryGetComponentUniqueClassName(element);
 
     element = element || this.selectedElement?.nativeElement;
-    if (!element) throwError('Can not find element for styling');
-    if (!this._workspaceService.activeComponent) throwError('ActiveComponent not set');
+    if (!element) { throwError('Can not find element for styling'); }
+    if (!this._workspaceService.activeComponent) { throwError('ActiveComponent not set'); }
 
-    if (!selectedElementUniqueClassName) throwError('Can not get Unique element css class. Must start with unique');
+    if (!selectedElementUniqueClassName) { throwError('Can not get Unique element css class. Must start with unique'); }
 
     if (!file) {
+      // tslint:disable-next-line: max-line-length
       file = this.virtualTreeService.getFile(this._workspaceService.activeComponent, `${this._workspaceService.activeComponent}.component.scss`);
     }
 
