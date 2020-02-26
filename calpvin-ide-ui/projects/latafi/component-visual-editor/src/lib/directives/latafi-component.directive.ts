@@ -5,8 +5,6 @@ import { DragDrop, DragRef } from '@angular/cdk/drag-drop';
 import { VirtualFileTreeService } from '@latafi/core/src/lib/services/virtual-tree.service';
 import { EventManagerService } from '@latafi/core/src/lib/services/event-manager.service';
 import { findElement } from '@latafi/core/src/lib/extension/angular-html-elements.extension';
-import { tryGetNode, setCssValue } from '@latafi/core/src/lib/extension/csstree-walker.extension';
-import { Point } from '@angular/cdk/drag-drop/drag-ref';
 import { ComponentVisualEditorService } from '../services/component-visual-editor.service/component-visual-editor.service';
 import { Subscription } from 'rxjs';
 import { WorkspaceService } from '@latafi/core/src/lib/services/workspace.service';
@@ -54,7 +52,7 @@ export class LatafiComponentDirective implements OnInit, OnDestroy {
   private makeInteractable(el: HTMLElement) {
     this._interactable = interact(this.hostElement.nativeElement)
       .resizable({
-        edges: { left: '.latafi-resizer-left', right: '.latafi-resizer-right', bottom: '.latafi-resizer-bottom', top: '.latafi-resizer-top' },
+        edges: { right: '.latafi-resizer-right', bottom: '.latafi-resizer-bottom' },
         modifiers: [
           interact.modifiers.restrictEdges({
             outer: 'parent'
@@ -76,28 +74,6 @@ export class LatafiComponentDirective implements OnInit, OnDestroy {
         ]
       })
       .on('resizemove', this.onResizeMoveEl);
-  }
-
-  private addElBorder() {
-    const appendBorderFragment = (...cssStyle: string[]) => {
-      const el = this._renderer.createElement('div') as HTMLElement;
-      el.classList.add(...cssStyle);
-      this._renderer.appendChild(this.hostElement.nativeElement, el);
-    };
-
-    appendBorderFragment('latafi-resizer', 'latafi-resizer-top');
-    appendBorderFragment('latafi-resizer', 'latafi-resizer-right');
-    appendBorderFragment('latafi-resizer', 'latafi-resizer-bottom');
-    appendBorderFragment('latafi-resizer', 'latafi-resizer-left');
-
-    this._renderer.addClass(this.hostElement.nativeElement, 'latafi-resizable');
-  }
-
-  private removeElBorder() {
-    const borderFragments = this.hostElement.nativeElement.querySelectorAll('.latafi-resizer');
-    borderFragments.forEach(fragment => fragment.remove());
-
-    this._renderer.removeClass(this.hostElement, 'latafi-resizable');
   }
 
   private _wrapperElement: HTMLElement;
@@ -165,8 +141,6 @@ export class LatafiComponentDirective implements OnInit, OnDestroy {
 
   private onClick = async (event: MouseEvent) => {
     event.stopPropagation();
-
-    this.addElBorder();
 
     this._componentVisualEditorService.selectedElement = this.hostElement;
 

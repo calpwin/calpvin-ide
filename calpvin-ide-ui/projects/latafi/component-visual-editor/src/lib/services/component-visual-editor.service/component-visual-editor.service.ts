@@ -35,7 +35,7 @@ export class ComponentVisualEditorService extends LatafiInjectableService {
   public set wrapperElement(v: HTMLElement) {
     this._wrapperElement = v;
 
-    this.onWrapperElementUpdate.emit(v);
+    this.onWrapperElementChange.emit(v);
   }
 
   public get previousSelectedElement(): ElementRef<HTMLElement> {
@@ -46,6 +46,8 @@ export class ComponentVisualEditorService extends LatafiInjectableService {
     return this._selectedElement;
   }
   public set selectedElement(v: ElementRef | undefined) {
+    if (this._selectedElement === v) { return; }
+
     this._previousSelectedElement = this._selectedElement;
     this._selectedElement = v;
 
@@ -56,9 +58,17 @@ export class ComponentVisualEditorService extends LatafiInjectableService {
     this.onSelectElement.emit(v);
   }
 
+  public get isDeselectPreviouseEl(): boolean {
+    return this._isDeselectPreviouseEl;
+  }
+  public set isDeselectPreviouseEl(v: boolean) {
+    this._isDeselectPreviouseEl = v;
+  }
+
   public get selectedElementGroup(): ElementRef[] {
     return this._selectedElementGroup;
   }
+
 
   public static readonly COMPONENT_CONTAINER_CLASS = 'cide-component-container';
 
@@ -68,7 +78,7 @@ export class ComponentVisualEditorService extends LatafiInjectableService {
 
   readonly onPropertyEditorWrapperInit = new EventEmitter<ViewContainerRef>();
 
-  readonly onWrapperElementUpdate = new EventEmitter<HTMLElement | undefined>();
+  readonly onWrapperElementChange = new EventEmitter<HTMLElement | undefined>();
 
   readonly onResetWrapperElementsPosition = new EventEmitter<HTMLElement>();
 
@@ -85,6 +95,8 @@ export class ComponentVisualEditorService extends LatafiInjectableService {
   canvaEditorComponent: ComponentVisualEditorComponent;
 
   //#region Interface
+
+  private _isDeselectPreviouseEl = true;
 
   private _wrapperElement: HTMLElement;
 

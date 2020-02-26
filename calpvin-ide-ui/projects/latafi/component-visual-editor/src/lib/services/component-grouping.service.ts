@@ -1,4 +1,4 @@
-import { Injectable, ElementRef, RendererFactory2 } from '@angular/core';
+import { Injectable, ElementRef, RendererFactory2, Renderer2 } from '@angular/core';
 import { ComponentVisualEditorService } from '../services/component-visual-editor.service/component-visual-editor.service';
 import { LatafiInjectableService } from '@latafi/core/src/lib/services/injectable.service';
 import { VirtualFileTreeService } from '@latafi/core/src/lib/services/virtual-tree.service';
@@ -23,9 +23,11 @@ export class ComponentGroupingService extends LatafiInjectableService {
     _rendererFactory: RendererFactory2) {
     super();
 
-    const rendrer = _rendererFactory.createRenderer(null, null);
-    rendrer.listen('document', 'keydown', event => { this.onDocumentKeydown(event); });
+    this._renderer = _rendererFactory.createRenderer(null, null);
+    this._renderer.listen('document', 'keydown', event => { this.onDocumentKeydown(event); });
   }
+
+  private readonly _renderer: Renderer2;
 
   onBaseAppConstruct() {
     this._componentVisualEditorService.onAddSelectElementToGroup.subscribe(this.onVisualEditorAddSelectedElementToGroup);
@@ -42,25 +44,40 @@ export class ComponentGroupingService extends LatafiInjectableService {
 
       const parsedTreeResult = file.astTree as ParseTreeResult;
 
+      const firstGroupEl = this._componentVisualEditorService.selectedElementGroup[0].nativeElement as HTMLElement;
+      const newGuid = Guid.create().toString();
+      const wrapperEl = this._renderer.createElement('div') as HTMLElement;
+      wrapperEl.classList.add('cide-component-container', 'cide-component', `cide-unique-${newGuid}`);
+      wrapperEl.style.position = 'relative';
+      const parentEl = firstGroupEl.parentElement;
+
+      this._componentVisualEditorService.selectedElementGroup.forEach(el => {
+        parentEl.removeChild(el.nativeElement);
+        wrapperEl.appendChild(el.nativeElement);
+      });
+      parentEl.appendChild(wrapperEl);
+
+      this.setBlockDimenisions(wrapperEl);
+
       const uniqueClassName =
-        LatafiComponentDirective.tryGetComponentUniqueClassName(this._componentVisualEditorService.selectedElementGroup[0].nativeElement);
+        LatafiComponentDirective.tryGetComponentUniqueClassName(firstGroupEl);
 
       const findResult = findElement(parsedTreeResult.rootNodes.map(x => x as Element), uniqueClassName);
 
       if (findResult) {
         file.content =
           file.content.slice(0, findResult.parentNode.startSourceSpan.end.offset)
-          + `<div class=\"cide-component-container cide-component cide-unique-${Guid.create().toString()}\">`
+          + `<div class=\"cide-component-container cide-component cide-unique-${newGuid}\">`
           + file.content.slice(findResult.parentNode.startSourceSpan.end.offset, findResult.parentNode.endSourceSpan.start.offset)
           + '</div>'
           + file.content.slice(findResult.parentNode.endSourceSpan.start.offset, file.content.length);
 
-        const res = await this._eventManagerService.EventManager.sendEvent<VirtualFile>(
-          {
-            eventType: EventType.WriteComponentFile,
-            uniqueIdentifier: EventManager.generateUniqueIdentifire(),
-            data: file
-          }, false);
+        // const res = await this._eventManagerService.EventManager.sendEvent<VirtualFile>(
+        //   {
+        //     eventType: EventType.WriteComponentFile,
+        //     uniqueIdentifier: EventManager.generateUniqueIdentifire(),
+        //     data: file
+        //   }, false);
 
         this._componentVisualEditorService.updateLatafiComponentDirective();
       }
@@ -93,5 +110,23 @@ export class ComponentGroupingService extends LatafiInjectableService {
 
     this._componentVisualEditorService.wrapperElement = this._componentVisualEditorService.selectedElement.nativeElement;
     this._componentVisualEditorService.updateLatafiComponentDirective();
+
+    this.setBlockDimenisions(this._componentVisualEditorService.wrapperElement);
+  }
+
+  private setBlockDimenisions(blockEL: HTMLElement) {
+    let right = 0;
+    let bottom = 0;
+
+    for (let index = 0; index < blockEL.children.length; index++) {
+      const element = blockEL.children[index];
+      const boundingClientRect = element.getBoundingClientRect();
+
+      if (right < boundingClientRect.right) { right = boundingClientRect.right; }
+      if (bottom < boundingClientRect.bottom) { bottom = boundingClientRect.bottom; }
+    }
+
+    this._componentVisualEditorService.setElementStyle('width', right + 'px', blockEL);
+    this._componentVisualEditorService.setElementStyle('height', bottom + 'px', blockEL);
   }
 }
