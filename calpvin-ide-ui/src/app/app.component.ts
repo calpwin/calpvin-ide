@@ -6,9 +6,9 @@ import { WorkspaceService } from '@latafi/core/src/lib/services/workspace.servic
 import { LatafiInjectableService } from '@latafi/core/src/lib/services/injectable.service';
 import Split from 'split.js';
 import { LayoutService } from '@latafi/core/src/lib/services/layout.service';
-import { Store, select, createFeatureSelector } from '@ngrx/store';
-import { LatafiComponentListState, addLatafiComponentAction } from '@latafi/component-visual-editor';
-import { LatafiComponent } from '@latafi/component-visual-editor/src/lib/services/component-visual-editor.service/reducer/latafi-component';
+import { Store, select, createFeatureSelector, createSelector } from '@ngrx/store';
+import { LatafiComponentListState, addLatafiComponentAction, setLatafiComponentDisplayModeAction } from '@latafi/component-visual-editor';
+import { LatafiComponent, LatafiComponentDisplayMode } from '@latafi/component-visual-editor/src/lib/services/component-visual-editor.service/reducer/latafi-component';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -48,7 +48,17 @@ export class AppComponent implements OnInit {
     const newComp = new LatafiComponent('uniqueId', null);
     this._store.dispatch(addLatafiComponentAction({ newComp }));
 
-    this._store.select(s => s).subscribe(v => console.log(v));
+    const selector = createSelector(
+      createFeatureSelector<LatafiComponentListState>('visualComponentEditorFeature'),
+      (state: LatafiComponentListState) => state);
+
+    this._store.select(selector).subscribe(v => console.log(v));
+
+    // const newComp2 = new LatafiComponent('uniqueId2', null);
+    // this._store.dispatch(addLatafiComponentAction({ newComp: newComp2 }));
+
+    this._store.dispatch(setLatafiComponentDisplayModeAction(
+      { uniqueClassName: 'uniqueId', displayMode: LatafiComponentDisplayMode.FlexColumn }));
 
 
     // this.enablePanelSplit();
