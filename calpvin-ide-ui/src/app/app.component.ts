@@ -6,7 +6,10 @@ import { WorkspaceService } from '@latafi/core/src/lib/services/workspace.servic
 import { LatafiInjectableService } from '@latafi/core/src/lib/services/injectable.service';
 import Split from 'split.js';
 import { LayoutService } from '@latafi/core/src/lib/services/layout.service';
-import interact from 'interactjs';
+import { Store, select, createFeatureSelector } from '@ngrx/store';
+import { LatafiComponentListState, addLatafiComponentAction } from '@latafi/component-visual-editor';
+import { LatafiComponent } from '@latafi/component-visual-editor/src/lib/services/component-visual-editor.service/reducer/latafi-component';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'cide-root',
@@ -21,7 +24,8 @@ export class AppComponent implements OnInit {
     private _el: ElementRef<HTMLElement>,
     private _eventManagerService: EventManagerService,
     private readonly _injector: Injector,
-    private readonly _layoutService: LayoutService) {
+    private readonly _layoutService: LayoutService,
+    private readonly _store: Store<{ latafiComponentList: LatafiComponentListState }>) {
     this.constractExtensions();
   }
 
@@ -40,6 +44,12 @@ export class AppComponent implements OnInit {
 
     this._layoutService.canvaEditorLayoutElRef = this._canvaEditorLayoutElRef;
     this._layoutService.ideLayoutElRef = this._ideLayoutElRef;
+
+    const newComp = new LatafiComponent('uniqueId', null);
+    this._store.dispatch(addLatafiComponentAction({ newComp }));
+
+    this._store.select(s => s).subscribe(v => console.log(v));
+
 
     // this.enablePanelSplit();
   }

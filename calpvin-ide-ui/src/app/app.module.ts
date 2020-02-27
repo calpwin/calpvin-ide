@@ -10,6 +10,8 @@ import { ComponentVisualEditorModule } from '@latafi/component-visual-editor/src
 import { ComponentPropertyEditorModule } from '@latafi/component-property-editor/src/lib/component-property-editor.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
+import { StoreModule } from '@ngrx/store';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -21,6 +23,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     DragDropModule,
     FormsModule,
     ReactiveFormsModule,
+    StoreModule.forRoot({ }),
     LatafiCoreModule.forRoot(),
     ComponentVisualEditorModule.forRoot(),
     ComponentPropertyEditorModule.forRoot()
