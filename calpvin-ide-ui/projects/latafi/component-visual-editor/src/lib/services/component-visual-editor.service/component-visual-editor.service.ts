@@ -11,6 +11,7 @@ import { CssNode, Rule } from 'css-tree';
 import * as csstree from 'css-tree';
 import { throwError } from 'rxjs';
 import { ComponentVisualEditorComponent } from '../../component-visual-editor.component';
+import { LatafiComponentListState } from './reducer/latafi-component-list.reducer';
 
 @Injectable({
   providedIn: 'root'
@@ -90,11 +91,11 @@ export class ComponentVisualEditorService extends LatafiInjectableService {
 
   //#endregion
 
+  private _latafiComponentListState: LatafiComponentListState;
+
   private readonly _renderer: Renderer2;
 
   canvaEditorComponent: ComponentVisualEditorComponent;
-
-  //#region Interface
 
   private _isDeselectPreviouseEl = true;
 
@@ -130,7 +131,9 @@ export class ComponentVisualEditorService extends LatafiInjectableService {
     this.onRemoveSelectElementFromGroup.emit(v);
   }
 
-  //#endregion
+  rebuildVisualEditor() {
+
+  }
 
   async resetWrapperElementsPosition() {
     for (let index = 0; index < this._wrapperElement.children.length; index++) {
