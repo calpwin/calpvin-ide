@@ -12,6 +12,8 @@ import * as csstree from 'css-tree';
 import { throwError } from 'rxjs';
 import { ComponentVisualEditorComponent } from '../../component-visual-editor.component';
 import { LatafiComponentListState } from './reducer/latafi-component-list.reducer';
+import { Store, createSelector, createFeatureSelector } from '@ngrx/store';
+import { LatafiComponent } from './reducer/latafi-component';
 
 @Injectable({
   providedIn: 'root'
@@ -24,10 +26,15 @@ export class ComponentVisualEditorService extends LatafiInjectableService {
     private readonly rendererFactory: RendererFactory2,
     private readonly virtualTreeService: VirtualFileTreeService,
     private readonly eventManagerService: EventManagerService,
-    private readonly _workspaceService: WorkspaceService) {
+    private readonly _workspaceService: WorkspaceService,
+    private readonly _store: Store<any>) {
     super();
 
     this._renderer = rendererFactory.createRenderer(null, null);
+
+    this._store
+      .select(createFeatureSelector<LatafiComponentListState>('visualComponentEditorFeature'))
+      .subscribe(this.onCurrentFeatureStateUpdated);
   }
 
   public get wrapperElement(): HTMLElement {
@@ -116,10 +123,12 @@ export class ComponentVisualEditorService extends LatafiInjectableService {
   }
 
   onAppInit() {
+
   }
 
   onBaseAppConstruct() {
   }
+
   public addSelectElementToGroup(v: ElementRef) {
     this._selectedElementGroup.push(v);
 
@@ -131,8 +140,10 @@ export class ComponentVisualEditorService extends LatafiInjectableService {
     this.onRemoveSelectElementFromGroup.emit(v);
   }
 
-  rebuildVisualEditor() {
+  onCurrentFeatureStateUpdated = (state: LatafiComponentListState) => {
+  }
 
+  rebuildVisualEditor() {
   }
 
   async resetWrapperElementsPosition() {
