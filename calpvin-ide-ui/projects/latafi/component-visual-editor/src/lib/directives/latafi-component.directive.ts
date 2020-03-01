@@ -9,6 +9,8 @@ import { ComponentVisualEditorService } from '../services/component-visual-edito
 import { Subscription } from 'rxjs';
 import { WorkspaceService } from '@latafi/core/src/lib/services/workspace.service';
 import interact from 'interactjs';
+import { Store } from '@ngrx/store';
+import { setSelectedComponentAction } from '../reducers';
 
 @Directive({
   selector: '[latafiComponent]'
@@ -27,7 +29,8 @@ export class LatafiComponentDirective implements OnInit, OnDestroy {
     private virtualTree: VirtualFileTreeService,
     private readonly eventManagerService: EventManagerService,
     private readonly _componentVisualEditorService: ComponentVisualEditorService,
-    private readonly _workspaceService: WorkspaceService) {
+    private readonly _workspaceService: WorkspaceService,
+    private readonly _store: Store<any>) {
 
     _renderer.addClass(hostElement.nativeElement, LatafiComponentDirective.ComponentCssClass);
 
@@ -142,7 +145,9 @@ export class LatafiComponentDirective implements OnInit, OnDestroy {
   private onClick = async (event: MouseEvent) => {
     event.stopPropagation();
 
-    this._componentVisualEditorService.selectedElement = this.hostElement;
+    // this._componentVisualEditorService.selectedElement = this.hostElement;
+
+    this._store.dispatch(setSelectedComponentAction({ uniqueClassName: this._uniqueClassName }));
 
     if (event.altKey)
       this._componentVisualEditorService.addSelectElementToGroup(this.hostElement);

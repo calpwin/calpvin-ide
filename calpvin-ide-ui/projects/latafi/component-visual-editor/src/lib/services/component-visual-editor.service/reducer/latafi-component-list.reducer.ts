@@ -1,4 +1,4 @@
-import { createAction, createReducer, props, on, Action } from '@ngrx/store';
+import { createAction, createReducer, props, on, Action, createFeatureSelector, createSelector } from '@ngrx/store';
 import { Actions, ofType, Effect, createEffect } from '@ngrx/effects';
 import { LatafiComponent, LatafiComponentDisplayMode } from './latafi-component';
 import { Injectable } from '@angular/core';
@@ -11,29 +11,43 @@ import { state } from '@angular/animations';
 
 export interface VisualComponentEditorState {
   wrapperComponent?: LatafiComponent;
+  selectedComponent?: LatafiComponent;
   innerComponents: LatafiComponent[];
 }
 
 export const initialVisualComponentEditorState: VisualComponentEditorState = {
-  wrapperComponent: undefined,
   innerComponents: []
 }
+
+//#endregion
+
+//#region Selectors
+
+export const visualComponentEditorFeatureSelector = createFeatureSelector('visualComponentEditorFeature');
+
+export const selectedComponentSelector = createSelector(
+  visualComponentEditorFeatureSelector,
+  (state: VisualComponentEditorState) => state.selectedComponent);
 
 //#endregion
 
 //#region Actions
 
 export const addLatafiComponentAction = createAction(
-  '[Visual Editor] Add latafi component',
+  '[Component Visual Editor] Add latafi component',
   props<{ newComp: LatafiComponent }>());
 
 export const wrapperComponentsRebuildAction = createAction(
-  '[Visual Editor] Wrapper components rebuild',
+  '[Component Visual Editor] Wrapper components rebuild',
   props<{ components: LatafiComponent[] }>());
 
 export const setLatafiComponentDisplayModeAction = createAction(
-  '[Visual Editor] Set latafi component display mode',
+  '[Component Visual Editor] Set latafi component display mode',
   props<{ uniqueClassName: string, displayMode: LatafiComponentDisplayMode }>());
+
+export const setSelectedComponentAction = createAction(
+  '[Component Visual Editor] Set selected component',
+  props<{ uniqueClassName?: string }>());
 
 //#endregion
 
@@ -64,6 +78,13 @@ export const latafiComponentListReducer = createReducer(
     if (comp) { comp.wrapperDisplayMode = displayMode; }
 
     return { ...state };
+  }),
+  on(setSelectedComponentAction, (state, { uniqueClassName }) => {
+    const findComp = state.innerComponents.find(x => x.uniqueClassName === uniqueClassName);
+
+    if (findComp) { return { ...state, selectedComponent: findComp }; }
+
+    return { ...state, selectedComponent: null };
   }));
 
 //#endregion

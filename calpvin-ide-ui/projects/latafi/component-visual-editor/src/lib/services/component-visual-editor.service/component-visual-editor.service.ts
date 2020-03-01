@@ -125,16 +125,16 @@ export class ComponentVisualEditorService extends LatafiInjectableService {
   onAppInit() {
     const selector = createSelector(
       createFeatureSelector('visualComponentEditorFeature'),
-      (state: { latafiComponentListState: VisualComponentEditorState }) => state.latafiComponentListState.innerComponents);
+      (state: VisualComponentEditorState) => state.innerComponents);
 
-    this._store.select(createFeatureSelector('visualComponentEditorFeature')).subscribe(v => {
-      console.log('VV', v);
-
-      // this.onInnerComponentsUpdated(v);
-    });
+    this._store.select(selector).subscribe(this.onInnerComponentsUpdated);
   }
 
   onBaseAppConstruct() {
+  }
+
+  private onInnerComponentsUpdated = (components: LatafiComponent[]) => {
+    if (components?.length > 0) { this.updateLatafiComponentsDirective(components); }
   }
 
   public addSelectElementToGroup(v: ElementRef) {
@@ -148,12 +148,7 @@ export class ComponentVisualEditorService extends LatafiInjectableService {
     this.onRemoveSelectElementFromGroup.emit(v);
   }
 
-  public onInnerComponentsUpdated(state: VisualComponentEditorState) {
-
-    if (state?.innerComponents && state.innerComponents.length > 0) { this.updateLatafiComponentsDirective(state.innerComponents); }
-  }
-
-  public updateLatafiComponentsDirective(components: LatafiComponent[]) {
+  updateLatafiComponentsDirective(components: LatafiComponent[]) {
     this._directives.forEach(directive => directive.ngOnDestroy());
     this._directives = [];
 
@@ -165,7 +160,8 @@ export class ComponentVisualEditorService extends LatafiInjectableService {
         this.virtualTreeService,
         this.eventManagerService,
         this,
-        this._workspaceService);
+        this._workspaceService,
+        this._store);
 
       directive.ngOnInit();
 
@@ -217,7 +213,8 @@ export class ComponentVisualEditorService extends LatafiInjectableService {
         this.virtualTreeService,
         this.eventManagerService,
         this,
-        this._workspaceService);
+        this._workspaceService,
+        this._store);
 
       directive.ngOnInit();
 
@@ -252,19 +249,6 @@ export class ComponentVisualEditorService extends LatafiInjectableService {
         isWrapperEl: false,
         wrapperDisplayMode: LatafiComponentDisplayMode.Relative,
       });
-
-      // const directive = new LatafiComponentDirective(
-      //   this.dragDrop,
-      //   this.rendererFactory.createRenderer(null, null),
-      //   new ElementRef(compEl as HTMLElement),
-      //   this.virtualTreeService,
-      //   this.eventManagerService,
-      //   this,
-      //   this._workspaceService);
-
-      // directive.ngOnInit();
-
-      // this._directives.push(directive);
     }
 
     return components;

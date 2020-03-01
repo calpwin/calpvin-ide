@@ -2,9 +2,10 @@ import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, ViewContainerR
 import { ComponentVisualEditorService } from './services/component-visual-editor.service/component-visual-editor.service';
 import { LayoutService } from '@latafi/core/src/lib/services/layout.service';
 import { LatafiComponent } from './services/component-visual-editor.service/reducer/latafi-component';
-import { Store } from '@ngrx/store';
+import { Store, createSelector } from '@ngrx/store';
 import { addLatafiComponentAction } from '../public-api';
 import { LatafiComponentDirective } from './directives/latafi-component.directive';
+import { selectedComponentSelector, setSelectedComponentAction } from './reducers';
 
 @Component({
   selector: 'latafi-component-visual-editor',
@@ -24,12 +25,15 @@ export class ComponentVisualEditorComponent implements OnInit, AfterViewInit {
     private readonly _layoutService: LayoutService,
     private readonly _store: Store<any>) { }
 
+  private _previousSelectedEl?: HTMLElement;
 
   ngOnInit(): void {
     this._componentVisualEditorService.canvaEditorComponent = this;
     this._componentVisualEditorService.onSelectElement.subscribe(this.onSelectElement);
 
     this.trySetWrapperComponent(this.hostedElRef.nativeElement);
+
+    this._store.select(selectedComponentSelector).subscribe(this.onSelectComponent);
   }
 
   ngAfterViewInit(): void {
@@ -51,7 +55,17 @@ export class ComponentVisualEditorComponent implements OnInit, AfterViewInit {
 
 
   onCanvaClick(event: MouseEvent) {
-    this._componentVisualEditorService.selectedElement = undefined;
+    this._store.dispatch(setSelectedComponentAction({ uniqueClassName: null }));
+  }
+
+  private onSelectComponent = (comp?: LatafiComponent) => {
+    if (comp) { this.addSelectedElBorder(comp.baseEl); }
+
+    if (this._componentVisualEditorService.isDeselectPreviouseEl && this._previousSelectedEl) {
+      this.removeElBorder(this._previousSelectedEl);
+    }
+
+    this._previousSelectedEl = comp?.baseEl;
   }
 
   private trySetWrapperComponent(hostedEl: HTMLElement): { wrapperEl?: HTMLElement, wrapperComp?: LatafiComponent } {
