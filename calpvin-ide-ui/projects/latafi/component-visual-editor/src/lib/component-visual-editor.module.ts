@@ -6,16 +6,18 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 import { ComponentGroupingService } from './services/component-grouping.service';
 import { StoreModule } from '@ngrx/store';
 import { latafiComponentListReducer } from '../public-api';
-import { initialLatafiComponentListState } from './services/component-visual-editor.service/reducer/latafi-component-list.reducer';
+import { VisualComponentEditorEffects } from './services/component-visual-editor.service/reducer/latafi-component-list.reducer';
+import { EffectsModule } from '@ngrx/effects';
 
 
 @NgModule({
   declarations: [ComponentVisualEditorComponent],
   imports: [
     DragDropModule,
+    EffectsModule.forRoot([VisualComponentEditorEffects]),
     StoreModule.forFeature(
       'visualComponentEditorFeature',
-      new InjectionToken<any>('latafiComponentListReducer', { factory: () => ({ latafiComponentListState: latafiComponentListReducer }) }))
+      new InjectionToken<any>('latafiComponentListReducer', { factory: () => latafiComponentListReducer }))
   ],
   exports: [ComponentVisualEditorComponent, DragDropModule]
 })

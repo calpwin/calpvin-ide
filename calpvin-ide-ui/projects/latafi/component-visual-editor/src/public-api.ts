@@ -6,4 +6,4 @@ export * from './lib/services/component-visual-editor.service/component-visual-e
 export * from './lib/component-visual-editor.component';
 export * from './lib/component-visual-editor.module';
 
-export * from './lib/services/component-visual-editor.service/reducer/latafi-component-list.reducer';
+export * from './lib/reducers';

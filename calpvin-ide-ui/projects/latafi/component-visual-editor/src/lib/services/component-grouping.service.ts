@@ -79,7 +79,7 @@ export class ComponentGroupingService extends LatafiInjectableService {
         //     data: file
         //   }, false);
 
-        this._componentVisualEditorService.updateLatafiComponentDirective();
+        // this._componentVisualEditorService.updateLatafiComponentDirective();
       }
     } else if (event.ctrlKey && !event.altKey && event.key === 'b') {
       this.setEditorToBlock();
@@ -95,7 +95,7 @@ export class ComponentGroupingService extends LatafiInjectableService {
       const previouseBlockEl = this._previouseBlockElemets.pop();
 
       this._componentVisualEditorService.wrapperElement = previouseBlockEl;
-      this._componentVisualEditorService.updateLatafiComponentDirective();
+      // this._componentVisualEditorService.updateLatafiComponentDirective();
     }
   }
 
@@ -109,7 +109,7 @@ export class ComponentGroupingService extends LatafiInjectableService {
     this._previouseBlockElemets.push(this._componentVisualEditorService.wrapperElement);
 
     this._componentVisualEditorService.wrapperElement = this._componentVisualEditorService.selectedElement.nativeElement;
-    this._componentVisualEditorService.updateLatafiComponentDirective();
+    // this._componentVisualEditorService.updateLatafiComponentDirective();
 
     this.setBlockDimenisions(this._componentVisualEditorService.wrapperElement);
   }

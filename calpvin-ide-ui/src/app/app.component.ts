@@ -7,7 +7,7 @@ import { LatafiInjectableService } from '@latafi/core/src/lib/services/injectabl
 import Split from 'split.js';
 import { LayoutService } from '@latafi/core/src/lib/services/layout.service';
 import { Store, select, createFeatureSelector, createSelector } from '@ngrx/store';
-import { LatafiComponentListState, addLatafiComponentAction, setLatafiComponentDisplayModeAction } from '@latafi/component-visual-editor';
+import { VisualComponentEditorState, addLatafiComponentAction, setLatafiComponentDisplayModeAction } from '@latafi/component-visual-editor';
 import { LatafiComponent, LatafiComponentDisplayMode } from '@latafi/component-visual-editor/src/lib/services/component-visual-editor.service/reducer/latafi-component';
 import { Observable } from 'rxjs';
 
@@ -25,7 +25,7 @@ export class AppComponent implements OnInit {
     private _eventManagerService: EventManagerService,
     private readonly _injector: Injector,
     private readonly _layoutService: LayoutService,
-    private readonly _store: Store<{ latafiComponentList: LatafiComponentListState }>) {
+    private readonly _store: Store<{ latafiComponentList: VisualComponentEditorState }>) {
     this.constractExtensions();
   }
 
@@ -45,20 +45,20 @@ export class AppComponent implements OnInit {
     this._layoutService.canvaEditorLayoutElRef = this._canvaEditorLayoutElRef;
     this._layoutService.ideLayoutElRef = this._ideLayoutElRef;
 
-    const newComp = new LatafiComponent('uniqueId', null);
-    this._store.dispatch(addLatafiComponentAction({ newComp }));
+    // const newComp = new LatafiComponent('uniqueId', null);
+    // this._store.dispatch(addLatafiComponentAction({ newComp }));
 
-    const selector = createSelector(
-      createFeatureSelector<LatafiComponentListState>('visualComponentEditorFeature'),
-      (state: LatafiComponentListState) => state);
+    // const selector = createSelector(
+    //   createFeatureSelector<LatafiComponentListState>('visualComponentEditorFeature'),
+    //   (state: LatafiComponentListState) => state.innerComponents);
 
-    this._store.select(selector).subscribe(v => console.log(v));
+    // this._store.select(selector).subscribe(v => console.log(v));
 
-    // const newComp2 = new LatafiComponent('uniqueId2', null);
-    // this._store.dispatch(addLatafiComponentAction({ newComp: newComp2 }));
+    // // const newComp2 = new LatafiComponent('uniqueId2', null);
+    // // this._store.dispatch(addLatafiComponentAction({ newComp: newComp2 }));
 
-    this._store.dispatch(setLatafiComponentDisplayModeAction(
-      { uniqueClassName: 'uniqueId', displayMode: LatafiComponentDisplayMode.FlexColumn }));
+    // this._store.dispatch(setLatafiComponentDisplayModeAction(
+    //   { uniqueClassName: 'uniqueId', displayMode: LatafiComponentDisplayMode.FlexColumn }));
 
 
     // this.enablePanelSplit();

@@ -11,9 +11,9 @@ import { CssNode, Rule } from 'css-tree';
 import * as csstree from 'css-tree';
 import { throwError } from 'rxjs';
 import { ComponentVisualEditorComponent } from '../../component-visual-editor.component';
-import { LatafiComponentListState } from './reducer/latafi-component-list.reducer';
-import { Store, createSelector, createFeatureSelector } from '@ngrx/store';
-import { LatafiComponent } from './reducer/latafi-component';
+import { VisualComponentEditorState } from './reducer/latafi-component-list.reducer';
+import { Store, createSelector, createFeatureSelector, select } from '@ngrx/store';
+import { LatafiComponent, LatafiComponentDisplayMode } from './reducer/latafi-component';
 
 @Injectable({
   providedIn: 'root'
@@ -32,9 +32,9 @@ export class ComponentVisualEditorService extends LatafiInjectableService {
 
     this._renderer = rendererFactory.createRenderer(null, null);
 
-    this._store
-      .select(createFeatureSelector<LatafiComponentListState>('visualComponentEditorFeature'))
-      .subscribe(this.onCurrentFeatureStateUpdated);
+    // const selector = createSelector(
+    //   createFeatureSelector('visualComponentEditorFeature'));
+
   }
 
   public get wrapperElement(): HTMLElement {
@@ -98,7 +98,7 @@ export class ComponentVisualEditorService extends LatafiInjectableService {
 
   //#endregion
 
-  private _latafiComponentListState: LatafiComponentListState;
+  private _latafiComponentListState: VisualComponentEditorState;
 
   private readonly _renderer: Renderer2;
 
@@ -123,7 +123,15 @@ export class ComponentVisualEditorService extends LatafiInjectableService {
   }
 
   onAppInit() {
+    const selector = createSelector(
+      createFeatureSelector('visualComponentEditorFeature'),
+      (state: { latafiComponentListState: VisualComponentEditorState }) => state.latafiComponentListState.innerComponents);
 
+    this._store.select(createFeatureSelector('visualComponentEditorFeature')).subscribe(v => {
+      console.log('VV', v);
+
+      // this.onInnerComponentsUpdated(v);
+    });
   }
 
   onBaseAppConstruct() {
@@ -140,7 +148,29 @@ export class ComponentVisualEditorService extends LatafiInjectableService {
     this.onRemoveSelectElementFromGroup.emit(v);
   }
 
-  onCurrentFeatureStateUpdated = (state: LatafiComponentListState) => {
+  public onInnerComponentsUpdated(state: VisualComponentEditorState) {
+
+    if (state?.innerComponents && state.innerComponents.length > 0) { this.updateLatafiComponentsDirective(state.innerComponents); }
+  }
+
+  public updateLatafiComponentsDirective(components: LatafiComponent[]) {
+    this._directives.forEach(directive => directive.ngOnDestroy());
+    this._directives = [];
+
+    components.forEach(comp => {
+      const directive = new LatafiComponentDirective(
+        this.dragDrop,
+        this.rendererFactory.createRenderer(null, null),
+        new ElementRef(comp.baseEl),
+        this.virtualTreeService,
+        this.eventManagerService,
+        this,
+        this._workspaceService);
+
+      directive.ngOnInit();
+
+      this._directives.push(directive);
+    });
   }
 
   rebuildVisualEditor() {
@@ -156,7 +186,7 @@ export class ComponentVisualEditorService extends LatafiInjectableService {
     this.onResetWrapperElementsPosition.emit(this._wrapperElement);
   }
 
-  updateLatafiComponentDirective() {
+  updateLatafiComponentDirective2() {
 
     this._directives.forEach(directive => directive.ngOnDestroy());
     this._directives = [];
@@ -193,6 +223,51 @@ export class ComponentVisualEditorService extends LatafiInjectableService {
 
       this._directives.push(directive);
     }
+  }
+
+  public rebuildWrapperComponents(wrapperEl: HTMLElement): LatafiComponent[] {
+    const componentEls: HTMLElement[] = [];
+    const components: LatafiComponent[] = [];
+
+    for (let i = 0; i < wrapperEl.children.length; i++) {
+      const element = wrapperEl.children[i];
+
+      if (element.classList.contains(ComponentVisualEditorService.COMPONENT_CLASS))
+        componentEls.push(element as HTMLElement);
+    }
+
+    for (let index = 0; index < componentEls.length; index++) {
+      const compEl = componentEls[index];
+
+      const elStyle = getComputedStyle(compEl);
+
+      if (elStyle.transform !== 'none') {
+        const transformMatch = /matrix\([-\.0-9]+, [-\.0-9]+, [-\.0-9]+, [-\.0-9]+, ([-\.0-9]+), ([-\.0-9]+)\)/.exec(elStyle.transform);
+        this._renderer.setStyle(compEl, 'transform', `translate3d(${transformMatch[1]}px, ${transformMatch[2]}px, 0px)`);
+      }
+
+      components.push({
+        baseEl: compEl,
+        uniqueClassName: LatafiComponentDirective.tryGetComponentUniqueClassName(compEl),
+        isWrapperEl: false,
+        wrapperDisplayMode: LatafiComponentDisplayMode.Relative,
+      });
+
+      // const directive = new LatafiComponentDirective(
+      //   this.dragDrop,
+      //   this.rendererFactory.createRenderer(null, null),
+      //   new ElementRef(compEl as HTMLElement),
+      //   this.virtualTreeService,
+      //   this.eventManagerService,
+      //   this,
+      //   this._workspaceService);
+
+      // directive.ngOnInit();
+
+      // this._directives.push(directive);
+    }
+
+    return components;
   }
 
   async setElementStyle(style: string, value?: string, element?: HTMLElement, hardSave = false, softSave = true, file?: VirtualFile) {

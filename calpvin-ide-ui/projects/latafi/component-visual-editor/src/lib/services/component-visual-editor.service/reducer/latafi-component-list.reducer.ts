@@ -1,18 +1,22 @@
-import { createAction, createReducer, props, on } from '@ngrx/store';
-import { Actions, ofType, Effect } from '@ngrx/effects';
+import { createAction, createReducer, props, on, Action } from '@ngrx/store';
+import { Actions, ofType, Effect, createEffect } from '@ngrx/effects';
 import { LatafiComponent, LatafiComponentDisplayMode } from './latafi-component';
 import { Injectable } from '@angular/core';
+import { switchMap, map, exhaustMap } from 'rxjs/operators';
+import { ComponentVisualEditorService } from '../component-visual-editor.service';
+import { of } from 'rxjs';
+import { state } from '@angular/animations';
 
 //#region States
 
-export interface LatafiComponentListState {
+export interface VisualComponentEditorState {
   wrapperComponent?: LatafiComponent;
-  allComponent: LatafiComponent[];
+  innerComponents: LatafiComponent[];
 }
 
-export const initialLatafiComponentListState: LatafiComponentListState = {
+export const initialVisualComponentEditorState: VisualComponentEditorState = {
   wrapperComponent: undefined,
-  allComponent: []
+  innerComponents: []
 }
 
 //#endregion
@@ -23,6 +27,10 @@ export const addLatafiComponentAction = createAction(
   '[Visual Editor] Add latafi component',
   props<{ newComp: LatafiComponent }>());
 
+export const wrapperComponentsRebuildAction = createAction(
+  '[Visual Editor] Wrapper components rebuild',
+  props<{ components: LatafiComponent[] }>());
+
 export const setLatafiComponentDisplayModeAction = createAction(
   '[Visual Editor] Set latafi component display mode',
   props<{ uniqueClassName: string, displayMode: LatafiComponentDisplayMode }>());
@@ -32,23 +40,26 @@ export const setLatafiComponentDisplayModeAction = createAction(
 //#region Reducers
 
 export const latafiComponentListReducer = createReducer(
-  initialLatafiComponentListState,
+  initialVisualComponentEditorState,
   on(addLatafiComponentAction, (state, { newComp }) => {
-    let list = Array.from(state.allComponent);
+    let list = Array.from(state.innerComponents);
     list.push(newComp);
 
     if (!newComp.isWrapperEl) {
-      return { ...state, allComponent: list };
+      return { ...state, innerComponents: list };
     }
     else {
-      list = list.filter(x => x.uniqueClassName !== newComp.uniqueClassName && !x.isWrapperEl);
-      list.forEach(x => x.isWrapperEl = false);
-
-      return { ...state, allComponent: list, wrapperComponent: newComp };
+      return { ...state, wrapperComponent: newComp };
     }
   }),
+  on(wrapperComponentsRebuildAction, (state, { components }) => {
+    return { ...state, innerComponents: Array.from(components) }
+  }),
   on(setLatafiComponentDisplayModeAction, (state, { uniqueClassName, displayMode }) => {
-    const comp = state.allComponent.find(c => c.uniqueClassName === uniqueClassName) as LatafiComponent;
+    const comps = Array.from(state.innerComponents);
+    if (state.wrapperComponent) { comps.push(state.wrapperComponent); }
+
+    const comp = comps.find(c => c.uniqueClassName === uniqueClassName) as LatafiComponent;
 
     if (comp) { comp.wrapperDisplayMode = displayMode; }
 
@@ -58,17 +69,21 @@ export const latafiComponentListReducer = createReducer(
 //#endregion
 
 @Injectable()
-export class LatafiComponentEffects {
-  constructor(private readonly _actions: Actions) {
+export class VisualComponentEditorEffects {
+  constructor(
+    private readonly _actions: Actions,
+    private readonly _componentVisualEditorService: ComponentVisualEditorService) {
   }
 
-  @Effect()
-  updateComponents = this._actions.pipe(
+  updateComponents = createEffect(() => this._actions.pipe(
     ofType(addLatafiComponentAction),
-    () => {
-
-    }
-  )
+    map(action => {
+      if (action.newComp.isWrapperEl) {
+        const components = this._componentVisualEditorService.rebuildWrapperComponents(action.newComp.baseEl);
+        return wrapperComponentsRebuildAction({ components });
+      }
+    })
+  ))
 }
 
 
