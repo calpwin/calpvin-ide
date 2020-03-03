@@ -30,8 +30,6 @@ export class ComponentVisualEditorComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this._componentVisualEditorService.canvaEditorComponent = this;
 
-    this.trySetWrapperComponent(this.hostedElRef.nativeElement);
-
     this._store.select(lastSelectedComponentSelector).subscribe(this.onSelectComponent);
   }
 
@@ -55,34 +53,6 @@ export class ComponentVisualEditorComponent implements OnInit, AfterViewInit {
     }
 
     this._previousSelectedEl = comp?.baseEl;
-  }
-
-  private trySetWrapperComponent(hostedEl: HTMLElement): { wrapperEl?: HTMLElement, wrapperComp?: LatafiComponent } {
-    let wrapperEl: HTMLElement = undefined;
-    let wrapperElUniqueClass: string = undefined;
-    let wrapperComp: LatafiComponent = undefined;
-
-    for (let index = 0; index < hostedEl.children.length; index++) {
-      const element = hostedEl.children[index];
-
-      if (element.classList.contains(ComponentVisualEditorService.COMPONENT_CONTAINER_CLASS)) {
-        wrapperEl = element as HTMLElement;
-        wrapperElUniqueClass = LatafiComponentDirective.tryGetComponentUniqueClassName(wrapperEl);
-
-        if (!wrapperElUniqueClass)
-          throw `${ComponentVisualEditorService.COMPONENT_CONTAINER_CLASS} should have ${LatafiComponentDirective.ComponentUniqueCssClass}`;
-
-        break;
-      }
-    }
-
-    if (wrapperEl) {
-      wrapperComp = new LatafiComponent(wrapperElUniqueClass, wrapperEl);
-      wrapperComp.isWrapperEl = true;
-      this._store.dispatch(addWrapperComponentAction({ newComp: wrapperComp }));
-    }
-
-    return { wrapperEl, wrapperComp };
   }
 
   private addSelectedElBorder(selectedEl: HTMLElement) {

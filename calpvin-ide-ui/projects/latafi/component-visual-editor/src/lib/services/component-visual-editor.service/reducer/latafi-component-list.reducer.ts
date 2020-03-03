@@ -45,15 +45,12 @@ export const wrapperComponentSelector = createSelector(
 
 export const addWrapperComponentAction = createAction(
   '[Component Visual Editor] Add latafi component',
-  props<{ newComp: LatafiComponent }>());
+  props<{ wrapperComp: LatafiComponent }>());
 
-export const wrapperComponentsRebuildAction = createAction(
+export const addInnerComponentsAction = createAction(
   '[Component Visual Editor] Wrapper components rebuild',
   props<{ components: LatafiComponent[] }>());
 
-export const setWrapperComponentAction = createAction(
-  '[Component Visual Editor] Set Wrapper component',
-  props<{ uniqueClassName: string, wrapperComponentId?: string }>());
 
 export const setLatafiComponentDisplayModeAction = createAction(
   '[Component Visual Editor] Set latafi component display mode',
@@ -73,33 +70,12 @@ export const unselectComponentAction = createAction(
 
 export const latafiComponentListReducer = createReducer(
   initialVisualComponentEditorState,
-  on(addWrapperComponentAction, (state, { newComp }) => {
-    let list = Array.from(state.innerComponents);
-    list.push(newComp);
-
-    if (!newComp.isWrapperEl) {
-      return { ...state, innerComponents: list };
-    }
-    else {
-      return { ...state, wrapperComponent: newComp };
-    }
+  on(addWrapperComponentAction, (state, { wrapperComp: newComp }) => {
+    newComp.isWrapperEl = true;
+    return { ...state, wrapperComponent: newComp };
   }),
-  on(wrapperComponentsRebuildAction, (state, { components }) => {
+  on(addInnerComponentsAction, (state, { components }) => {
     return { ...state, innerComponents: Array.from(components) }
-  }),
-  on(setWrapperComponentAction, (state, { uniqueClassName, wrapperComponentId }) => {
-    const findComp = state.innerComponents.find(x => x.uniqueClassName === uniqueClassName);
-
-    if (findComp) {
-      state.wrapperComponent.isWrapperEl = false;
-      findComp.isWrapperEl = true;
-      findComp.wrapperComponentId = wrapperComponentId;
-      const innerComponents = Array.from(state.innerComponents.filter(x => x.uniqueClassName !== findComp.uniqueClassName));
-      innerComponents.push(state.wrapperComponent);
-      return { ...state, wrapperComponent: findComp, innerComponents };
-    } else {
-      return { ...state };
-    }
   }),
   on(setLatafiComponentDisplayModeAction, (state, { uniqueClassName, displayMode }) => {
     const comps = Array.from(state.innerComponents);
@@ -145,7 +121,6 @@ export const latafiComponentListReducer = createReducer(
 export class VisualComponentEditorEffects {
   constructor(
     private readonly _actions: Actions,
-    private readonly _store: Store<any>,
     private readonly _componentVisualEditorService: ComponentVisualEditorService,
     private readonly _componentGroupingService: ComponentGroupingService) {
   }
@@ -153,17 +128,9 @@ export class VisualComponentEditorEffects {
   addLatafiComponentEffect = createEffect(() => this._actions.pipe(
     ofType(addWrapperComponentAction),
     map(action => {
-      return setWrapperComponentAction({ uniqueClassName: action.newComp.uniqueClassName });
-    })
-  ))
-
-  setWrapperComponentEffect = createEffect(() => this._actions.pipe(
-    ofType(setWrapperComponentAction),
-    withLatestFrom(this._store.select(wrapperComponentSelector)),
-    map(([action, wrapperComponent]) => {
-      const components = this._componentVisualEditorService.rebuildWrapperComponents(wrapperComponent.baseEl);
-      if (wrapperComponent.wrapperComponentId) { this._componentGroupingService.setBlockDimenisions(wrapperComponent.baseEl); }
-      return wrapperComponentsRebuildAction({ components });
+      const components = this._componentVisualEditorService.rebuildWrapperComponents(action.wrapperComp.baseEl);
+      if (action.wrapperComp.wrapperComponentId) { this._componentGroupingService.setBlockDimenisions(action.wrapperComp.baseEl); }
+      return addInnerComponentsAction({ components });
     })
   ))
 }

@@ -8,7 +8,7 @@ import { findElement } from '@latafi/core/src/lib/extension/angular-html-element
 import { LatafiComponentDirective } from '../../directives/latafi-component.directive';
 import { Guid } from 'guid-typescript';
 import { Store } from '@ngrx/store';
-import { selectedComponentsSelector, lastSelectedComponentSelector, wrapperComponentSelector, wrapperComponentsRebuildAction, setWrapperComponentAction, addWrapperComponentAction } from '../../../public-api';
+import { selectedComponentsSelector, lastSelectedComponentSelector, wrapperComponentSelector, addWrapperComponentAction } from '../../../public-api';
 import { LatafiComponent, LatafiComponentDisplayMode } from '../component-visual-editor.service/reducer/latafi-component';
 
 @Injectable({
@@ -36,18 +36,11 @@ export class ComponentGroupingService extends LatafiInjectableService {
 
   private readonly _previouseBlockComponents: LatafiComponent[] = [];
 
-  onBaseAppConstruct() {
-    // this._componentVisualEditorService.onAddSelectElementToGroup.subscribe(this.onVisualEditorAddSelectedElementToGroup);
-  }
-
   onAppInit() {
     this._store.select(selectedComponentsSelector).subscribe(comps => this._selectedComponents = comps);
     this._store.select(lastSelectedComponentSelector).subscribe(c => this._selectedComponent = c);
     this._store.select(wrapperComponentSelector).subscribe(c => this._wrapperComponent = c);
   }
-
-  // private onVisualEditorAddSelectedElementToGroup = (el: ElementRef<HTMLElement>) => {
-  // }
 
   onDocumentKeydown = async (event: KeyboardEvent) => {
     if (event.ctrlKey && event.key === 'g' && this._selectedComponents.length >= 2) {
@@ -84,15 +77,6 @@ export class ComponentGroupingService extends LatafiInjectableService {
           + file.content.slice(findResult.parentNode.startSourceSpan.end.offset, findResult.parentNode.endSourceSpan.start.offset)
           + '</div>'
           + file.content.slice(findResult.parentNode.endSourceSpan.start.offset, file.content.length);
-
-        // const res = await this._eventManagerService.EventManager.sendEvent<VirtualFile>(
-        //   {
-        //     eventType: EventType.WriteComponentFile,
-        //     uniqueIdentifier: EventManager.generateUniqueIdentifire(),
-        //     data: file
-        //   }, false);
-
-        // this._componentVisualEditorService.updateLatafiComponentDirective();
       }
     } else if (event.ctrlKey && !event.altKey && event.key === 'b') {
       this.setEditorToBlock();
@@ -104,17 +88,7 @@ export class ComponentGroupingService extends LatafiInjectableService {
   private setPreviouseBlock() {
     if (this._previouseBlockComponents.length > 0) {
       const previouseBlockComp = this._previouseBlockComponents.pop();
-
-      this._store.dispatch(wrapperComponentsRebuildAction({ components: [previouseBlockComp] }));
-
-      this._store.dispatch(setWrapperComponentAction({
-        uniqueClassName: previouseBlockComp.uniqueClassName,
-        wrapperComponentId: previouseBlockComp.wrapperComponentId
-      }));
-
-      // this._componentVisualEditorService.wrapperElement = previouseBlockEl;
-
-      // this._componentVisualEditorService.updateLatafiComponentDirective();
+      this._store.dispatch(addWrapperComponentAction({ wrapperComp: previouseBlockComp }));
     }
   }
 
@@ -127,15 +101,8 @@ export class ComponentGroupingService extends LatafiInjectableService {
 
     this._previouseBlockComponents.push(this._wrapperComponent);
 
-    this._store.dispatch(setWrapperComponentAction({
-      uniqueClassName: this._selectedComponent.uniqueClassName,
-      wrapperComponentId: this._wrapperComponent.uniqueClassName
-    }));
-
-    // this._componentVisualEditorService.wrapperElement = this._componentVisualEditorService.selectedElement.nativeElement; !!
-    // this._componentVisualEditorService.updateLatafiComponentDirective();
-
-    // this.setBlockDimenisions(this._componentVisualEditorService.wrapperElement); !!
+    this._selectedComponent.wrapperComponentId = this._wrapperComponent.uniqueClassName;
+    this._store.dispatch(addWrapperComponentAction({ wrapperComp: this._selectedComponent }));
   }
 
   setBlockDimenisions(blockEL: HTMLElement) {

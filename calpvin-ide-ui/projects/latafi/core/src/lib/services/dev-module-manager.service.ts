@@ -31,10 +31,9 @@ export class DevModuleManagerService {
 
     if (wrapperEl) {
       const newComp = new LatafiComponent(LatafiComponentDirective.tryGetComponentUniqueClassName(wrapperEl), wrapperEl);
-      newComp.isWrapperEl = true;
       newComp.wrapperDisplayMode = LatafiComponentDisplayMode.Relative;
 
-      this._store.dispatch(addWrapperComponentAction({ newComp }));
+      this._store.dispatch(addWrapperComponentAction({ wrapperComp: newComp }));
     }
   }
 

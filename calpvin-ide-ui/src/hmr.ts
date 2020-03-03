@@ -26,9 +26,6 @@ export const hmrBootstrap = async (module: any, bootstrap: () => Promise<NgModul
 
       const devModuleManagerService = mainModule.injector.get(DevModuleManagerService);
       devModuleManagerService.setComponentWrapperElement();
-
-      const componentVisualEditorService = mainModule.injector.get(ComponentVisualEditorService);
-      // componentVisualEditorService.updateLatafiComponentDirective();
     });
   } else {
     const el = document.getElementsByClassName('component-canva-wrapper')[0];
@@ -41,9 +38,6 @@ export const hmrBootstrap = async (module: any, bootstrap: () => Promise<NgModul
       const devModuleManagerService = mainModule.injector.get(DevModuleManagerService);
       await devModuleManagerService.updateVirtualTreeAsync();
       devModuleManagerService.setComponentWrapperElement();
-
-      const componentVisualEditorService = mainModule.injector.get(ComponentVisualEditorService);
-      // componentVisualEditorService.updateLatafiComponentDirective();
     }
   }
 
