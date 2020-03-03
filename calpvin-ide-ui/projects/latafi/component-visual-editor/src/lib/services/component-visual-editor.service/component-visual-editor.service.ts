@@ -10,16 +10,21 @@ import { tryGetNode, setCssValue, removeCssProperty } from '@latafi/core/src/lib
 import { CssNode, Rule } from 'css-tree';
 import * as csstree from 'css-tree';
 import { throwError } from 'rxjs';
+import { take } from 'rxjs/operators';
 import { ComponentVisualEditorComponent } from '../../component-visual-editor.component';
-import { VisualComponentEditorState } from './reducer/latafi-component-list.reducer';
+import { VisualComponentEditorState, lastSelectedComponentSelector, wrapperComponentSelector, setSelectedComponentAction, selectedComponentsSelector } from './reducer/latafi-component-list.reducer';
 import { Store, createSelector, createFeatureSelector, select } from '@ngrx/store';
 import { LatafiComponent, LatafiComponentDisplayMode } from './reducer/latafi-component';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
+
 })
 export class ComponentVisualEditorService extends LatafiInjectableService {
 
+  public static readonly COMPONENT_CONTAINER_CLASS = 'cide-component-container';
+
+  public static readonly COMPONENT_CLASS = 'cide-component';
 
   constructor(
     @Inject(DragDrop) private dragDrop: DragDrop,
@@ -29,41 +34,7 @@ export class ComponentVisualEditorService extends LatafiInjectableService {
     private readonly _workspaceService: WorkspaceService,
     private readonly _store: Store<any>) {
     super();
-
     this._renderer = rendererFactory.createRenderer(null, null);
-
-    // const selector = createSelector(
-    //   createFeatureSelector('visualComponentEditorFeature'));
-
-  }
-
-  public get wrapperElement(): HTMLElement {
-    return this._wrapperElement;
-  }
-  public set wrapperElement(v: HTMLElement) {
-    this._wrapperElement = v;
-
-    this.onWrapperElementChange.emit(v);
-  }
-
-  public get previousSelectedElement(): ElementRef<HTMLElement> {
-    return this._previousSelectedElement;
-  }
-
-  public get selectedElement(): ElementRef | undefined {
-    return this._selectedElement;
-  }
-  public set selectedElement(v: ElementRef | undefined) {
-    if (this._selectedElement === v) { return; }
-
-    this._previousSelectedElement = this._selectedElement;
-    this._selectedElement = v;
-
-    if (v) {
-      this._selectedElementUniqueClassName = LatafiComponentDirective.tryGetComponentUniqueClassName(v.nativeElement);
-    }
-
-    this.onSelectElement.emit(v);
   }
 
   public get isDeselectPreviouseEl(): boolean {
@@ -77,42 +48,26 @@ export class ComponentVisualEditorService extends LatafiInjectableService {
     return this._selectedElementGroup;
   }
 
-
-  public static readonly COMPONENT_CONTAINER_CLASS = 'cide-component-container';
-
-  public static readonly COMPONENT_CLASS = 'cide-component';
+  private _wrapperComp?: LatafiComponent = undefined;
+  private _selectedComp?: LatafiComponent = undefined;
 
   //#region Events
 
   readonly onPropertyEditorWrapperInit = new EventEmitter<ViewContainerRef>();
 
-  readonly onWrapperElementChange = new EventEmitter<HTMLElement | undefined>();
-
   readonly onResetWrapperElementsPosition = new EventEmitter<HTMLElement>();
 
-  readonly onSelectElement = new EventEmitter<ElementRef | undefined>();
+  // readonly onAddSelectElementToGroup = new EventEmitter<ElementRef>();
 
-  readonly onAddSelectElementToGroup = new EventEmitter<ElementRef>();
-
-  readonly onRemoveSelectElementFromGroup = new EventEmitter<ElementRef>();
+  // readonly onRemoveSelectElementFromGroup = new EventEmitter<ElementRef>();
 
   //#endregion
-
-  private _latafiComponentListState: VisualComponentEditorState;
 
   private readonly _renderer: Renderer2;
 
   canvaEditorComponent: ComponentVisualEditorComponent;
 
   private _isDeselectPreviouseEl = true;
-
-  private _wrapperElement: HTMLElement;
-
-  private _previousSelectedElement: ElementRef<HTMLElement>;
-
-  private _selectedElementUniqueClassName: string = undefined;
-
-  private _selectedElement: ElementRef | undefined;
 
   private _selectedElementGroup: ElementRef[] = [];
 
@@ -127,6 +82,8 @@ export class ComponentVisualEditorService extends LatafiInjectableService {
       createFeatureSelector('visualComponentEditorFeature'),
       (state: VisualComponentEditorState) => state.innerComponents);
 
+    this._store.select(wrapperComponentSelector).subscribe(c => this._wrapperComp = c);
+    this._store.select(lastSelectedComponentSelector).subscribe(c => this._selectedComp = c);
     this._store.select(selector).subscribe(this.onInnerComponentsUpdated);
   }
 
@@ -137,16 +94,19 @@ export class ComponentVisualEditorService extends LatafiInjectableService {
     if (components?.length > 0) { this.updateLatafiComponentsDirective(components); }
   }
 
-  public addSelectElementToGroup(v: ElementRef) {
-    this._selectedElementGroup.push(v);
+  // public addSelectElementToGroup(v: ElementRef) {
+  //   // this._selectedElementGroup.push(v);
 
-    this.onAddSelectElementToGroup.emit(v);
-  }
-  public removeSelectElementFromGroup(v: ElementRef) {
-    this._selectedElementGroup = this._selectedElementGroup.filter(x => x != v);
+  //   // this.onAddSelectElementToGroup.emit(v);
 
-    this.onRemoveSelectElementFromGroup.emit(v);
-  }
+  //   this._store.dispatch(setSelectedComponentAction({uniqueClassName}))
+  // }
+
+  // public removeSelectElementFromGroup(v: ElementRef) {
+  //   this._selectedElementGroup = this._selectedElementGroup.filter(x => x != v);
+
+  //   this.onRemoveSelectElementFromGroup.emit(v);
+  // }
 
   updateLatafiComponentsDirective(components: LatafiComponent[]) {
     this._directives.forEach(directive => directive.ngOnDestroy());
@@ -173,53 +133,13 @@ export class ComponentVisualEditorService extends LatafiInjectableService {
   }
 
   async resetWrapperElementsPosition() {
-    for (let index = 0; index < this._wrapperElement.children.length; index++) {
-      const element = this._wrapperElement.children[index];
+    for (let index = 0; index < this._wrapperComp.baseEl.children.length; index++) {
+      const element = this._wrapperComp.baseEl.children[index];
 
       await this.setElementStyle('transform', null, element as HTMLElement);
     }
 
-    this.onResetWrapperElementsPosition.emit(this._wrapperElement);
-  }
-
-  updateLatafiComponentDirective2() {
-
-    this._directives.forEach(directive => directive.ngOnDestroy());
-    this._directives = [];
-
-    const componentEls: HTMLElement[] = [];
-
-    for (let i = 0; i < this.wrapperElement.children.length; i++) {
-      const element = this.wrapperElement.children[i];
-
-      if (element.classList.contains(ComponentVisualEditorService.COMPONENT_CLASS))
-        componentEls.push(element as HTMLElement);
-    }
-
-    for (let index = 0; index < componentEls.length; index++) {
-      const compEl = componentEls[index];
-
-      const elStyle = getComputedStyle(compEl);
-
-      if (elStyle.transform !== 'none') {
-        const transformMatch = /matrix\([-\.0-9]+, [-\.0-9]+, [-\.0-9]+, [-\.0-9]+, ([-\.0-9]+), ([-\.0-9]+)\)/.exec(elStyle.transform);
-        this._renderer.setStyle(compEl, 'transform', `translate3d(${transformMatch[1]}px, ${transformMatch[2]}px, 0px)`);
-      }
-
-      const directive = new LatafiComponentDirective(
-        this.dragDrop,
-        this.rendererFactory.createRenderer(null, null),
-        new ElementRef(compEl as HTMLElement),
-        this.virtualTreeService,
-        this.eventManagerService,
-        this,
-        this._workspaceService,
-        this._store);
-
-      directive.ngOnInit();
-
-      this._directives.push(directive);
-    }
+    this.onResetWrapperElementsPosition.emit(this._wrapperComp.baseEl);
   }
 
   public rebuildWrapperComponents(wrapperEl: HTMLElement): LatafiComponent[] {
@@ -248,6 +168,7 @@ export class ComponentVisualEditorService extends LatafiInjectableService {
         uniqueClassName: LatafiComponentDirective.tryGetComponentUniqueClassName(compEl),
         isWrapperEl: false,
         wrapperDisplayMode: LatafiComponentDisplayMode.Relative,
+        isSelected: false
       });
     }
 
@@ -255,11 +176,12 @@ export class ComponentVisualEditorService extends LatafiInjectableService {
   }
 
   async setElementStyle(style: string, value?: string, element?: HTMLElement, hardSave = false, softSave = true, file?: VirtualFile) {
+
     const selectedElementUniqueClassName = !element
-      ? this._selectedElementUniqueClassName
+      ? this._selectedComp?.uniqueClassName
       : LatafiComponentDirective.tryGetComponentUniqueClassName(element);
 
-    element = element || this.selectedElement?.nativeElement;
+    element = element || this._selectedComp.baseEl;
     if (!element) { throwError('Can not find element for styling'); }
     if (!this._workspaceService.activeComponent) { throwError('ActiveComponent not set'); }
 

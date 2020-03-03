@@ -2,7 +2,7 @@ import { Injectable, Inject, RendererFactory2 } from '@angular/core';
 import { DragDrop } from '@angular/cdk/drag-drop';
 import { VirtualFileTreeService } from './virtual-tree.service';
 import { EventManagerService } from './event-manager.service';
-import { ComponentVisualEditorService, addLatafiComponentAction } from '@latafi/component-visual-editor/src/public-api';
+import { ComponentVisualEditorService, addWrapperComponentAction } from '@latafi/component-visual-editor/src/public-api';
 import { DOCUMENT } from '@angular/common';
 import {
   LatafiComponent,
@@ -34,7 +34,7 @@ export class DevModuleManagerService {
       newComp.isWrapperEl = true;
       newComp.wrapperDisplayMode = LatafiComponentDisplayMode.Relative;
 
-      this._store.dispatch(addLatafiComponentAction({ newComp }));
+      this._store.dispatch(addWrapperComponentAction({ newComp }));
     }
   }
 

@@ -3,9 +3,9 @@ import { ComponentVisualEditorService } from './services/component-visual-editor
 import { LayoutService } from '@latafi/core/src/lib/services/layout.service';
 import { LatafiComponent } from './services/component-visual-editor.service/reducer/latafi-component';
 import { Store, createSelector } from '@ngrx/store';
-import { addLatafiComponentAction } from '../public-api';
+import { addWrapperComponentAction } from '../public-api';
 import { LatafiComponentDirective } from './directives/latafi-component.directive';
-import { selectedComponentSelector, setSelectedComponentAction } from './reducers';
+import { lastSelectedComponentSelector, setSelectedComponentAction } from './reducers';
 
 @Component({
   selector: 'latafi-component-visual-editor',
@@ -29,11 +29,10 @@ export class ComponentVisualEditorComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this._componentVisualEditorService.canvaEditorComponent = this;
-    this._componentVisualEditorService.onSelectElement.subscribe(this.onSelectElement);
 
     this.trySetWrapperComponent(this.hostedElRef.nativeElement);
 
-    this._store.select(selectedComponentSelector).subscribe(this.onSelectComponent);
+    this._store.select(lastSelectedComponentSelector).subscribe(this.onSelectComponent);
   }
 
   ngAfterViewInit(): void {
@@ -43,19 +42,9 @@ export class ComponentVisualEditorComponent implements OnInit, AfterViewInit {
     this._layoutService.propertyEditorLayoutElRef = this.componentPropertyWrapper;
   }
 
-  onSelectElement = (el: ElementRef<HTMLElement>) => {
-    if (el) {
-      this.addSelectedElBorder(el.nativeElement);
-    }
-
-    if (this._componentVisualEditorService.isDeselectPreviouseEl && this._componentVisualEditorService.previousSelectedElement) {
-      this.removeElBorder(this._componentVisualEditorService.previousSelectedElement.nativeElement);
-    }
-  }
-
 
   onCanvaClick(event: MouseEvent) {
-    this._store.dispatch(setSelectedComponentAction({ uniqueClassName: null }));
+    this._store.dispatch(setSelectedComponentAction({ uniqueClassName: null, toGroup: false }));
   }
 
   private onSelectComponent = (comp?: LatafiComponent) => {
@@ -90,7 +79,7 @@ export class ComponentVisualEditorComponent implements OnInit, AfterViewInit {
     if (wrapperEl) {
       wrapperComp = new LatafiComponent(wrapperElUniqueClass, wrapperEl);
       wrapperComp.isWrapperEl = true;
-      this._store.dispatch(addLatafiComponentAction({ newComp: wrapperComp }));
+      this._store.dispatch(addWrapperComponentAction({ newComp: wrapperComp }));
     }
 
     return { wrapperEl, wrapperComp };
@@ -103,10 +92,13 @@ export class ComponentVisualEditorComponent implements OnInit, AfterViewInit {
       this._renderer.appendChild(selectedEl, el);
     };
 
+    // Unnessasary
+    //
     // appendBorderFragment('latafi-resizer', 'latafi-resizer-top');
+    // appendBorderFragment('latafi-resizer', 'latafi-resizer-left');
+
     appendBorderFragment('latafi-resizer', 'latafi-resizer-right');
     appendBorderFragment('latafi-resizer', 'latafi-resizer-bottom');
-    // appendBorderFragment('latafi-resizer', 'latafi-resizer-left');
 
     this._renderer.addClass(selectedEl, 'latafi-resizable');
   }

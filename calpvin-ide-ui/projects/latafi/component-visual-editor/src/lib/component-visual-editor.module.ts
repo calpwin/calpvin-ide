@@ -3,7 +3,7 @@ import { ComponentVisualEditorComponent } from './component-visual-editor.compon
 import { ComponentVisualEditorService } from './services/component-visual-editor.service/component-visual-editor.service';
 import { LatafiInjectableService } from '@latafi/core/src/lib/services/injectable.service';
 import { DragDropModule } from '@angular/cdk/drag-drop';
-import { ComponentGroupingService } from './services/component-grouping.service';
+import { ComponentGroupingService } from './services/component-grouping/component-grouping.service';
 import { StoreModule } from '@ngrx/store';
 import { latafiComponentListReducer } from '../public-api';
 import { VisualComponentEditorEffects } from './services/component-visual-editor.service/reducer/latafi-component-list.reducer';
@@ -26,8 +26,8 @@ export class ComponentVisualEditorModule {
     return {
       ngModule: ComponentVisualEditorModule,
       providers: [
-        { provide: LatafiInjectableService, useClass: ComponentVisualEditorService, multi: true },
-        { provide: LatafiInjectableService, useClass: ComponentGroupingService, multi: true }]
+        { provide: LatafiInjectableService, useExisting: ComponentVisualEditorService, multi: true },
+        { provide: LatafiInjectableService, useExisting: ComponentGroupingService, multi: true }]
     };
   }
 }

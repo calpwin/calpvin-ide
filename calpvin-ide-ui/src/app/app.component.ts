@@ -7,9 +7,7 @@ import { LatafiInjectableService } from '@latafi/core/src/lib/services/injectabl
 import Split from 'split.js';
 import { LayoutService } from '@latafi/core/src/lib/services/layout.service';
 import { Store, select, createFeatureSelector, createSelector } from '@ngrx/store';
-import { VisualComponentEditorState, addLatafiComponentAction, setLatafiComponentDisplayModeAction } from '@latafi/component-visual-editor';
-import { LatafiComponent, LatafiComponentDisplayMode } from '@latafi/component-visual-editor/src/lib/services/component-visual-editor.service/reducer/latafi-component';
-import { Observable } from 'rxjs';
+import { VisualComponentEditorState  } from '@latafi/component-visual-editor';
 
 @Component({
   selector: 'cide-root',

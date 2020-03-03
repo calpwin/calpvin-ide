@@ -1,14 +1,15 @@
 import { Injectable, ElementRef, RendererFactory2, Renderer2 } from '@angular/core';
-import { ComponentVisualEditorService } from '../services/component-visual-editor.service/component-visual-editor.service';
+import { ComponentVisualEditorService } from '../../services/component-visual-editor.service/component-visual-editor.service';
 import { LatafiInjectableService } from '@latafi/core/src/lib/services/injectable.service';
 import { VirtualFileTreeService } from '@latafi/core/src/lib/services/virtual-tree.service';
 import { WorkspaceService } from '@latafi/core/src/lib/services/workspace.service';
 import { ParseTreeResult, Element } from '@angular/compiler';
 import { findElement } from '@latafi/core/src/lib/extension/angular-html-elements.extension';
-import { LatafiComponentDirective } from '../directives/latafi-component.directive';
-import { EventManagerService } from '@latafi/core/src/lib/services/event-manager.service';
-import { VirtualFile, EventType, EventManager } from 'calpvin-ide-shared';
+import { LatafiComponentDirective } from '../../directives/latafi-component.directive';
 import { Guid } from 'guid-typescript';
+import { Store } from '@ngrx/store';
+import { selectedComponentsSelector, lastSelectedComponentSelector, wrapperComponentSelector, wrapperComponentsRebuildAction, setWrapperComponentAction, addWrapperComponentAction } from '../../../public-api';
+import { LatafiComponent, LatafiComponentDisplayMode } from '../component-visual-editor.service/reducer/latafi-component';
 
 @Injectable({
   providedIn: 'root'
@@ -16,10 +17,10 @@ import { Guid } from 'guid-typescript';
 export class ComponentGroupingService extends LatafiInjectableService {
 
   constructor(
+    private readonly _store: Store<any>,
     private readonly _componentVisualEditorService: ComponentVisualEditorService,
     private readonly _virtualFileTreeService: VirtualFileTreeService,
     private readonly _workspaceService: WorkspaceService,
-    private readonly _eventManagerService: EventManagerService,
     _rendererFactory: RendererFactory2) {
     super();
 
@@ -29,31 +30,43 @@ export class ComponentGroupingService extends LatafiInjectableService {
 
   private readonly _renderer: Renderer2;
 
+  private _selectedComponents: LatafiComponent[] = [];
+  private _selectedComponent?: LatafiComponent;
+  private _wrapperComponent?: LatafiComponent;
+
+  private readonly _previouseBlockComponents: LatafiComponent[] = [];
+
   onBaseAppConstruct() {
-    this._componentVisualEditorService.onAddSelectElementToGroup.subscribe(this.onVisualEditorAddSelectedElementToGroup);
+    // this._componentVisualEditorService.onAddSelectElementToGroup.subscribe(this.onVisualEditorAddSelectedElementToGroup);
   }
 
-  private onVisualEditorAddSelectedElementToGroup = (el: ElementRef<HTMLElement>) => {
+  onAppInit() {
+    this._store.select(selectedComponentsSelector).subscribe(comps => this._selectedComponents = comps);
+    this._store.select(lastSelectedComponentSelector).subscribe(c => this._selectedComponent = c);
+    this._store.select(wrapperComponentSelector).subscribe(c => this._wrapperComponent = c);
   }
+
+  // private onVisualEditorAddSelectedElementToGroup = (el: ElementRef<HTMLElement>) => {
+  // }
 
   onDocumentKeydown = async (event: KeyboardEvent) => {
-    if (event.ctrlKey && event.key === 'g' && this._componentVisualEditorService.selectedElementGroup.length >= 2) {
+    if (event.ctrlKey && event.key === 'g' && this._selectedComponents.length >= 2) {
       const file = this._virtualFileTreeService.getFile(
         this._workspaceService.activeComponent,
         `${this._workspaceService.activeComponent}.component.html`);
 
       const parsedTreeResult = file.astTree as ParseTreeResult;
 
-      const firstGroupEl = this._componentVisualEditorService.selectedElementGroup[0].nativeElement as HTMLElement;
+      const firstGroupEl = this._selectedComponents[0].baseEl;
       const newGuid = Guid.create().toString();
       const wrapperEl = this._renderer.createElement('div') as HTMLElement;
       wrapperEl.classList.add('cide-component-container', 'cide-component', `cide-unique-${newGuid}`);
       wrapperEl.style.position = 'relative';
       const parentEl = firstGroupEl.parentElement;
 
-      this._componentVisualEditorService.selectedElementGroup.forEach(el => {
-        parentEl.removeChild(el.nativeElement);
-        wrapperEl.appendChild(el.nativeElement);
+      this._selectedComponents.map(x => x.baseEl).forEach(el => {
+        parentEl.removeChild(el);
+        wrapperEl.appendChild(el);
       });
       parentEl.appendChild(wrapperEl);
 
@@ -88,33 +101,44 @@ export class ComponentGroupingService extends LatafiInjectableService {
     }
   }
 
-  private readonly _previouseBlockElemets: HTMLElement[] = [];
-
   private setPreviouseBlock() {
-    if (this._previouseBlockElemets.length > 0) {
-      const previouseBlockEl = this._previouseBlockElemets.pop();
+    if (this._previouseBlockComponents.length > 0) {
+      const previouseBlockComp = this._previouseBlockComponents.pop();
 
-      this._componentVisualEditorService.wrapperElement = previouseBlockEl;
+      this._store.dispatch(wrapperComponentsRebuildAction({ components: [previouseBlockComp] }));
+
+      this._store.dispatch(setWrapperComponentAction({
+        uniqueClassName: previouseBlockComp.uniqueClassName,
+        wrapperComponentId: previouseBlockComp.wrapperComponentId
+      }));
+
+      // this._componentVisualEditorService.wrapperElement = previouseBlockEl;
+
       // this._componentVisualEditorService.updateLatafiComponentDirective();
     }
   }
 
   private setEditorToBlock() {
-    if (!this._componentVisualEditorService.selectedElement
-      || !ComponentVisualEditorService.isComponentContainer(this._componentVisualEditorService.selectedElement.nativeElement)) {
+    if (!this._selectedComponent
+      || !ComponentVisualEditorService.isComponentContainer(this._selectedComponent.baseEl)) {
       console.warn('Selected element is empty or not Component Container');
       return;
     }
 
-    this._previouseBlockElemets.push(this._componentVisualEditorService.wrapperElement);
+    this._previouseBlockComponents.push(this._wrapperComponent);
 
-    this._componentVisualEditorService.wrapperElement = this._componentVisualEditorService.selectedElement.nativeElement;
+    this._store.dispatch(setWrapperComponentAction({
+      uniqueClassName: this._selectedComponent.uniqueClassName,
+      wrapperComponentId: this._wrapperComponent.uniqueClassName
+    }));
+
+    // this._componentVisualEditorService.wrapperElement = this._componentVisualEditorService.selectedElement.nativeElement; !!
     // this._componentVisualEditorService.updateLatafiComponentDirective();
 
-    this.setBlockDimenisions(this._componentVisualEditorService.wrapperElement);
+    // this.setBlockDimenisions(this._componentVisualEditorService.wrapperElement); !!
   }
 
-  private setBlockDimenisions(blockEL: HTMLElement) {
+  setBlockDimenisions(blockEL: HTMLElement) {
     let right = 0;
     let bottom = 0;
 

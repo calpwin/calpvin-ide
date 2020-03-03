@@ -2,6 +2,7 @@ import { Injectable, ElementRef, ComponentFactoryResolver, ViewContainerRef, Com
 import { LatafiInjectableService } from '@latafi/core/src/lib/services/injectable.service';
 import { ComponentVisualEditorService } from '@latafi/component-visual-editor';
 import { ComponentPropertyEditorComponent } from './component-property-editor.component';
+import { Store } from '@ngrx/store';
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +10,8 @@ import { ComponentPropertyEditorComponent } from './component-property-editor.co
 export class ComponentPropertyEditorService extends LatafiInjectableService {
   constructor(
     private readonly _componentVisualEditorService: ComponentVisualEditorService,
-    private readonly componentFactoryResolver: ComponentFactoryResolver) {
+    private readonly componentFactoryResolver: ComponentFactoryResolver,
+    private readonly _store: Store<any>) {
     super();
   }
 
@@ -20,15 +22,10 @@ export class ComponentPropertyEditorService extends LatafiInjectableService {
 
   onBaseAppConstruct() {
     this._componentVisualEditorService.onPropertyEditorWrapperInit.subscribe(this.onPropertyEditorWrapperInit);
-    this._componentVisualEditorService.onSelectElement.subscribe(this.onEditorElementSelect);
   }
 
   private onPropertyEditorWrapperInit = (wrapper: ViewContainerRef) => {
     const compFactory = this.componentFactoryResolver.resolveComponentFactory(ComponentPropertyEditorComponent);
     this._propertyEditorComponentRef = wrapper.createComponent(compFactory);
-  }
-
-  private onEditorElementSelect = (el: ElementRef) => {
-    this._propertyEditorComponentRef.instance.editorSelectedEl = el;
   }
 }

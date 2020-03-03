@@ -1,15 +1,10 @@
 import { Component, OnInit, ElementRef, ChangeDetectorRef, Renderer2 } from '@angular/core';
-import { ComponentVisualEditorService } from '@latafi/component-visual-editor/src/public-api';
-import { WorkspaceService } from '@latafi/core/src/lib/services/workspace.service';
-import { VirtualFileTreeService } from '@latafi/core/src/lib/services/virtual-tree.service';
-import { tryGetNode, setCssValue } from '@latafi/core/src/lib/extension/csstree-walker.extension';
-import { CssNode, Rule } from 'css-tree';
-import * as csstree from 'css-tree';
-import { LatafiComponentDirective } from '@latafi/component-visual-editor/src/lib/directives/latafi-component.directive';
-import { EventManagerService } from '@latafi/core/src/lib/services/event-manager.service';
-import { VirtualFile, EventType, EventManager, IdeFormatDocumentCommandData } from 'calpvin-ide-shared';
+import { ComponentVisualEditorService, lastSelectedComponentSelector, wrapperComponentSelector } from '@latafi/component-visual-editor/src/public-api';
 import { MatButtonToggleChange } from '@angular/material/button-toggle';
 import { FlexboxWrapperModel } from './flexbox-wrapper-model';
+import { Store } from '@ngrx/store';
+import { LatafiComponent } from '@latafi/component-visual-editor/src/lib/services/component-visual-editor.service/reducer/latafi-component';
+import { take } from 'rxjs/operators';
 
 @Component({
   selector: 'latafi-component-property-editor',
@@ -21,63 +16,55 @@ export class ComponentPropertyEditorComponent implements OnInit {
   constructor(
     private readonly _componentVisualEditorService: ComponentVisualEditorService,
     private readonly _changeDedectionRef: ChangeDetectorRef,
-    private readonly _elementRef: ElementRef,
-    private readonly _workspaceService: WorkspaceService,
-    private readonly _virtualFileTreeService: VirtualFileTreeService,
-    private readonly _eventManagerService: EventManagerService,
-    private readonly _renderer2: Renderer2) {
+    private readonly _store: Store<any>) {
   }
 
   cssProperty: string;
   cssValue: string;
+  selectedComponent?: LatafiComponent;
 
   private _flexboxWrapperModel = new FlexboxWrapperModel();
-
-  private _editorSelectedEl: ElementRef<HTMLElement>;
-  public get editorSelectedEl(): ElementRef<HTMLElement> {
-    return this._editorSelectedEl;
-  }
-  public set editorSelectedEl(v: ElementRef<HTMLElement>) {
-    this._editorSelectedEl = v;
-
-    this._changeDedectionRef.detectChanges();
-  }
-
+  private _wrapperComponent?: LatafiComponent;
 
   ngOnInit(): void {
+    this._store.select(lastSelectedComponentSelector).subscribe(this.onEditorComponentSelect);
+    this._store.select(wrapperComponentSelector).subscribe(c => this._wrapperComponent = c);
+
     this._changeDedectionRef.detectChanges();
   }
 
-  onCssValueChange(event: KeyboardEvent) {
+  onCssValueChange = (event: KeyboardEvent) => {
     this._componentVisualEditorService.setElementStyle(this.cssProperty, this.cssValue);
   }
 
   onFlexboxActionChange(event: MatButtonToggleChange) {
-    if (!this._componentVisualEditorService.wrapperElement) { return; }
+    if (!this._wrapperComponent) { return; }
+
+    const wrapperEl = this._wrapperComponent.baseEl;
 
     const mainAxis = this._flexboxWrapperModel.flexDirection === 'row' ? 'justify-content' : 'align-items';
     const assendAxis = this._flexboxWrapperModel.flexDirection === 'column' ? 'justify-content' : 'align-items';
 
     switch (event.value) {
       case 'left':
-        this._componentVisualEditorService.setElementStyle(mainAxis, 'flex-start', this._componentVisualEditorService.wrapperElement);
+        this._componentVisualEditorService.setElementStyle(mainAxis, 'flex-start', wrapperEl);
         break;
       case 'center_vertical':
-        this._componentVisualEditorService.setElementStyle(mainAxis, 'center', this._componentVisualEditorService.wrapperElement);
+        this._componentVisualEditorService.setElementStyle(mainAxis, 'center', wrapperEl);
         break;
       case 'right':
-        this._componentVisualEditorService.setElementStyle(mainAxis, 'flex-end', this._componentVisualEditorService.wrapperElement);
+        this._componentVisualEditorService.setElementStyle(mainAxis, 'flex-end', wrapperEl);
         break;
 
       case 'top':
         this._componentVisualEditorService.setElementStyle(
-          assendAxis, 'flex-start', this._componentVisualEditorService.wrapperElement);
+          assendAxis, 'flex-start', wrapperEl);
         break;
       case 'center_horizontal':
-        this._componentVisualEditorService.setElementStyle(assendAxis, 'center', this._componentVisualEditorService.wrapperElement);
+        this._componentVisualEditorService.setElementStyle(assendAxis, 'center', wrapperEl);
         break;
       case 'bottom':
-        this._componentVisualEditorService.setElementStyle(assendAxis, 'flex-end', this._componentVisualEditorService.wrapperElement);
+        this._componentVisualEditorService.setElementStyle(assendAxis, 'flex-end', wrapperEl);
         break;
       default:
         break;
@@ -85,26 +72,31 @@ export class ComponentPropertyEditorComponent implements OnInit {
   }
 
   async onWrapperElFlexDirectionChange(event: MatButtonToggleChange) {
-    if (!this._componentVisualEditorService.wrapperElement) { return; }
+    if (!this._wrapperComponent) { return; }
+
+    const wrapperEl = this._wrapperComponent.baseEl;
 
     if (event.value === 'none') {
       this._flexboxWrapperModel.flexDirection = 'none';
-      await this.setWrapperElDisplayMod(this._componentVisualEditorService.wrapperElement, 'none');
+      await this.setWrapperElDisplayMod(wrapperEl, 'none');
     } else if (event.value === 'absolute') {
       this._flexboxWrapperModel.flexDirection = 'absolute';
-      await this.setWrapperElDisplayMod(this._componentVisualEditorService.wrapperElement, 'absolute');
+      await this.setWrapperElDisplayMod(wrapperEl, 'absolute');
     } else if (event.value === 'row') {
       this._flexboxWrapperModel.flexDirection = 'row';
-      await this.setWrapperElDisplayMod(this._componentVisualEditorService.wrapperElement, 'row');
-      await this._componentVisualEditorService.setElementStyle('flex-direction', 'row', this._componentVisualEditorService.wrapperElement);
+      await this.setWrapperElDisplayMod(wrapperEl, 'row');
+      await this._componentVisualEditorService.setElementStyle('flex-direction', 'row', wrapperEl);
     } else if (event.value === 'column') {
       this._flexboxWrapperModel.flexDirection = 'column';
-      await this.setWrapperElDisplayMod(this._componentVisualEditorService.wrapperElement, 'column');
+      await this.setWrapperElDisplayMod(wrapperEl, 'column');
       await this._componentVisualEditorService.setElementStyle(
-        'flex-direction', 'column', this._componentVisualEditorService.wrapperElement);
+        'flex-direction', 'column', wrapperEl);
     }
+  }
 
-
+  private onEditorComponentSelect = (comp: LatafiComponent) => {
+    this.selectedComponent = comp;
+    this._changeDedectionRef.detectChanges();
   }
 
   private async setWrapperElDisplayMod(wrapperEl: HTMLElement, displayVal: 'none' | 'absolute' | 'row' | 'column') {

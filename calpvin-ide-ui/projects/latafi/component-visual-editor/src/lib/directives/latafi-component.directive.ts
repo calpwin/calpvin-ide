@@ -147,10 +147,10 @@ export class LatafiComponentDirective implements OnInit, OnDestroy {
 
     // this._componentVisualEditorService.selectedElement = this.hostElement;
 
-    this._store.dispatch(setSelectedComponentAction({ uniqueClassName: this._uniqueClassName }));
-
     if (event.altKey)
-      this._componentVisualEditorService.addSelectElementToGroup(this.hostElement);
+      this._store.dispatch(setSelectedComponentAction({ uniqueClassName: this._uniqueClassName, toGroup: true }));
+    else
+      this._store.dispatch(setSelectedComponentAction({ uniqueClassName: this._uniqueClassName, toGroup: false }));
 
     if (event.ctrlKey) {
       const componentName = VirtualFileTreeService.getComponentName(this._workspaceService.activeComponent);

@@ -2,8 +2,9 @@ export class LatafiComponent {
   constructor(public readonly uniqueClassName: string, public readonly baseEl: HTMLElement) {
   }
 
+  isSelected = false;
   isWrapperEl = false;
-  wrapperComponent?: LatafiComponent;
+  wrapperComponentId?: string;
   wrapperDisplayMode: LatafiComponentDisplayMode;
 }
 
