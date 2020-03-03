@@ -52,9 +52,9 @@ export const addInnerComponentsAction = createAction(
   props<{ components: LatafiComponent[] }>());
 
 
-export const setLatafiComponentDisplayModeAction = createAction(
-  '[Component Visual Editor] Set latafi component display mode',
-  props<{ uniqueClassName: string, displayMode: LatafiComponentDisplayMode }>());
+export const setWrapperComponentDisplayModeAction = createAction(
+  '[Component Visual Editor] Set wrapper component display mode',
+  props<{ displayMode: LatafiComponentDisplayMode }>());
 
 export const setSelectedComponentAction = createAction(
   '[Component Visual Editor] Set selected component',
@@ -77,13 +77,11 @@ export const latafiComponentListReducer = createReducer(
   on(addInnerComponentsAction, (state, { components }) => {
     return { ...state, innerComponents: Array.from(components) }
   }),
-  on(setLatafiComponentDisplayModeAction, (state, { uniqueClassName, displayMode }) => {
-    const comps = Array.from(state.innerComponents);
-    if (state.wrapperComponent) { comps.push(state.wrapperComponent); }
-
-    const comp = comps.find(c => c.uniqueClassName === uniqueClassName) as LatafiComponent;
-
-    if (comp) { comp.wrapperDisplayMode = displayMode; }
+  on(setWrapperComponentDisplayModeAction, (state, { displayMode }) => {
+    if (state.wrapperComponent) {
+      state.wrapperComponent.wrapperDisplayMode = displayMode;
+      return { ...state, wrapperComponent: { ...state.wrapperComponent } };
+    }
 
     return { ...state };
   }),

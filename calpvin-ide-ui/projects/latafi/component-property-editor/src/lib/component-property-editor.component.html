@@ -16,7 +16,7 @@
       </mat-button-toggle>
     </mat-button-toggle-group>
 
-    <div class="align-items">
+    <div class="align-items" *ngIf="showAligns()">
       <mat-button-toggle-group (change)="onFlexboxActionChange($event)">
         <mat-button-toggle value="top" aria-label="Aling - Center">
           <mat-icon>border_top</mat-icon>

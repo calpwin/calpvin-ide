@@ -10,7 +10,6 @@ import { tryGetNode, setCssValue, removeCssProperty } from '@latafi/core/src/lib
 import { CssNode, Rule } from 'css-tree';
 import * as csstree from 'css-tree';
 import { throwError } from 'rxjs';
-import { take } from 'rxjs/operators';
 import { ComponentVisualEditorComponent } from '../../component-visual-editor.component';
 import { VisualComponentEditorState, lastSelectedComponentSelector, wrapperComponentSelector, setSelectedComponentAction, selectedComponentsSelector } from './reducer/latafi-component-list.reducer';
 import { Store, createSelector, createFeatureSelector, select } from '@ngrx/store';
@@ -18,7 +17,6 @@ import { LatafiComponent, LatafiComponentDisplayMode } from './reducer/latafi-co
 
 @Injectable({
   providedIn: 'root',
-
 })
 export class ComponentVisualEditorService extends LatafiInjectableService {
 
@@ -44,10 +42,6 @@ export class ComponentVisualEditorService extends LatafiInjectableService {
     this._isDeselectPreviouseEl = v;
   }
 
-  public get selectedElementGroup(): ElementRef[] {
-    return this._selectedElementGroup;
-  }
-
   private _wrapperComp?: LatafiComponent = undefined;
   private _selectedComp?: LatafiComponent = undefined;
 
@@ -68,8 +62,6 @@ export class ComponentVisualEditorService extends LatafiInjectableService {
   canvaEditorComponent: ComponentVisualEditorComponent;
 
   private _isDeselectPreviouseEl = true;
-
-  private _selectedElementGroup: ElementRef[] = [];
 
   private _directives: LatafiComponentDirective[] = []
 
@@ -94,20 +86,6 @@ export class ComponentVisualEditorService extends LatafiInjectableService {
     if (components?.length > 0) { this.updateLatafiComponentsDirective(components); }
   }
 
-  // public addSelectElementToGroup(v: ElementRef) {
-  //   // this._selectedElementGroup.push(v);
-
-  //   // this.onAddSelectElementToGroup.emit(v);
-
-  //   this._store.dispatch(setSelectedComponentAction({uniqueClassName}))
-  // }
-
-  // public removeSelectElementFromGroup(v: ElementRef) {
-  //   this._selectedElementGroup = this._selectedElementGroup.filter(x => x != v);
-
-  //   this.onRemoveSelectElementFromGroup.emit(v);
-  // }
-
   updateLatafiComponentsDirective(components: LatafiComponent[]) {
     this._directives.forEach(directive => directive.ngOnDestroy());
     this._directives = [];
@@ -127,9 +105,6 @@ export class ComponentVisualEditorService extends LatafiInjectableService {
 
       this._directives.push(directive);
     });
-  }
-
-  rebuildVisualEditor() {
   }
 
   async resetWrapperElementsPosition() {

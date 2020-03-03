@@ -1,9 +1,12 @@
 import { Component, OnInit, ElementRef, ChangeDetectorRef, Renderer2 } from '@angular/core';
-import { ComponentVisualEditorService, lastSelectedComponentSelector, wrapperComponentSelector } from '@latafi/component-visual-editor/src/public-api';
+import { ComponentVisualEditorService, lastSelectedComponentSelector, wrapperComponentSelector, setWrapperComponentDisplayModeAction } from '@latafi/component-visual-editor/src/public-api';
 import { MatButtonToggleChange } from '@angular/material/button-toggle';
 import { FlexboxWrapperModel } from './flexbox-wrapper-model';
 import { Store } from '@ngrx/store';
-import { LatafiComponent } from '@latafi/component-visual-editor/src/lib/services/component-visual-editor.service/reducer/latafi-component';
+import {
+  LatafiComponent,
+  LatafiComponentDisplayMode
+} from '@latafi/component-visual-editor/src/lib/services/component-visual-editor.service/reducer/latafi-component';
 import { take } from 'rxjs/operators';
 
 @Component({
@@ -22,13 +25,21 @@ export class ComponentPropertyEditorComponent implements OnInit {
   cssProperty: string;
   cssValue: string;
   selectedComponent?: LatafiComponent;
+  wrapperComponentDisplayMode: LatafiComponentDisplayMode;
 
   private _flexboxWrapperModel = new FlexboxWrapperModel();
   private _wrapperComponent?: LatafiComponent;
 
+  showAligns = () =>
+    this.wrapperComponentDisplayMode === LatafiComponentDisplayMode.FlexRow
+    || this.wrapperComponentDisplayMode === LatafiComponentDisplayMode.FlexColumn
+
   ngOnInit(): void {
     this._store.select(lastSelectedComponentSelector).subscribe(this.onEditorComponentSelect);
-    this._store.select(wrapperComponentSelector).subscribe(c => this._wrapperComponent = c);
+    this._store.select(wrapperComponentSelector).subscribe(c => {
+      this._wrapperComponent = c;
+      this.wrapperComponentDisplayMode = c?.wrapperDisplayMode;
+    });
 
     this._changeDedectionRef.detectChanges();
   }
@@ -42,8 +53,9 @@ export class ComponentPropertyEditorComponent implements OnInit {
 
     const wrapperEl = this._wrapperComponent.baseEl;
 
-    const mainAxis = this._flexboxWrapperModel.flexDirection === 'row' ? 'justify-content' : 'align-items';
-    const assendAxis = this._flexboxWrapperModel.flexDirection === 'column' ? 'justify-content' : 'align-items';
+    const mainAxis = this._flexboxWrapperModel.flexDirection === LatafiComponentDisplayMode.FlexRow ? 'justify-content' : 'align-items';
+    // tslint:disable-next-line: max-line-length
+    const assendAxis = this._flexboxWrapperModel.flexDirection === LatafiComponentDisplayMode.FlexColumn ? 'justify-content' : 'align-items';
 
     switch (event.value) {
       case 'left':
@@ -77,21 +89,19 @@ export class ComponentPropertyEditorComponent implements OnInit {
     const wrapperEl = this._wrapperComponent.baseEl;
 
     if (event.value === 'none') {
-      this._flexboxWrapperModel.flexDirection = 'none';
-      await this.setWrapperElDisplayMod(wrapperEl, 'none');
+      this._flexboxWrapperModel.flexDirection = LatafiComponentDisplayMode.Relative;
     } else if (event.value === 'absolute') {
-      this._flexboxWrapperModel.flexDirection = 'absolute';
-      await this.setWrapperElDisplayMod(wrapperEl, 'absolute');
+      this._flexboxWrapperModel.flexDirection = LatafiComponentDisplayMode.Absolute;
     } else if (event.value === 'row') {
-      this._flexboxWrapperModel.flexDirection = 'row';
-      await this.setWrapperElDisplayMod(wrapperEl, 'row');
+      this._flexboxWrapperModel.flexDirection = LatafiComponentDisplayMode.FlexRow;
       await this._componentVisualEditorService.setElementStyle('flex-direction', 'row', wrapperEl);
     } else if (event.value === 'column') {
-      this._flexboxWrapperModel.flexDirection = 'column';
-      await this.setWrapperElDisplayMod(wrapperEl, 'column');
+      this._flexboxWrapperModel.flexDirection = LatafiComponentDisplayMode.FlexColumn;
       await this._componentVisualEditorService.setElementStyle(
         'flex-direction', 'column', wrapperEl);
     }
+
+    await this.setWrapperElDisplayMod(wrapperEl, this._flexboxWrapperModel.flexDirection);
   }
 
   private onEditorComponentSelect = (comp: LatafiComponent) => {
@@ -99,10 +109,13 @@ export class ComponentPropertyEditorComponent implements OnInit {
     this._changeDedectionRef.detectChanges();
   }
 
-  private async setWrapperElDisplayMod(wrapperEl: HTMLElement, displayVal: 'none' | 'absolute' | 'row' | 'column') {
+  private async setWrapperElDisplayMod(wrapperEl: HTMLElement, displayMode: LatafiComponentDisplayMode) {
+    this._store.dispatch(
+      setWrapperComponentDisplayModeAction({ displayMode }));
+
     await this._componentVisualEditorService.resetWrapperElementsPosition();
 
-    if (displayVal === 'row' || displayVal === 'column') {
+    if (displayMode === LatafiComponentDisplayMode.FlexRow || displayMode === LatafiComponentDisplayMode.FlexColumn) {
       await this._componentVisualEditorService.setElementStyle('display', 'flex', wrapperEl);
     } else {
       await this._componentVisualEditorService.setElementStyle('display', 'block', wrapperEl);
@@ -111,7 +124,7 @@ export class ComponentPropertyEditorComponent implements OnInit {
     for (let index = 0; index < wrapperEl.children.length; index++) {
       const element = wrapperEl.children[index];
 
-      if (displayVal === 'absolute') {
+      if (displayMode === LatafiComponentDisplayMode.Absolute) {
         await this._componentVisualEditorService.setElementStyle('position', 'absolute', element as HTMLElement);
       } else {
         await this._componentVisualEditorService.setElementStyle('position', 'relative', element as HTMLElement);

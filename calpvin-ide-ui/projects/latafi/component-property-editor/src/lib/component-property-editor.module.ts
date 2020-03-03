@@ -9,6 +9,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { CommonModule } from '@angular/common';
+import { StoreModule } from '@ngrx/store';
 
 @NgModule({
   declarations: [ComponentPropertyEditorComponent],
@@ -19,7 +20,8 @@ import { CommonModule } from '@angular/common';
     FormsModule,
     ReactiveFormsModule,
     MatIconModule,
-    MatButtonToggleModule
+    MatButtonToggleModule,
+    StoreModule
   ],
   exports: [
     CommonModule,
@@ -37,7 +39,7 @@ export class ComponentPropertyEditorModule {
     return {
       ngModule: ComponentPropertyEditorModule,
       providers: [
-        { provide: LatafiInjectableService, useClass: ComponentPropertyEditorService, multi: true }]
+        { provide: LatafiInjectableService, useExisting: ComponentPropertyEditorService, multi: true }]
     };
   }
 }
