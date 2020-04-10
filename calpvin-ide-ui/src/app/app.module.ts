@@ -11,6 +11,7 @@ import { ComponentPropertyEditorModule } from '@latafi/component-property-editor
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { StoreModule } from '@ngrx/store';
+import { LanguageModule } from 'projects/latafi/language/src/public-api';
 
 @NgModule({
   declarations: [
@@ -26,7 +27,8 @@ import { StoreModule } from '@ngrx/store';
     StoreModule.forRoot({ }),
     LatafiCoreModule.forRoot(),
     ComponentVisualEditorModule.forRoot(),
-    ComponentPropertyEditorModule.forRoot()
+    ComponentPropertyEditorModule.forRoot(),
+    LanguageModule
   ],
   providers: [],
   bootstrap: [AppComponent]

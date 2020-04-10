@@ -31,6 +31,10 @@
       "@latafi/core": [
         "dist/latafi/core/latafi-core",
         "dist/latafi/core"
+      ],
+      "@latafi/language": [
+        "dist/latafi/language/latafi-language",
+        "dist/latafi/language"
       ]
     }
   },
