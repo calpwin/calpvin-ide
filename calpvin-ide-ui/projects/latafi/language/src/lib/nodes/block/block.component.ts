@@ -1,34 +1,36 @@
-import { Component, OnInit, ViewContainerRef, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, OnInit, ViewContainerRef, ViewChild, ChangeDetectorRef, AfterViewChecked } from '@angular/core';
 import { NodeComponent } from '../node.component';
 import { BlockNode } from './block.node';
 
 @Component({
   selector: 'ltfy-block',
   template: `
-    <div style="">
+    <div class='node' style="" [ngStyle]="setNodeStyle(node)">
       <ng-template #nodePlace1></ng-template>
     </div>
   `,
-  styles: []
+  styles: [``]
 })
-export class BlockComponent extends NodeComponent implements OnInit, AfterViewInit {
+export class BlockComponent extends NodeComponent implements OnInit, AfterViewChecked {
   node: BlockNode;
 
   @ViewChild('nodePlace1', { read: ViewContainerRef }) nodePlace1Ref: ViewContainerRef;
 
-  constructor() {
+  constructor(private cdRef: ChangeDetectorRef) {
     super();
+
+    this.cdRef.detach();
   }
 
   ngOnInit(): void {
   }
 
-  ngAfterViewInit(): void {
+  ngAfterViewChecked(): void {
+    this.cdRef.detectChanges();
+    this.cdRef.reattach();
+
     this.nodePLaces.push(this.nodePlace1Ref);
 
-    this.afterViewInit.emit();
-  }
-
-  onClick() {
+    this.afterViewInitLont.emit();
   }
 }

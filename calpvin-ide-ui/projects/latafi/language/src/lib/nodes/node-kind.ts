@@ -1,5 +1,6 @@
 export enum NodeKind {
   Block = 1,
-  IfStatement = 2,
-  PropertyAccessExpression = 3
+  NodePLace = 2,
+  IfStatement = 3,
+  PropertyAccessExpression = 4
 }

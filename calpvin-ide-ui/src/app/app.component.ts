@@ -33,33 +33,15 @@ export class AppComponent implements OnInit {
   @ViewChild('ideEditor', { read: ElementRef, static: true }) _canvaEditorLayoutElRef: ElementRef<HTMLElement>;
 
   async ngOnInit() {
-    this._eventManagerService.init(
-      window,
-      (this._ideLayoutElRef.nativeElement.querySelector('iframe') as any).contentWindow,
-      this.messageEventListener);
+    // this._eventManagerService.init(
+    //   window,
+    //   (this._ideLayoutElRef.nativeElement.querySelector('iframe') as any).contentWindow,
+    //   this.messageEventListener);
 
-    this.initExtensions();
+    // this.initExtensions();
 
-    this._layoutService.canvaEditorLayoutElRef = this._canvaEditorLayoutElRef;
-    this._layoutService.ideLayoutElRef = this._ideLayoutElRef;
-
-    // const newComp = new LatafiComponent('uniqueId', null);
-    // this._store.dispatch(addLatafiComponentAction({ newComp }));
-
-    // const selector = createSelector(
-    //   createFeatureSelector<LatafiComponentListState>('visualComponentEditorFeature'),
-    //   (state: LatafiComponentListState) => state.innerComponents);
-
-    // this._store.select(selector).subscribe(v => console.log(v));
-
-    // // const newComp2 = new LatafiComponent('uniqueId2', null);
-    // // this._store.dispatch(addLatafiComponentAction({ newComp: newComp2 }));
-
-    // this._store.dispatch(setLatafiComponentDisplayModeAction(
-    //   { uniqueClassName: 'uniqueId', displayMode: LatafiComponentDisplayMode.FlexColumn }));
-
-
-    // this.enablePanelSplit();
+    // this._layoutService.canvaEditorLayoutElRef = this._canvaEditorLayoutElRef;
+    // this._layoutService.ideLayoutElRef = this._ideLayoutElRef;
   }
 
   private initExtensions() {
@@ -96,12 +78,12 @@ export class AppComponent implements OnInit {
 
   }
 
-  @HostListener('document:keydown', ['$event'])
-  onKeydownHandler(event: KeyboardEvent) {
-    if (event.altKey && event.key === 'q') {
-      this._layoutService.collapse();
-    } else if (event.altKey && event.key === 's') {
-      this.virtualFileTree.saveAsync();
-    }
-  }
+  // @HostListener('document:keydown', ['$event'])
+  // onKeydownHandler(event: KeyboardEvent) {
+  //   if (event.altKey && event.key === 'q') {
+  //     this._layoutService.collapse();
+  //   } else if (event.altKey && event.key === 's') {
+  //     this.virtualFileTree.saveAsync();
+  //   }
+  // }
 }

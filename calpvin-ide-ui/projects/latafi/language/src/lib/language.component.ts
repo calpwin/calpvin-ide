@@ -2,18 +2,28 @@ import { Component, OnInit, ChangeDetectorRef, ViewChild, ViewContainerRef, Comp
 import * as ts from 'typescript';
 import { IfStatementNode } from './nodes/if-statement/if-statement.node';
 import { Node } from './nodes/node';
-import { copyFile } from 'fs';
 import { NodePlace } from './nodes/node-place';
 import { PropertyAccessExpressionNode } from './nodes/property-access-expression/property-access-expression.node';
 import { BlockNode } from './nodes/block/block.node';
 import { NodeKind } from './nodes/node-kind';
+import { NodePlaceComponent } from './nodes/node-place.component';
 
 const tsCode = `
 {
-  if (A.B.C) {
+  A.LogUser;
+
+  if () {
+    A.Call();
   }
 
-  if (Andrey.IsLoggedIn) {
+  if (A.B) {
+    A.B();
+
+    B.C();
+
+    if () {
+      k.c();
+    }
   }
 }
 `;
@@ -23,7 +33,7 @@ const tsCode = `
   template: `
     <ng-template #dynamicNodes></ng-template>
   `,
-  styles: []
+  styleUrls: ['language.component.scss']
 })
 export class LanguageComponent implements AfterViewInit, OnInit {
 
@@ -76,11 +86,17 @@ export class LanguageComponent implements AfterViewInit, OnInit {
           this.matchNode(node, ifNode);
           break;
         case ts.SyntaxKind.PropertyAccessExpression:
+        case ts.SyntaxKind.ExpressionStatement:
         case ts.SyntaxKind.Identifier:
-          if (toParentNode.nodePlaces.length === 0) { break; }
+        case ts.SyntaxKind.CallExpression:
+          if (toParentNode.kind !== NodeKind.Block && toParentNode.nodePlaces.length === 0) { break; }
+
+          if (ts.isIdentifier(node) && node.getText() === '') { nodePLacePosition++; return; }
 
           // const propAccessPlace = this.currentPlace.currentNode.nodePlaces[0];
-          const propAccessNode = new PropertyAccessExpressionNode(node as ts.PropertyAccessExpression);
+          const propAccessNode = new PropertyAccessExpressionNode(
+            node as ts.PropertyAccessExpression | ts.Identifier | ts.ExpressionStatement | ts.CallExpression);
+          propAccessNode.independent = toParentNode.kind === NodeKind.Block ? true : false;
           // this.currentPlace = propAccessPlace;
 
           this.addNode(propAccessNode, toParentNode, nodePLacePosition);
@@ -95,7 +111,7 @@ export class LanguageComponent implements AfterViewInit, OnInit {
   }
 
   private addNode(node: Node, toNode: Node, nodePLacePosition: number) {
-    if (toNode.kind === NodeKind.Block) {
+    if (toNode.kind === NodeKind.Block && toNode.nodePlaces.length - 1 < nodePLacePosition) {
       const _nodePlace = new NodePlace(['any']);
       _nodePlace.currentNode = node;
       toNode.nodePlaces.push(_nodePlace);
@@ -104,20 +120,35 @@ export class LanguageComponent implements AfterViewInit, OnInit {
     }
   }
 
-  private renderNodePlace(nodePlace: NodePlace, viewContainer: ViewContainerRef) {
-    const componentFactory = this.componentFactoryResolver.resolveComponentFactory(nodePlace.currentNode.NodeComponentType);
-    const viewCompRef = viewContainer.createComponent(componentFactory);
-    viewCompRef.instance.node = nodePlace.currentNode;
+  private timeoutExeced = false;
 
-    const subscription = viewCompRef.instance.afterViewInit.subscribe(() => {
-      for (let index = 0; index < nodePlace.currentNode.nodePlaces.length; index++) {
-        const np = nodePlace.currentNode.nodePlaces[index];
+  private renderNodePlace(nodePlace: NodePlace, viewContainer: ViewContainerRef) {
+    const currentNode = nodePlace.currentNode ?? nodePlace;
+
+    const componentFactory = this.componentFactoryResolver.resolveComponentFactory(currentNode.NodeComponentType);
+    const viewCompRef = viewContainer.createComponent(componentFactory);
+    viewCompRef.instance.node = currentNode;
+
+    // const subscription = viewCompRef.instance.afterViewInitLont.subscribe(() => {
+    //   for (let index = 0; index < nodePlace.currentNode.nodePlaces.length; index++) {
+    //     const np = nodePlace.currentNode.nodePlaces[index];
+
+    //     this.renderNodePlace(np, viewCompRef.instance.nodePLaces[index]);
+    //   }
+
+    //   subscription.unsubscribe();
+    // });
+
+    setTimeout(() => {
+      for (let index = 0; index < currentNode.nodePlaces.length; index++) {
+        const np = currentNode.nodePlaces[index];
 
         this.renderNodePlace(np, viewCompRef.instance.nodePLaces[index]);
       }
 
-      subscription.unsubscribe();
-    });
+      this.timeoutExeced = true;
+      // subscription.unsubscribe();
+    }, 0.01);
   }
 
   renderNodes() {

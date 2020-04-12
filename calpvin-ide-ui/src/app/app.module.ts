@@ -11,7 +11,7 @@ import { ComponentPropertyEditorModule } from '@latafi/component-property-editor
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { StoreModule } from '@ngrx/store';
-import { LanguageModule } from 'projects/latafi/language/src/public-api';
+import { LanguageModule, LanguageComponent } from 'projects/latafi/language/src/public-api';
 
 @NgModule({
   declarations: [
@@ -31,6 +31,6 @@ import { LanguageModule } from 'projects/latafi/language/src/public-api';
     LanguageModule
   ],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [LanguageComponent]
 })
 export class AppModule { }

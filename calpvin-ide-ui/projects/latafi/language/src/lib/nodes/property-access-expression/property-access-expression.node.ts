@@ -14,12 +14,16 @@ export class PropertyAccessExpressionNode extends Node {
   NodeComponentType: Type<NodeComponent> = PropertyAccessExpressionComponent;
 
   constructor(
-    public node: ts.PropertyAccessExpression | ts.Identifier) {
+    public node: ts.PropertyAccessExpression | ts.Identifier | ts.ExpressionStatement | ts.CallExpression) {
     super();
 
     if (ts.isIdentifier(node)) {
       this.state.expressionText = node.text;
     } else if (ts.isPropertyAccessExpression(node)) {
+      this.state.expressionText = node.getFullText();
+    } else if (ts.isExpressionStatement(node)) {
+      this.state.expressionText = node.getFullText();
+    } else if (ts.isCallExpression(node)) {
       this.state.expressionText = node.getFullText();
     }
   }

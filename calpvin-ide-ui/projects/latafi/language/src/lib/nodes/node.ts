@@ -12,4 +12,6 @@ export abstract class Node {
   abstract readonly kind: NodeKind;
 
   abstract readonly nodePlaces: NodePlace[];
+
+  independent = true;
 }

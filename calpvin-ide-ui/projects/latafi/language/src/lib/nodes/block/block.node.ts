@@ -9,7 +9,9 @@ import { BlockComponent } from './block.component';
 export class BlockNode extends Node {
   kind = NodeKind.Block;
 
-  nodePlaces: NodePlace[] = [];
+  nodePlaces: NodePlace[] = [new NodePlace(['any'])];
+
+  independent = false;
 
   NodeComponentType: Type<NodeComponent> = BlockComponent;
 

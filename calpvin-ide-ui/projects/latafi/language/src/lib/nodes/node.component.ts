@@ -5,5 +5,15 @@ export abstract class NodeComponent {
   abstract node: Node;
   readonly nodePLaces: ViewContainerRef[] = [];
 
-  afterViewInit = new EventEmitter();
+  afterViewInitLont = new EventEmitter();
+
+  public setNodeStyle(node: Node): {} {
+    if (node?.independent === true) {
+      return {
+        margin: '20px'
+      };
+    } else {
+      return {};
+    }
+  }
 }
